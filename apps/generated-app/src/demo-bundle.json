@@ -1,0 +1,830 @@
+{
+  "bundleVersion": 1,
+  "generator": {
+    "name": "semantic-dapp",
+    "version": "0.0.1"
+  },
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "name": "Demo Token",
+  "chainId": 1,
+  "rpcUrl": "http://127.0.0.1:8545",
+  "contractName": "DemoToken",
+  "abi": [
+    {
+      "type": "function",
+      "name": "name",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "symbol",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "decimals",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint8"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "totalSupply",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "balanceOf",
+      "inputs": [
+        {
+          "name": "owner",
+          "type": "address"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "allowance",
+      "inputs": [
+        {
+          "name": "owner",
+          "type": "address"
+        },
+        {
+          "name": "spender",
+          "type": "address"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "transfer",
+      "inputs": [
+        {
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "approve",
+      "inputs": [
+        {
+          "name": "spender",
+          "type": "address"
+        },
+        {
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "transferFrom",
+      "inputs": [
+        {
+          "name": "from",
+          "type": "address"
+        },
+        {
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "mint",
+      "inputs": [
+        {
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "owner",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "transferOwnership",
+      "inputs": [
+        {
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "paused",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "pause",
+      "inputs": [],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "unpause",
+      "inputs": [],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "event",
+      "name": "Transfer",
+      "inputs": [
+        {
+          "name": "from",
+          "type": "address",
+          "indexed": true
+        },
+        {
+          "name": "to",
+          "type": "address",
+          "indexed": true
+        },
+        {
+          "name": "value",
+          "type": "uint256",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "Approval",
+      "inputs": [
+        {
+          "name": "owner",
+          "type": "address",
+          "indexed": true
+        },
+        {
+          "name": "spender",
+          "type": "address",
+          "indexed": true
+        },
+        {
+          "name": "value",
+          "type": "uint256",
+          "indexed": false
+        }
+      ]
+    }
+  ],
+  "manifest": {
+    "version": 1,
+    "project": {
+      "name": "Demo Token"
+    },
+    "contracts": [
+      {
+        "id": "contract",
+        "chainId": 1,
+        "name": "DemoToken",
+        "abiSource": "manual",
+        "standards": ["erc-20", "ownable", "pausable"]
+      }
+    ],
+    "operations": [
+      {
+        "id": "contract.allowance.a3e16738",
+        "contract": "contract",
+        "function": "allowance(address,address)",
+        "selector": "0xdd62ed3e",
+        "title": "Allowance",
+        "audience": "user",
+        "operationType": "read",
+        "isRead": true,
+        "confidence": 1,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "Matches erc-20 rule for allowance(address,address)",
+            "weight": 1
+          },
+          {
+            "source": "signature",
+            "detail": "allowance is a view/pure read"
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "inputs": [
+          {
+            "name": "owner",
+            "type": "address",
+            "widget": "address"
+          },
+          {
+            "name": "spender",
+            "type": "address",
+            "widget": "address"
+          }
+        ],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.approve.5d1a23e6",
+        "contract": "contract",
+        "function": "approve(address,uint256)",
+        "selector": "0x095ea7b3",
+        "title": "Approve spender",
+        "description": "Allow a spender to move tokens on your behalf.",
+        "audience": "user",
+        "operationType": "token-approve",
+        "isRead": false,
+        "confidence": 1,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "Matches erc-20 rule for approve(address,uint256)",
+            "weight": 1
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "risk": {
+          "level": "medium"
+        },
+        "inputs": [
+          {
+            "name": "spender",
+            "type": "address",
+            "widget": "address"
+          },
+          {
+            "name": "amount",
+            "type": "uint256",
+            "widget": "token-amount",
+            "token": "self"
+          }
+        ],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.balanceOf.af5cd17d",
+        "contract": "contract",
+        "function": "balanceOf(address)",
+        "selector": "0x70a08231",
+        "title": "Balance of",
+        "audience": "user",
+        "operationType": "read",
+        "isRead": true,
+        "confidence": 1,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "Matches erc-20 rule for balanceOf(address)",
+            "weight": 1
+          },
+          {
+            "source": "signature",
+            "detail": "balanceOf is a view/pure read"
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "inputs": [
+          {
+            "name": "owner",
+            "type": "address",
+            "widget": "address"
+          }
+        ],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.decimals.2e267c1c",
+        "contract": "contract",
+        "function": "decimals()",
+        "selector": "0x313ce567",
+        "title": "Decimals",
+        "audience": "user",
+        "operationType": "read",
+        "isRead": true,
+        "confidence": 1,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "Matches erc-20 rule for decimals()",
+            "weight": 1
+          },
+          {
+            "source": "signature",
+            "detail": "decimals is a view/pure read"
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "inputs": [],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.mint.7de30b37",
+        "contract": "contract",
+        "function": "mint(address,uint256)",
+        "selector": "0x40c10f19",
+        "title": "Mint tokens",
+        "description": "Create new tokens. Privileged.",
+        "audience": "admin",
+        "operationType": "token-mint",
+        "isRead": false,
+        "confidence": 1,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "Matches erc-20 rule for mint(address,uint256)",
+            "weight": 1
+          },
+          {
+            "source": "name",
+            "detail": "Function name \"mint\" suggests token-mint",
+            "weight": 0.5
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "risk": {
+          "level": "high"
+        },
+        "permission": {
+          "kind": "ownable"
+        },
+        "inputs": [
+          {
+            "name": "to",
+            "type": "address",
+            "widget": "address"
+          },
+          {
+            "name": "amount",
+            "type": "uint256",
+            "widget": "token-amount",
+            "token": "self"
+          }
+        ],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.name.62e66323",
+        "contract": "contract",
+        "function": "name()",
+        "selector": "0x06fdde03",
+        "title": "Name",
+        "audience": "user",
+        "operationType": "read",
+        "isRead": true,
+        "confidence": 1,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "Matches erc-20 rule for name()",
+            "weight": 1
+          },
+          {
+            "source": "signature",
+            "detail": "name is a view/pure read"
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "inputs": [],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.owner.362e1a05",
+        "contract": "contract",
+        "function": "owner()",
+        "selector": "0x8da5cb5b",
+        "title": "Owner",
+        "audience": "user",
+        "operationType": "read",
+        "isRead": true,
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "Matches ownable rule for owner()",
+            "weight": 0.9
+          },
+          {
+            "source": "signature",
+            "detail": "owner is a view/pure read"
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "inputs": [],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.pause.96168c56",
+        "contract": "contract",
+        "function": "pause()",
+        "selector": "0x8456cb59",
+        "title": "Pause",
+        "description": "Halt state-changing operations.",
+        "audience": "emergency",
+        "operationType": "pause",
+        "isRead": false,
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "Matches pausable rule for pause()",
+            "weight": 0.9
+          },
+          {
+            "source": "name",
+            "detail": "Function name \"pause\" suggests pause",
+            "weight": 0.5
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "risk": {
+          "level": "high"
+        },
+        "permission": {
+          "kind": "ownable"
+        },
+        "inputs": [],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.paused.58e8f652",
+        "contract": "contract",
+        "function": "paused()",
+        "selector": "0x5c975abb",
+        "title": "Paused",
+        "audience": "user",
+        "operationType": "read",
+        "isRead": true,
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "Matches pausable rule for paused()",
+            "weight": 0.9
+          },
+          {
+            "source": "signature",
+            "detail": "paused is a view/pure read"
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "inputs": [],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.symbol.07a2caa2",
+        "contract": "contract",
+        "function": "symbol()",
+        "selector": "0x95d89b41",
+        "title": "Symbol",
+        "audience": "user",
+        "operationType": "read",
+        "isRead": true,
+        "confidence": 1,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "Matches erc-20 rule for symbol()",
+            "weight": 1
+          },
+          {
+            "source": "signature",
+            "detail": "symbol is a view/pure read"
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "inputs": [],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.totalSupply.38fbfdd5",
+        "contract": "contract",
+        "function": "totalSupply()",
+        "selector": "0x18160ddd",
+        "title": "Total supply",
+        "audience": "user",
+        "operationType": "read",
+        "isRead": true,
+        "confidence": 1,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "Matches erc-20 rule for totalSupply()",
+            "weight": 1
+          },
+          {
+            "source": "signature",
+            "detail": "totalSupply is a view/pure read"
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "inputs": [],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.transfer.43dcf742",
+        "contract": "contract",
+        "function": "transfer(address,uint256)",
+        "selector": "0xa9059cbb",
+        "title": "Transfer tokens",
+        "description": "Send tokens to another address.",
+        "audience": "user",
+        "operationType": "token-transfer",
+        "isRead": false,
+        "confidence": 1,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "Matches erc-20 rule for transfer(address,uint256)",
+            "weight": 1
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "risk": {
+          "level": "low"
+        },
+        "inputs": [
+          {
+            "name": "to",
+            "type": "address",
+            "widget": "address"
+          },
+          {
+            "name": "amount",
+            "type": "uint256",
+            "widget": "token-amount",
+            "token": "self"
+          }
+        ],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.transferFrom.cd55216e",
+        "contract": "contract",
+        "function": "transferFrom(address,address,uint256)",
+        "selector": "0x23b872dd",
+        "title": "Transfer from",
+        "description": "Move tokens from one address to another using an allowance.",
+        "audience": "user",
+        "operationType": "token-transfer",
+        "isRead": false,
+        "confidence": 1,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "Matches erc-20 rule for transferFrom(address,address,uint256)",
+            "weight": 1
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "risk": {
+          "level": "medium"
+        },
+        "inputs": [
+          {
+            "name": "from",
+            "type": "address",
+            "widget": "address"
+          },
+          {
+            "name": "to",
+            "type": "address",
+            "widget": "address"
+          },
+          {
+            "name": "amount",
+            "type": "uint256",
+            "widget": "token-amount",
+            "token": "self"
+          }
+        ],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.transferOwnership.3cf1bf1a",
+        "contract": "contract",
+        "function": "transferOwnership(address)",
+        "selector": "0xf2fde38b",
+        "title": "Transfer ownership",
+        "description": "Hand control of the contract to a new owner.",
+        "audience": "admin",
+        "operationType": "ownership-transfer",
+        "isRead": false,
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "Matches ownable rule for transferOwnership(address)",
+            "weight": 0.9
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "risk": {
+          "level": "high"
+        },
+        "permission": {
+          "kind": "ownable"
+        },
+        "inputs": [
+          {
+            "name": "newOwner",
+            "type": "address",
+            "widget": "address"
+          }
+        ],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.unpause.f82efd0d",
+        "contract": "contract",
+        "function": "unpause()",
+        "selector": "0x3f4ba83a",
+        "title": "Unpause",
+        "description": "Resume state-changing operations.",
+        "audience": "emergency",
+        "operationType": "unpause",
+        "isRead": false,
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "Matches pausable rule for unpause()",
+            "weight": 0.9
+          },
+          {
+            "source": "name",
+            "detail": "Function name \"unpause\" suggests unpause",
+            "weight": 0.5
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "risk": {
+          "level": "medium"
+        },
+        "permission": {
+          "kind": "ownable"
+        },
+        "inputs": [],
+        "visibility": "visible",
+        "reviewed": false
+      }
+    ]
+  }
+}

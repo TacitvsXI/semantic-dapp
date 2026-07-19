@@ -9,6 +9,7 @@ import {
 import { applyReview } from '@semantic-dapp/classifier';
 import { GeneratedApp } from '@semantic-dapp/renderer';
 import { AuditLog, type AuditEntry } from '@semantic-dapp/components';
+import { buildBundle, bundleFilename } from '@semantic-dapp/export';
 import { useContractRuntime, type WriteRecord } from '../runtime/useContractRuntime.js';
 import { computeManifest, CONTRACT_ID } from '../state/manifest.js';
 import { saveProject } from '../state/storage.js';
@@ -59,6 +60,22 @@ export function ProjectView({ project: initialProject, onBack, onUpdated }: Proj
   };
 
   const persistManifest = (next: SemanticManifest) => persist(project, next);
+
+  // Package identity + ABI + reviewed manifest into a portable bundle the
+  // standalone template (or CLI-exported app) can render (ADR-009).
+  const exportApp = () => {
+    const bundle = buildBundle({
+      name: project.name,
+      chainId: project.contract.chainId,
+      // `Abi` (viem) is readonly; the bundle schema validates a mutable copy.
+      abi: project.abi as never,
+      manifest,
+      rpcUrl: project.rpcUrl,
+      ...(project.contract.address ? { address: project.contract.address } : {}),
+      ...(project.contract.name ? { contractName: project.contract.name } : {}),
+    });
+    downloadJson(bundleFilename(project.name), bundle);
+  };
 
   // Re-run classification on the current ABI (preserving reviewed edits) and
   // refresh the recorded implementation code hash so the staleness check resets.
@@ -210,6 +227,9 @@ export function ProjectView({ project: initialProject, onBack, onUpdated }: Proj
             onClick={() => downloadJson(`${project.name || 'manifest'}.manifest.json`, manifest)}
           >
             Export manifest
+          </button>
+          <button className="sd-btn sd-btn--write" onClick={exportApp}>
+            Export app
           </button>
           <button className="sd-btn sd-btn--ghost" onClick={() => fileInputRef.current?.click()}>
             Import manifest

@@ -60,7 +60,13 @@ Phase 7 (safety & diagnostics) is implemented
 untrusted text (bidi/zero-width/control/homoglyph) via `SafeText`, computes
 preflight `writeWarnings` (wrong network, unverified source, stale manifest,
 critical risk) surfaced in the ConfirmDialog, and the studio keeps a local,
-exportable execution history (audit trail) of every transaction.
+exportable execution history (audit trail) of every transaction. Phase 8 (export
+& CLI) is implemented ([checklist](progress/phase-8-export-cli.md),
+[ADR-009](adr/ADR-009-export-bundle-template.md), [guide](export.md)): a portable
+`SemanticBundle` (`packages/export`), a `semantic-dapp` CLI (`packages/cli`) that
+turns an ABI into a bundle, scaffolds a standalone app and serves it, and a
+`generated-app` template (`apps/generated-app`) that renders any bundle at runtime
+without the studio.
 
 ## In scope for the open-source MVP
 

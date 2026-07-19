@@ -1,6 +1,8 @@
 import type { Abi, AbiFunction, AbiEvent, AbiError, AbiParameter } from 'abitype';
 import { toFunctionSelector, toFunctionSignature, toEventSelector, toEventSignature } from 'viem';
 
+export type { Abi } from 'abitype';
+
 export type StateMutability = 'pure' | 'view' | 'nonpayable' | 'payable';
 
 export interface NormalizedParameter {

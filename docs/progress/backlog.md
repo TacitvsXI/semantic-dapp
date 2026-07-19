@@ -114,11 +114,21 @@ Pick these up between phases or when they naturally fold into a larger workstrea
 - [ ] Explorer links in the audit log (needs an `explorerUrl` in the studio
       runtime)
 
-## Phase 8 — Export & CLI (`export`, `cli`)
+## Phase 8 — Export & CLI (`export`, `cli`) — done (slice)
 
-- `generated-app` template; inject manifest on export
-- `npx semantic-dapp import | serve | export`
-- Static-hosting deployment verification
+- [x] Portable `SemanticBundle` (identity + ABI + manifest) with zod validation
+- [x] `generated-app` template renders a bundle at runtime (analyzer-free)
+- [x] Studio "Export app" button
+- [x] `semantic-dapp bundle | export | serve` CLI (+ `import` alias)
+- [x] Static-hosting friendly (SPA fallback serve; any static host works)
+- [ ] CLI address-based `import` (resolver-backed) — today `bundle` takes an ABI
+      file; the studio already resolves by address
+- [ ] Publish `@semantic-dapp/*` to npm for a true `npx semantic-dapp` and a
+      standalone `pnpm install` outside the monorepo
+- [ ] Extract a shared `app-kit` (wallet providers + runtime hook) so the studio
+      and template stop duplicating wiring
+- [ ] `export` that emits a prebuilt static `dist` (not just source) for
+      zero-toolchain hosting
 
 ## Phase 9 — Public beta
 

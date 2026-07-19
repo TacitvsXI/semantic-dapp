@@ -1,0 +1,39 @@
+import { useMemo, type ReactNode } from 'react';
+import { WagmiProvider } from 'wagmi';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
+import { buildWagmiConfig } from './config.js';
+
+const queryClient = new QueryClient();
+
+const rkTheme = darkTheme({
+  accentColor: '#3b82f6',
+  accentColorForeground: '#ffffff',
+  borderRadius: 'medium',
+  overlayBlur: 'small',
+});
+
+export interface AppProvidersProps {
+  chainId: number;
+  rpcUrl: string;
+  name?: string;
+  children: ReactNode;
+}
+
+/** Wallet + query providers for the standalone app, scoped to the bundle's chain. */
+export function AppProviders({ chainId, rpcUrl, name, children }: AppProvidersProps) {
+  const config = useMemo(
+    () => buildWagmiConfig({ chainId, rpcUrl, ...(name ? { name } : {}) }),
+    [chainId, rpcUrl, name],
+  );
+
+  return (
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <RainbowKitProvider theme={rkTheme} modalSize="compact">
+          {children}
+        </RainbowKitProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
+  );
+}

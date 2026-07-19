@@ -15,10 +15,24 @@ for the full plan.
 | 5     | Classification & routing | ✅ Done (slice)    |
 | 6     | Trusted UI components    | ✅ Done (slice)    |
 | 7     | Safety & diagnostics     | ✅ Done (slice)    |
-| 8     | Export & CLI             | ⬜ Not started     |
+| 8     | Export & CLI             | ✅ Done (slice)    |
 | 9     | Fixtures, docs, beta     | ⬜ Not started     |
 
-## Current phase: Phase 7 — Safety & Diagnostics
+## Current phase: Phase 8 — Export & CLI
+
+Detailed checklist: [`docs/progress/phase-8-export-cli.md`](docs/progress/phase-8-export-cli.md).
+
+A reviewed contract can now be **shipped as a standalone dApp** (ADR-009). The
+portable artifact is a **`SemanticBundle`** (`packages/export`) — identity + ABI +
+reviewed manifest in one validated JSON. The studio exports it with one click; the
+**`semantic-dapp` CLI** (`packages/cli`) produces it headlessly (`bundle`),
+scaffolds a standalone app (`export`) and previews it (`serve`); and the
+**`generated-app` template** (`apps/generated-app`) renders any bundle at runtime,
+analyzer-free, hostable on any static host. See
+[ADR-009](docs/adr/ADR-009-export-bundle-template.md) and
+[`docs/export.md`](docs/export.md).
+
+## Previous phase: Phase 7 — Safety & Diagnostics
 
 Detailed checklist: [`docs/progress/phase-7-safety-diagnostics.md`](docs/progress/phase-7-safety-diagnostics.md).
 
