@@ -4,6 +4,36 @@
   "private": true,
   "type": "module",
   "description": "Generate usable user dApps and admin consoles from EVM contract ABI, NatSpec and source code.",
+  "keywords": [
+    "ethereum",
+    "evm",
+    "smart-contracts",
+    "abi",
+    "dapp",
+    "web3",
+    "wallet",
+    "viem",
+    "wagmi",
+    "solidity",
+    "erc20",
+    "erc721",
+    "erc4626",
+    "accesscontrol",
+    "admin-panel",
+    "code-generation",
+    "developer-tools",
+    "typescript",
+    "self-hostable",
+    "open-source"
+  ],
+  "homepage": "https://github.com/TacitvsXI/semantic-dapp#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TacitvsXI/semantic-dapp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/TacitvsXI/semantic-dapp/issues"
+  },
   "license": "AGPL-3.0-only",
   "packageManager": "pnpm@10.13.1",
   "engines": {
