@@ -1,22 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { keccak256, toBytes } from 'viem';
 import type { ContractFunction, ContractModel } from '@semantic-dapp/spec';
 import { RoleManager, TxStatusView, type RoleOption } from '@semantic-dapp/components';
 import type { ContractRuntime } from '../runtime.js';
 import { useConfirm } from '../useConfirm.js';
-
-const ZERO_ROLE = `0x${'00'.repeat(32)}` as const;
-
-/**
- * Compute a role's bytes32 id from its constant name using the OpenZeppelin
- * convention: `DEFAULT_ADMIN_ROLE` is `0x00…0`; every other role constant is
- * `keccak256(bytes(NAME))`. Used as an offline fallback so the role dropdown
- * works even before an on-chain read confirms the exact value.
- */
-function computeRoleValue(name: string): `0x${string}` {
-  if (name === 'DEFAULT_ADMIN_ROLE') return ZERO_ROLE;
-  return keccak256(toBytes(name));
-}
+import { computeRoleValue, initialRoleOptions, isBytes32, roleGetters } from './roleDiscovery.js';
 
 export interface RoleManagerHostProps {
   model: ContractModel;
@@ -25,26 +12,6 @@ export interface RoleManagerHostProps {
 
 function findFn(model: ContractModel, signature: string): ContractFunction | undefined {
   return model.functions.find((f) => f.signature === signature);
-}
-
-/**
- * Role constant getters: no-arg view functions returning a single bytes32 whose
- * name mentions "role" (e.g. MINTER_ROLE, DEFAULT_ADMIN_ROLE). Their on-chain
- * values populate the role dropdown so users pick a role by name, not by hash.
- */
-function roleGetters(model: ContractModel): ContractFunction[] {
-  return model.functions.filter(
-    (f) =>
-      f.isRead &&
-      f.inputs.length === 0 &&
-      f.outputs.length === 1 &&
-      f.outputs[0]!.type === 'bytes32' &&
-      /role/i.test(f.name),
-  );
-}
-
-function isBytes32(value: unknown): value is `0x${string}` {
-  return typeof value === 'string' && /^0x[0-9a-fA-F]{64}$/.test(value);
 }
 
 function isBusy(runtime: ContractRuntime, fn?: ContractFunction): boolean {
@@ -67,10 +34,7 @@ export function RoleManagerHost({ model, runtime }: RoleManagerHostProps) {
   // the picker working even before/without a live RPC, so role getters never
   // silently fall back to a bare hash field.
   const getters = useMemo(() => roleGetters(model), [model]);
-  const initialRoles = useMemo<RoleOption[]>(
-    () => getters.map((fn) => ({ name: fn.name, value: computeRoleValue(fn.name) })),
-    [getters],
-  );
+  const initialRoles = useMemo<RoleOption[]>(() => initialRoleOptions(model), [model]);
   const [roles, setRoles] = useState<RoleOption[]>(initialRoles);
   const { callRead } = runtime;
   useEffect(() => {
