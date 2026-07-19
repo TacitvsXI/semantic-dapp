@@ -560,6 +560,19 @@
   color: var(--sd-muted);
   overflow-wrap: anywhere;
 }
+.sd-roles__membership {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0;
+}
+.sd-roles__member--yes {
+  border-color: var(--sd-ok);
+  color: var(--sd-ok);
+}
+.sd-roles__member--no {
+  color: var(--sd-muted);
+}
 
 /* Overview */
 .sd-overview__chips {

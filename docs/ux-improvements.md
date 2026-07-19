@@ -42,6 +42,10 @@ form, so they need no further work — listed here so the baseline is clear:
   offers them in a **dropdown mapped to their bytes32 id**, so you grant/revoke a
   role by name instead of pasting a hash. A “Custom…” option keeps raw
   bytes32 / keccak256-name entry for anything not discovered.
+- **Role membership badges** — once you enter an account, the manager runs
+  `hasRole` for every discovered role and shows which ones it holds (✓/·), then
+  **disables no-op actions** (Grant for a role already held, Revoke for one it
+  doesn't). Wired in `RoleManagerHost` via `checkMembership`.
 - **Accessibility gate** — `@axe-core/playwright` fails the build on
   serious/critical violations on the standalone app (User + Raw tabs).
 - **WCAG AA contrast** — audience/risk badge text, the connect button
@@ -82,9 +86,6 @@ form, so they need no further work — listed here so the baseline is clear:
 - [ ] **Amount widgets with decimals** — render `token-amount` inputs with human
       units (respecting `decimals`), a MAX button, and balance hints; wire the
       manifest `InputDefinition` widgets into the generic form. (backlog: Phase 6)
-- [ ] **Role membership display** — after entering an account, show which of the
-      discovered roles it currently holds (`hasRole` reads) with a badge, and
-      disable grant/revoke when it would be a no-op. Builds on the new role picker.
 - [ ] **Diagnostics panel** — a green/warn/fail checklist (verified source,
       proxy, staleness, standards confidence, network) beyond the Overview
       summary, so a reviewer can judge trust at a glance. (backlog: Phase 7)

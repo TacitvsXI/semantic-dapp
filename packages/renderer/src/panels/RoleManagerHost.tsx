@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { ContractFunction, ContractModel } from '@semantic-dapp/spec';
 import { RoleManager, TxStatusView, type RoleOption } from '@semantic-dapp/components';
 import type { ContractRuntime } from '../runtime.js';
@@ -44,6 +44,7 @@ export function RoleManagerHost({ model, runtime }: RoleManagerHostProps) {
   const grantFn = findFn(model, 'grantRole(bytes32,address)');
   const revokeFn = findFn(model, 'revokeRole(bytes32,address)');
   const renounceFn = findFn(model, 'renounceRole(bytes32,address)');
+  const hasRoleFn = findFn(model, 'hasRole(bytes32,address)');
   const { confirm, dialog } = useConfirm();
 
   // Discover the contract's role constants and read their bytes32 values so the
@@ -75,6 +76,24 @@ export function RoleManagerHost({ model, runtime }: RoleManagerHostProps) {
       cancelled = true;
     };
   }, [getters, callRead]);
+
+  // Resolve which discovered roles an account currently holds via `hasRole`.
+  const checkMembership = useCallback(
+    async (account: `0x${string}`): Promise<Record<string, boolean>> => {
+      const out: Record<string, boolean> = {};
+      if (!hasRoleFn) return out;
+      for (const r of roles) {
+        try {
+          const result = await callRead(hasRoleFn, [r.value, account]);
+          out[r.name] = result[0]?.value === 'true';
+        } catch {
+          /* unreadable — leave this role out of the result */
+        }
+      }
+      return out;
+    },
+    [hasRoleFn, roles, callRead],
+  );
 
   const run = async (
     fn: ContractFunction | undefined,
@@ -110,6 +129,7 @@ export function RoleManagerHost({ model, runtime }: RoleManagerHostProps) {
         connectedAddress={runtime.wallet.address}
         busy={busy}
         roles={roles}
+        {...(hasRoleFn && roles.length > 0 ? { checkMembership } : {})}
         onGrant={(role, account) => void run(grantFn, 'Grant role', 'high', role, account)}
         onRevoke={(role, account) => void run(revokeFn, 'Revoke role', 'high', role, account)}
         onRenounce={(role, account) =>

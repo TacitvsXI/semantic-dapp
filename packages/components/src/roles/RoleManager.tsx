@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getAddress, isAddress, isHex, keccak256, toBytes } from 'viem';
 
 const DEFAULT_ADMIN_ROLE = '0x0000000000000000000000000000000000000000000000000000000000000000';
@@ -23,6 +23,12 @@ export interface RoleManagerProps {
    * option still allows a raw bytes32 / hashed name.
    */
   roles?: RoleOption[];
+  /**
+   * Resolve which discovered roles an account currently holds (name → held).
+   * When provided, the manager shows membership badges for the entered account
+   * and disables no-op grant/revoke. Should be stable (memoized) by the host.
+   */
+  checkMembership?: (account: `0x${string}`) => Promise<Record<string, boolean>>;
   onGrant?: (role: `0x${string}`, account: `0x${string}`) => void;
   onRevoke?: (role: `0x${string}`, account: `0x${string}`) => void;
   onRenounce?: (role: `0x${string}`, account: `0x${string}`) => void;
@@ -46,6 +52,7 @@ export function RoleManager({
   connectedAddress,
   busy,
   roles,
+  checkMembership,
   onGrant,
   onRevoke,
   onRenounce,
@@ -55,6 +62,7 @@ export function RoleManager({
   const [account, setAccount] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState('');
+  const [membership, setMembership] = useState<Record<string, boolean> | null>(null);
 
   const knownRoles = roles ?? [];
   const hasKnownRoles = knownRoles.length > 0;
@@ -63,6 +71,33 @@ export function RoleManager({
   const knownRole = hasKnownRoles
     ? knownRoles.find((r) => r.name === effectiveSelected)
     : undefined;
+
+  // Look up which roles the entered account holds (debounced), so the user sees
+  // current membership and no-op grants/revokes are disabled.
+  useEffect(() => {
+    const raw = account.trim();
+    if (!checkMembership || !hasKnownRoles || !isAddress(raw)) {
+      setMembership(null);
+      return;
+    }
+    let cancelled = false;
+    const handle = setTimeout(() => {
+      void checkMembership(getAddress(raw))
+        .then((result) => {
+          if (!cancelled) setMembership(result);
+        })
+        .catch(() => {
+          if (!cancelled) setMembership(null);
+        });
+    }, 400);
+    return () => {
+      cancelled = true;
+      clearTimeout(handle);
+    };
+  }, [account, checkMembership, hasKnownRoles]);
+
+  const selectedHeld =
+    knownRole && membership ? (membership[knownRole.name] ?? undefined) : undefined;
 
   const resolveRole = (): `0x${string}` | undefined => {
     if (hasKnownRoles && !isCustom) {
@@ -181,18 +216,40 @@ export function RoleManager({
         />
       </label>
 
+      {membership && hasKnownRoles ? (
+        <div className="sd-roles__membership" aria-label="Roles held by this account">
+          {knownRoles.map((r) => {
+            const held = membership[r.name] ?? false;
+            return (
+              <span
+                key={r.name}
+                className={`sd-badge sd-roles__member sd-roles__member--${held ? 'yes' : 'no'}`}
+              >
+                {held ? '✓' : '·'} {r.name}
+              </span>
+            );
+          })}
+        </div>
+      ) : null}
+
       {error ? <p className="sd-field__error">{error}</p> : null}
 
       <div className="sd-roles__actions">
         {canGrant ? (
-          <button className="sd-btn sd-btn--write" disabled={busy} onClick={() => run(onGrant)}>
+          <button
+            className="sd-btn sd-btn--write"
+            disabled={busy || selectedHeld === true}
+            title={selectedHeld === true ? 'Account already has this role' : undefined}
+            onClick={() => run(onGrant)}
+          >
             Grant
           </button>
         ) : null}
         {canRevoke ? (
           <button
             className="sd-btn sd-btn--emergency"
-            disabled={busy}
+            disabled={busy || selectedHeld === false}
+            title={selectedHeld === false ? 'Account does not have this role' : undefined}
             onClick={() => run(onRevoke)}
           >
             Revoke

@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { render, screen, fireEvent, cleanup } from '@testing-library/react';
+import { render, screen, fireEvent, cleanup, waitFor } from '@testing-library/react';
 import { keccak256, toBytes } from 'viem';
 import { RoleManager } from './RoleManager.js';
 
@@ -66,6 +66,30 @@ describe('RoleManager', () => {
     fireEvent.change(screen.getByRole('combobox'), { target: { value: '__custom__' } });
     // A custom role textbox appears alongside the account field.
     expect(screen.getAllByRole('textbox')).toHaveLength(2);
+  });
+
+  it('shows membership and disables a no-op grant for a held role', async () => {
+    render(
+      <RoleManager
+        canGrant
+        canRevoke
+        roles={[{ name: 'MINTER_ROLE', value: ROLE }]}
+        checkMembership={async () => ({ MINTER_ROLE: true })}
+        onGrant={() => {}}
+        onRevoke={() => {}}
+      />,
+    );
+    const grant = screen.getByRole('button', { name: 'Grant' }) as HTMLButtonElement;
+    const revoke = screen.getByRole('button', { name: 'Revoke' }) as HTMLButtonElement;
+    expect(grant.disabled).toBe(false);
+
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: ADDR } });
+
+    // After the membership lookup resolves, granting a held role is disabled but
+    // revoking it is allowed, and a "held" badge is shown.
+    await waitFor(() => expect(grant.disabled).toBe(true));
+    expect(revoke.disabled).toBe(false);
+    expect(screen.getByText(/✓ MINTER_ROLE/)).toBeTruthy();
   });
 
   it('applies the DEFAULT_ADMIN_ROLE preset', () => {
