@@ -65,6 +65,10 @@ form, so they need no further work — listed here so the baseline is clear:
   click.
 - **`initialChain`** — the connect/switch flow defaults to the project's (or
   bundle's) chain, cutting wrong-network prompts.
+- **Reads fall back to the wallet** — when the configured HTTP RPC is missing,
+  rate-limited, or CORS-blocked (the classic “HTTP request failed” on a read),
+  a connected wallet on the contract’s chain is used as a fallback transport, so
+  reads keep working. Studio + generated app (`createReadClientFor`).
 
 ## Prioritized backlog
 
@@ -81,7 +85,8 @@ form, so they need no further work — listed here so the baseline is clear:
       hashes, and the generated app URL, with a "copied" tick.
 - [ ] **Empty/loading/error polish** — skeletons for reads in flight, a clear
       "RPC unreachable" banner (vs. silent empty reads), and a first-run empty
-      state that points at "New import".
+      state that points at "New import". Now that reads fall back to the wallet,
+      the banner should distinguish "no RPC and no wallet" from a genuine revert.
 - [ ] **Inline validation in the generic form** — bring the Role manager's
       live "✓ accepted / checksummed / preview" feedback to the generic
       `FunctionForm` (per-field, as-you-type) so every parameter is confirmed

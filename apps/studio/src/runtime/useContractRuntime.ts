@@ -1,9 +1,9 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useAccount, useConnect, useDisconnect, useSwitchChain, useWalletClient } from 'wagmi';
-import type { Abi, Address } from 'viem';
+import type { Abi, Address, EIP1193Provider } from 'viem';
 import type { ContractFunction } from '@semantic-dapp/spec';
 import {
-  createPublicClientFor,
+  createReadClientFor,
   decodeExecutionError,
   estimateWriteGas,
   idleTxState,
@@ -31,21 +31,36 @@ export interface RuntimeHooks {
 }
 
 export function useContractRuntime(project: Project, hooks?: RuntimeHooks): ContractRuntime {
-  const publicClient = useMemo(
-    () =>
-      createPublicClientFor({
-        chainId: project.contract.chainId,
-        rpcUrl: project.rpcUrl,
-        name: project.contract.name ?? project.name,
-      }),
-    [project.contract.chainId, project.rpcUrl, project.contract.name, project.name],
-  );
-
   const { address, isConnected, chainId } = useAccount();
   const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
   const { switchChain } = useSwitchChain();
   const { data: walletClient } = useWalletClient();
+
+  // Reads go over the configured HTTP RPC, but fall back to the connected
+  // wallet's provider when it's on the contract's chain — so a connected user
+  // can still read even if the public RPC is missing/rate-limited/CORS-blocked.
+  const publicClient = useMemo(() => {
+    const onContractChain = isConnected && chainId === project.contract.chainId;
+    const provider =
+      onContractChain && walletClient ? (walletClient as unknown as EIP1193Provider) : undefined;
+    return createReadClientFor(
+      {
+        chainId: project.contract.chainId,
+        rpcUrl: project.rpcUrl,
+        name: project.contract.name ?? project.name,
+      },
+      provider,
+    );
+  }, [
+    project.contract.chainId,
+    project.rpcUrl,
+    project.contract.name,
+    project.name,
+    walletClient,
+    isConnected,
+    chainId,
+  ]);
 
   const [txStates, setTxStates] = useState<Record<string, TxState>>({});
   const setTx = useCallback((signature: string, state: TxState) => {

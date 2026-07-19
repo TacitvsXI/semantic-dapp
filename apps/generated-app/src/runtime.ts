@@ -1,9 +1,9 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useAccount, useConnect, useDisconnect, useSwitchChain, useWalletClient } from 'wagmi';
-import type { Abi, Address } from 'viem';
+import type { Abi, Address, EIP1193Provider } from 'viem';
 import type { ContractFunction } from '@semantic-dapp/spec';
 import {
-  createPublicClientFor,
+  createReadClientFor,
   decodeExecutionError,
   estimateWriteGas,
   idleTxState,
@@ -29,21 +29,28 @@ export interface RuntimeConfig {
  * template owns its own wiring (ADR-009).
  */
 export function useContractRuntime(config: RuntimeConfig): ContractRuntime {
-  const publicClient = useMemo(
-    () =>
-      createPublicClientFor({
-        chainId: config.chainId,
-        rpcUrl: config.rpcUrl,
-        ...(config.name ? { name: config.name } : {}),
-      }),
-    [config.chainId, config.rpcUrl, config.name],
-  );
-
   const { address, isConnected, chainId } = useAccount();
   const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
   const { switchChain } = useSwitchChain();
   const { data: walletClient } = useWalletClient();
+
+  // Reads use the configured HTTP RPC, but fall back to the connected wallet's
+  // provider (when on the contract's chain) so reads still work if the public
+  // RPC is missing/rate-limited/CORS-blocked.
+  const publicClient = useMemo(() => {
+    const onContractChain = isConnected && chainId === config.chainId;
+    const provider =
+      onContractChain && walletClient ? (walletClient as unknown as EIP1193Provider) : undefined;
+    return createReadClientFor(
+      {
+        chainId: config.chainId,
+        rpcUrl: config.rpcUrl,
+        ...(config.name ? { name: config.name } : {}),
+      },
+      provider,
+    );
+  }, [config.chainId, config.rpcUrl, config.name, walletClient, isConnected, chainId]);
 
   const [txStates, setTxStates] = useState<Record<string, TxState>>({});
   const setTx = useCallback((signature: string, state: TxState) => {
