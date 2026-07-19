@@ -2,7 +2,12 @@ import { useMemo, useState } from 'react';
 import type { ContractModel, SemanticManifest } from '@semantic-dapp/spec';
 import type { ContractRuntime } from './runtime.js';
 import { buildSections, groupOperations, type SectionId } from './sections.js';
-import { OperationCard, RawFunctionCard, type ReviewControls } from './OperationCard.js';
+import {
+  OperationCard,
+  RawFunctionCard,
+  type ReviewControls,
+  type SafetyContext,
+} from './OperationCard.js';
 import { TokenActions } from './TokenActions.js';
 import { OverviewSummary } from './OverviewSummary.js';
 import { PausePanelHost } from './panels/PausePanelHost.js';
@@ -20,6 +25,8 @@ export interface GeneratedAppProps {
   runtime: ContractRuntime;
   contractId?: string;
   review?: ReviewControls;
+  /** Contract-level safety signals used for preflight write warnings. */
+  safety?: { verified?: boolean; stale?: boolean };
 }
 
 /**
@@ -27,7 +34,14 @@ export interface GeneratedAppProps {
  * the semantic manifest, plus an always-present Raw tab listing every ABI
  * function. Each function's confidence and evidence are shown inline.
  */
-export function GeneratedApp({ manifest, model, runtime, contractId, review }: GeneratedAppProps) {
+export function GeneratedApp({
+  manifest,
+  model,
+  runtime,
+  contractId,
+  review,
+  safety,
+}: GeneratedAppProps) {
   const layout = useMemo(
     () => buildSections(manifest, model, contractId),
     [manifest, model, contractId],
@@ -37,6 +51,12 @@ export function GeneratedApp({ manifest, model, runtime, contractId, review }: G
     ? manifest.contracts.find((c) => c.id === contractId)
     : manifest.contracts[0];
   const isErc20 = activeContract?.standards.includes('erc-20') ?? false;
+
+  const safetyContext: SafetyContext = {
+    ...(activeContract?.chainId !== undefined ? { contractChainId: activeContract.chainId } : {}),
+    ...(safety?.verified !== undefined ? { verified: safety.verified } : {}),
+    ...(safety?.stale !== undefined ? { stale: safety.stale } : {}),
+  };
 
   const tabs: { id: SectionId; title: string; count: number }[] = [
     ...layout.sections.map((s) => ({ id: s.id, title: s.title, count: s.operations.length })),
@@ -106,6 +126,7 @@ export function GeneratedApp({ manifest, model, runtime, contractId, review }: G
                       view={view}
                       runtime={runtime}
                       review={review}
+                      safety={safetyContext}
                     />
                   ))}
                 </div>

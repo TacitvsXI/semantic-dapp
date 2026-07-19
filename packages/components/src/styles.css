@@ -587,3 +587,79 @@
   color: var(--sd-emergency);
   font-size: 12px;
 }
+
+/* ---- Phase 7: safety & diagnostics (ADR-008) ---- */
+
+.sd-safe-warn {
+  color: var(--sd-admin);
+  cursor: help;
+}
+
+/* Preflight warnings */
+.sd-warnings {
+  list-style: none;
+  margin: 10px 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+.sd-warning {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--sd-border);
+  background: var(--sd-surface-2);
+}
+.sd-warning__title {
+  font-size: 12px;
+}
+.sd-warning__detail {
+  font-size: 12px;
+  color: var(--sd-muted);
+}
+.sd-warning--danger {
+  border-color: var(--sd-emergency);
+}
+.sd-warning--danger .sd-warning__title {
+  color: var(--sd-emergency);
+}
+.sd-warning--warn {
+  border-color: var(--sd-admin);
+}
+.sd-warning--warn .sd-warning__title {
+  color: var(--sd-admin);
+}
+.sd-warning--info .sd-warning__title {
+  color: var(--sd-muted);
+}
+
+/* Execution history */
+.sd-audit__actions {
+  display: flex;
+  gap: 8px;
+}
+.sd-audit__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.sd-audit__table th,
+.sd-audit__table td {
+  text-align: left;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--sd-border);
+}
+.sd-audit__table th {
+  color: var(--sd-muted);
+  font-weight: 600;
+}
+.sd-audit__status--success {
+  color: var(--sd-ok);
+  border-color: var(--sd-ok);
+}
+.sd-audit__status--error {
+  color: var(--sd-emergency);
+  border-color: var(--sd-emergency);
+}

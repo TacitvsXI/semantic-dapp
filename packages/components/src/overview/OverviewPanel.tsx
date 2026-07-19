@@ -1,3 +1,5 @@
+import { SafeText } from '../components/SafeText.js';
+
 export interface OverviewPanelProps {
   contractName?: string;
   address?: string;
@@ -45,7 +47,9 @@ export function OverviewPanel({
     <section className="sd-card sd-overview">
       <header className="sd-card__header">
         <div>
-          <h3 className="sd-card__title">{contractName || 'Contract'}</h3>
+          <h3 className="sd-card__title">
+            <SafeText value={contractName} fallback="Contract" maxLength={80} />
+          </h3>
           {address ? <code className="sd-card__sig">{shorten(address)}</code> : null}
         </div>
         {chainId !== undefined ? (

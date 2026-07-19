@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { ContractFunction, Permission, RiskLevel } from '@semantic-dapp/spec';
+import type { ContractFunction, Permission, RiskLevel, SafetyWarning } from '@semantic-dapp/spec';
 import { FunctionForm, ReadResultView, TxStatusView } from '@semantic-dapp/components';
 import type { FormattedOutput } from '@semantic-dapp/execution';
 import { decodeExecutionError } from '@semantic-dapp/execution';
@@ -10,6 +10,8 @@ export interface RunnerConfirm {
   risk?: RiskLevel;
   permission?: Permission;
   title?: string;
+  /** Preflight warnings surfaced in the confirmation modal. */
+  warnings?: SafetyWarning[];
 }
 
 export interface FunctionRunnerProps {
@@ -69,6 +71,7 @@ export function FunctionRunner({ func, runtime, confirm, submitLabel }: Function
         permission: confirm.permission,
         signature: func.signature,
         summary: summarizeArgs(func.inputs, args),
+        warnings: confirm.warnings,
       });
       if (!ok) return;
     }

@@ -54,6 +54,13 @@ components) is implemented ([checklist](progress/phase-6-trusted-ui.md),
 [ADR-007](adr/ADR-007-trusted-ui-dispatch.md)): an Overview summary, grouped Pause
 and Role consoles dispatched by `operationType`, and a reusable ConfirmDialog that
 gates high/critical/privileged writes (critical actions require typing `CONFIRM`).
+Phase 7 (safety & diagnostics) is implemented
+([checklist](progress/phase-7-safety-diagnostics.md),
+[ADR-008](adr/ADR-008-safety-diagnostics.md)): a pure safety core sanitizes
+untrusted text (bidi/zero-width/control/homoglyph) via `SafeText`, computes
+preflight `writeWarnings` (wrong network, unverified source, stale manifest,
+critical risk) surfaced in the ConfirmDialog, and the studio keeps a local,
+exportable execution history (audit trail) of every transaction.
 
 ## In scope for the open-source MVP
 

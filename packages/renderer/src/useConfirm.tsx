@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import type { Permission, RiskLevel } from '@semantic-dapp/spec';
+import type { Permission, RiskLevel, SafetyWarning } from '@semantic-dapp/spec';
 import { ConfirmDialog, type ConfirmSummaryRow } from '@semantic-dapp/components';
 
 export interface ConfirmMeta {
@@ -9,6 +9,7 @@ export interface ConfirmMeta {
   permission?: Permission;
   signature?: string;
   summary?: ConfirmSummaryRow[];
+  warnings?: SafetyWarning[];
   confirmLabel?: string;
 }
 
@@ -46,6 +47,7 @@ export function useConfirm() {
       permission={pending?.meta.permission}
       signature={pending?.meta.signature}
       summary={pending?.meta.summary}
+      warnings={pending?.meta.warnings}
       confirmLabel={pending?.meta.confirmLabel}
       onConfirm={() => settle(true)}
       onCancel={() => settle(false)}

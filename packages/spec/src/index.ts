@@ -3,6 +3,7 @@ export * from './abi-schema.js';
 export * from './manifest.js';
 export * from './migrations.js';
 export * from './staleness.js';
+export * from './safety.js';
 export * from './widgets.js';
 export * from './json-schema.js';
 export * from './ids.js';

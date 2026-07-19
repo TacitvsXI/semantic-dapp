@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import {
   isManifestStale,
@@ -8,10 +8,12 @@ import {
 } from '@semantic-dapp/spec';
 import { applyReview } from '@semantic-dapp/classifier';
 import { GeneratedApp } from '@semantic-dapp/renderer';
-import { useContractRuntime } from '../runtime/useContractRuntime.js';
+import { AuditLog, type AuditEntry } from '@semantic-dapp/components';
+import { useContractRuntime, type WriteRecord } from '../runtime/useContractRuntime.js';
 import { computeManifest, CONTRACT_ID } from '../state/manifest.js';
 import { saveProject } from '../state/storage.js';
 import { fetchCodeHash } from '../state/codehash.js';
+import { appendHistory, clearHistory, loadHistory, newEntryId } from '../state/history.js';
 import { downloadJson } from '../lib/download.js';
 import type { Project } from '../state/project.js';
 import { SettingsPanel } from './SettingsPanel.js';
@@ -32,10 +34,21 @@ export function ProjectView({ project: initialProject, onBack, onUpdated }: Proj
   );
   const [showSettings, setShowSettings] = useState(false);
   const [showEditor, setShowEditor] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
   const [stale, setStale] = useState(false);
+  const [history, setHistory] = useState<AuditEntry[]>(() => loadHistory(initialProject.id));
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const runtime = useContractRuntime(project);
+
+  const recordWrite = useCallback(
+    (rec: WriteRecord) => {
+      const entry: AuditEntry = { id: newEntryId(), timestamp: Date.now(), ...rec };
+      setHistory(appendHistory(initialProject.id, entry));
+    },
+    [initialProject.id],
+  );
+
+  const runtime = useContractRuntime(project, { onWrite: recordWrite });
 
   const persist = (nextProject: Project, nextManifest: SemanticManifest) => {
     const saved = { ...nextProject, manifest: nextManifest };
@@ -211,6 +224,9 @@ export function ProjectView({ project: initialProject, onBack, onUpdated }: Proj
           <button className="sd-btn sd-btn--ghost" onClick={() => void reanalyze()}>
             Re-analyze
           </button>
+          <button className="sd-btn sd-btn--ghost" onClick={() => setShowHistory((s) => !s)}>
+            History{history.length > 0 ? ` (${history.length})` : ''}
+          </button>
           <ConnectButton showBalance={false} chainStatus="icon" accountStatus="address" />
         </div>
       </header>
@@ -248,11 +264,26 @@ export function ProjectView({ project: initialProject, onBack, onUpdated }: Proj
         />
       ) : null}
 
+      {showHistory ? (
+        <AuditLog
+          entries={history}
+          onExport={() => downloadJson(`${project.name || 'project'}.history.json`, history)}
+          onClear={() => {
+            clearHistory(initialProject.id);
+            setHistory([]);
+          }}
+        />
+      ) : null}
+
       <GeneratedApp
         manifest={manifest}
         model={model}
         runtime={runtime}
         contractId={CONTRACT_ID}
+        safety={{
+          ...(project.provenance ? { verified: project.provenance.verified } : {}),
+          stale,
+        }}
         review={{
           onConfirm: (id) => persistManifest(applyReview(manifest, id, { type: 'confirm' })),
           onMoveToRaw: (id) => persistManifest(applyReview(manifest, id, { type: 'move-to-raw' })),

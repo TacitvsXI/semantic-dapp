@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import type { Permission, RiskLevel } from '@semantic-dapp/spec';
+import type { Permission, RiskLevel, SafetyWarning } from '@semantic-dapp/spec';
+import { SafetyWarnings } from './SafetyWarnings.js';
 
 export interface ConfirmSummaryRow {
   label: string;
@@ -17,6 +18,8 @@ export interface ConfirmDialogProps {
   signature?: string;
   /** A human summary of the arguments. */
   summary?: ConfirmSummaryRow[];
+  /** Preflight safety warnings shown before the confirm button. */
+  warnings?: SafetyWarning[];
   confirmLabel?: string;
   onConfirm: () => void;
   onCancel: () => void;
@@ -48,6 +51,7 @@ export function ConfirmDialog({
   permission,
   signature,
   summary,
+  warnings,
   confirmLabel,
   onConfirm,
   onCancel,
@@ -97,6 +101,8 @@ export function ConfirmDialog({
         ) : null}
 
         {permission ? <p className="sd-modal__perm">{permissionLabel(permission)}</p> : null}
+
+        {warnings && warnings.length > 0 ? <SafetyWarnings warnings={warnings} /> : null}
 
         {summary && summary.length > 0 ? (
           <dl className="sd-modal__summary">

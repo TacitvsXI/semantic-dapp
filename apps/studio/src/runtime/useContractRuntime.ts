@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useAccount, useConnect, useDisconnect, useSwitchChain, useWalletClient } from 'wagmi';
 import type { Abi, Address } from 'viem';
 import type { ContractFunction } from '@semantic-dapp/spec';
@@ -16,7 +16,21 @@ import {
 import type { ContractRuntime } from '@semantic-dapp/renderer';
 import type { Project } from '../state/project.js';
 
-export function useContractRuntime(project: Project): ContractRuntime {
+/** A terminal write result reported for the audit trail. */
+export interface WriteRecord {
+  function: string;
+  status: 'success' | 'error';
+  hash?: string;
+  chainId?: number;
+  detail?: string;
+}
+
+export interface RuntimeHooks {
+  /** Called once a write reaches a terminal (success/error) state. */
+  onWrite?: (record: WriteRecord) => void;
+}
+
+export function useContractRuntime(project: Project, hooks?: RuntimeHooks): ContractRuntime {
   const publicClient = useMemo(
     () =>
       createPublicClientFor({
@@ -37,6 +51,17 @@ export function useContractRuntime(project: Project): ContractRuntime {
   const setTx = useCallback((signature: string, state: TxState) => {
     setTxStates((prev) => ({ ...prev, [signature]: state }));
   }, []);
+
+  // Keep the latest recorder without re-creating submitWrite on every render.
+  const onWriteRef = useRef(hooks?.onWrite);
+  onWriteRef.current = hooks?.onWrite;
+  const contractChainId = project.contract.chainId;
+  const record = useCallback(
+    (rec: { function: string; status: 'success' | 'error'; hash?: string; detail?: string }) => {
+      onWriteRef.current?.({ ...rec, chainId: contractChainId });
+    },
+    [contractChainId],
+  );
 
   const abi = project.abi as Abi;
   const target = project.contract.address as Address | undefined;
@@ -109,11 +134,12 @@ export function useContractRuntime(project: Project): ContractRuntime {
         setTx(sig, { phase: 'pending', hash, gasEstimate });
 
         const receipt = await waitForTx(publicClient, hash);
+        const ok = receipt.status === 'success';
         setTx(sig, {
-          phase: receipt.status === 'success' ? 'success' : 'error',
+          phase: ok ? 'success' : 'error',
           hash,
           gasEstimate,
-          ...(receipt.status === 'success'
+          ...(ok
             ? {}
             : {
                 error: {
@@ -123,11 +149,19 @@ export function useContractRuntime(project: Project): ContractRuntime {
                 },
               }),
         });
+        record({
+          function: sig,
+          status: ok ? 'success' : 'error',
+          hash,
+          ...(ok ? {} : { detail: 'Reverted on-chain' }),
+        });
       } catch (error) {
-        setTx(sig, { phase: 'error', error: decodeExecutionError(error) });
+        const decoded = decodeExecutionError(error);
+        setTx(sig, { phase: 'error', error: decoded });
+        record({ function: sig, status: 'error', detail: `${decoded.title}: ${decoded.detail}` });
       }
     },
-    [publicClient, abi, target, walletClient, address, setTx],
+    [publicClient, abi, target, walletClient, address, setTx, record],
   );
 
   const getTxState = useCallback(

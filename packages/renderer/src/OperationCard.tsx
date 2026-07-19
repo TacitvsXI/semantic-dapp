@@ -1,4 +1,4 @@
-import type { ContractFunction } from '@semantic-dapp/spec';
+import { writeWarnings, type ContractFunction } from '@semantic-dapp/spec';
 import { AudienceBadge, ConfidenceBadge, EvidenceList, RiskBadge } from '@semantic-dapp/components';
 import type { OperationView } from './sections.js';
 import type { ContractRuntime } from './runtime.js';
@@ -9,20 +9,37 @@ export interface ReviewControls {
   onMoveToRaw: (operationId: string) => void;
 }
 
+/** Contract-level safety context used to compute preflight write warnings. */
+export interface SafetyContext {
+  contractChainId?: number;
+  verified?: boolean;
+  stale?: boolean;
+}
+
 export interface OperationCardProps {
   view: OperationView;
   runtime: ContractRuntime;
   review?: ReviewControls;
+  safety?: SafetyContext;
 }
 
 /** A semantic operation: title, badges (audience/confidence/risk), evidence and form. */
-export function OperationCard({ view, runtime, review }: OperationCardProps) {
+export function OperationCard({ view, runtime, review, safety }: OperationCardProps) {
   const { operation, func } = view;
   const risk = operation.risk?.level;
   const privileged = operation.permission !== undefined && operation.permission.kind !== 'none';
-  const needsConfirm = risk === 'high' || risk === 'critical' || privileged;
+  const warnings = operation.isRead
+    ? []
+    : writeWarnings({
+        walletChainId: runtime.wallet.chainId,
+        contractChainId: safety?.contractChainId,
+        verified: safety?.verified,
+        stale: safety?.stale,
+        risk,
+      });
+  const needsConfirm = risk === 'high' || risk === 'critical' || privileged || warnings.length > 0;
   const confirm = needsConfirm
-    ? { risk, permission: operation.permission, title: operation.title }
+    ? { risk, permission: operation.permission, title: operation.title, warnings }
     : undefined;
 
   return (

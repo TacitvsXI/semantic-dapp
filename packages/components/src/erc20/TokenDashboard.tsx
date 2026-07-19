@@ -1,3 +1,4 @@
+import { SafeText } from '../components/SafeText.js';
 import { displayTokenAmount } from './amount.js';
 
 export interface TokenDashboardProps {
@@ -23,15 +24,21 @@ export function TokenDashboard({
     <section className="sd-card sd-token-dashboard">
       <header className="sd-card__header">
         <div>
-          <h3 className="sd-card__title">{name ?? 'Token'}</h3>
-          {symbol ? <code className="sd-card__sig">{symbol}</code> : null}
+          <h3 className="sd-card__title">
+            <SafeText value={name} fallback="Token" maxLength={80} />
+          </h3>
+          {symbol ? (
+            <code className="sd-card__sig">
+              <SafeText value={symbol} maxLength={40} />
+            </code>
+          ) : null}
         </div>
       </header>
       {loading ? <p className="sd-empty">Loading metadata…</p> : null}
       <dl className="sd-token-dashboard__grid">
         <div>
           <dt>Symbol</dt>
-          <dd>{symbol ?? '—'}</dd>
+          <dd>{symbol ? <SafeText value={symbol} maxLength={40} /> : '—'}</dd>
         </div>
         <div>
           <dt>Decimals</dt>

@@ -14,11 +14,25 @@ for the full plan.
 | 4     | Standards analyzer       | ✅ Done (slice)    |
 | 5     | Classification & routing | ✅ Done (slice)    |
 | 6     | Trusted UI components    | ✅ Done (slice)    |
-| 7     | Safety & diagnostics     | ⬜ Not started     |
+| 7     | Safety & diagnostics     | ✅ Done (slice)    |
 | 8     | Export & CLI             | ⬜ Not started     |
 | 9     | Fixtures, docs, beta     | ⬜ Not started     |
 
-## Current phase: Phase 6 — Trusted UI Components
+## Current phase: Phase 7 — Safety & Diagnostics
+
+Detailed checklist: [`docs/progress/phase-7-safety-diagnostics.md`](docs/progress/phase-7-safety-diagnostics.md).
+
+The generated app is now **hardened against adversarial input** (ADR-008). A pure
+safety core in `spec` sanitizes untrusted strings (`sanitizeText` strips
+bidi/zero-width/control characters and flags mixed-script homoglyphs) and computes
+**preflight `writeWarnings`** (wrong network, unverified source, stale manifest,
+critical risk). A `SafeText` component wraps every untrusted label (token
+name/symbol, contract name) with a ⚠ marker, the **ConfirmDialog surfaces the
+preflight warnings** before sending, and the studio keeps a local, exportable
+**execution history** (audit trail) of every transaction. See
+[ADR-008](docs/adr/ADR-008-safety-diagnostics.md).
+
+## Previous phase: Phase 6 — Trusted UI Components
 
 Detailed checklist: [`docs/progress/phase-6-trusted-ui.md`](docs/progress/phase-6-trusted-ui.md).
 

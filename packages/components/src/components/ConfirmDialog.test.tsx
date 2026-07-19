@@ -55,6 +55,19 @@ describe('ConfirmDialog', () => {
     expect(confirmed).toBe(true);
   });
 
+  it('shows preflight safety warnings', () => {
+    render(
+      <ConfirmDialog
+        open
+        title="Transfer"
+        warnings={[{ severity: 'danger', title: 'Wrong network', detail: 'Switch chains.' }]}
+        onConfirm={() => {}}
+        onCancel={() => {}}
+      />,
+    );
+    expect(screen.getByTestId('safety-warnings').textContent).toContain('Wrong network');
+  });
+
   it('cancels via the backdrop', () => {
     let cancelled = false;
     const { container } = render(

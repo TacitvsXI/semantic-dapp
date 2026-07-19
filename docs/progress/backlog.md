@@ -95,12 +95,24 @@ Pick these up between phases or when they naturally fold into a larger workstrea
 - [ ] Wire manifest `InputDefinition` widgets (token-amount/token-id) into the
       generic form (currently ABI-type based, specialized panels handle amounts)
 
-## Phase 7 — Safety & diagnostics
+## Phase 7 — Safety & diagnostics — done (slice)
 
-- Connected-chain check; code-hash-mismatch warning
-- Risk badges and explanations
-- NatSpec/metadata sanitization
-- Audit-style local execution history
+- [x] Untrusted-text sanitization (`sanitizeText` + `SafeText`): strips
+      bidi/zero-width/control chars, flags mixed-script homoglyphs and length
+- [x] Preflight `writeWarnings` (wrong network, unverified source, stale
+      manifest, critical risk) surfaced in the ConfirmDialog
+- [x] Applied `SafeText` to token name/symbol and contract name
+- [x] Local execution history (audit trail) with export/clear in the studio
+- [ ] History store unit test — studio lacks a vitest runner; add jsdom+vitest to
+      the studio and cover `state/history.ts` and `lib/download.ts`
+- [ ] NatSpec/metadata sanitization at **import** time (sanitize titles/
+      descriptions into the manifest, not just at render)
+- [ ] Diagnostics panel with a green/warn/fail checklist (verified, proxy,
+      staleness, standards confidence, network) beyond the Overview summary
+- [ ] Simulation-based preflight warnings (revert/gas anomalies, unlimited
+      approval, self-transfer) feeding the same `SafetyWarning` type
+- [ ] Explorer links in the audit log (needs an `explorerUrl` in the studio
+      runtime)
 
 ## Phase 8 — Export & CLI (`export`, `cli`)
 
