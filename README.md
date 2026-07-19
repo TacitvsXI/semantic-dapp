@@ -21,6 +21,10 @@ Semantic Dapp turns any deployed EVM contract into a clean **user dApp**, an **a
 
 <br/>
 
+[**🚀 Live demo**](https://tacitvsxi.github.io/semantic-dapp/) — a generated dApp for a real mainnet token, running entirely in your browser · [**📓 Changelog**](CHANGELOG.md) · [**🗺️ Roadmap**](docs/roadmap.md)
+
+<br/>
+
 ⭐ **If this could save you from writing one more bespoke admin panel, star the repo — it genuinely helps.**
 
 </div>
@@ -115,6 +119,8 @@ pnpm --filter @semantic-dapp/generated-app dev  # render a bundled dApp
 ```
 
 ## Try the demos
+
+The [**live demo**](https://tacitvsxi.github.io/semantic-dapp/) renders a generated dApp for a real mainnet ERC-20 (USDC) — reads run against a public RPC, and connecting a wallet enables writes. Or run them locally:
 
 Three self-contained demos built from real compiled contracts:
 

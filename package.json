@@ -53,6 +53,7 @@
     "test:integration": "turbo run test:integration",
     "gen:abi": "node scripts/gen-abi.mjs",
     "gen:demos": "node scripts/gen-demos.mjs",
+    "gen:pages": "node scripts/gen-pages-bundle.mjs",
     "clean": "turbo run clean && rm -rf node_modules",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\"",
