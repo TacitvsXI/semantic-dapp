@@ -7,6 +7,8 @@ export interface WalletState {
   chainId?: number;
   connect: () => void;
   disconnect: () => void;
+  /** Ask the wallet to switch to the project's configured chain. */
+  switchChain?: () => void;
 }
 
 /**

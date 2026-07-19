@@ -6,4 +6,15 @@ export default defineConfig({
   server: {
     port: 5173,
   },
+  build: {
+    // Split heavy vendors so the web3 stack doesn't inflate the main chunk.
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ['react', 'react-dom'],
+          web3: ['viem', 'wagmi', '@tanstack/react-query'],
+        },
+      },
+    },
+  },
 });

@@ -3,6 +3,20 @@
 Captured while building the Phase 1 vertical slice. Ordered roughly by the
 roadmap. Each becomes a GitHub issue with the matching label.
 
+## Post-v0.0.1 polish (delivered)
+
+- [x] Vite `manualChunks` code-splitting (react / web3 vendors)
+- [x] Editable connection settings (address / chain / RPC) after import
+- [x] Wrong-network detection + "Switch network" button
+- [x] Export semantic manifest as JSON (client-side download)
+- [x] "Tech stack & rationale" section in the roadmap
+
+## Post-v0.0.1 polish (still open)
+
+- [ ] Wallet connector aggregator (Reown AppKit / RainbowKit over wagmi)
+- [ ] Route-level lazy loading for the studio
+- [ ] Import manifest JSON (round-trip with export) — folds into Phase 3
+
 ## Phase 2 — Address resolver (`resolver`)
 
 - Adapter interface for ABI/source providers

@@ -171,6 +171,41 @@ body {
   color: var(--sd-accent);
 }
 
+.studio-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+.studio-banner--warn {
+  border: 1px solid var(--sd-admin, #e6a23c);
+  color: var(--sd-admin, #e6a23c);
+  background: rgba(230, 162, 60, 0.08);
+}
+
+.studio-settings {
+  background: var(--sd-surface);
+  border: 1px solid var(--sd-border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.studio-settings h3 {
+  margin: 0;
+}
+.studio-settings__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 .studio-footer {
   margin-top: 40px;
   color: var(--sd-muted);

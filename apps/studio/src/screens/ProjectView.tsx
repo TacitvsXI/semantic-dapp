@@ -5,11 +5,14 @@ import { GeneratedApp } from '@semantic-dapp/renderer';
 import { useContractRuntime } from '../runtime/useContractRuntime.js';
 import { computeManifest, CONTRACT_ID } from '../state/manifest.js';
 import { saveProject } from '../state/storage.js';
+import { downloadJson } from '../lib/download.js';
 import type { Project } from '../state/project.js';
+import { SettingsPanel } from './SettingsPanel.js';
 
 export interface ProjectViewProps {
   project: Project;
   onBack: () => void;
+  onUpdated: () => void;
 }
 
 function shorten(address?: string): string {
@@ -18,23 +21,52 @@ function shorten(address?: string): string {
 }
 
 /** Renders a project's generated app. Must be wrapped in ProjectProviders. */
-export function ProjectView({ project, onBack }: ProjectViewProps) {
+export function ProjectView({ project: initialProject, onBack, onUpdated }: ProjectViewProps) {
+  const [project, setProject] = useState<Project>(initialProject);
   const model = useMemo(() => normalizeAbi(project.abi), [project.abi]);
   const [manifest, setManifest] = useState<SemanticManifest>(
     () => project.manifest ?? computeManifest(project, model),
   );
+  const [showSettings, setShowSettings] = useState(false);
   const runtime = useContractRuntime(project);
 
-  const persist = (next: SemanticManifest) => {
-    setManifest(next);
-    saveProject({ ...project, manifest: next });
+  const persist = (nextProject: Project, nextManifest: SemanticManifest) => {
+    const saved = { ...nextProject, manifest: nextManifest };
+    setProject(saved);
+    setManifest(nextManifest);
+    saveProject(saved);
+    onUpdated();
   };
 
-  const reanalyze = () => {
-    persist(computeManifest(project, model));
+  const persistManifest = (next: SemanticManifest) => persist(project, next);
+
+  const reanalyze = () => persist(project, computeManifest(project, model));
+
+  const saveSettings = (patch: {
+    address?: string;
+    chainId: number;
+    rpcUrl: string;
+    contractName?: string;
+  }) => {
+    const next: Project = {
+      ...project,
+      rpcUrl: patch.rpcUrl,
+      contract: {
+        chainId: patch.chainId,
+        ...(patch.address ? { address: patch.address } : {}),
+        ...(patch.contractName ? { name: patch.contractName } : {}),
+      },
+    };
+    persist(next, computeManifest(next, model));
+    setShowSettings(false);
   };
 
   const standards = manifest.contracts[0]?.standards ?? [];
+  const walletChainId = runtime.wallet.chainId;
+  const wrongNetwork =
+    runtime.wallet.isConnected &&
+    walletChainId !== undefined &&
+    walletChainId !== project.contract.chainId;
 
   return (
     <div className="studio-project">
@@ -56,6 +88,15 @@ export function ProjectView({ project, onBack }: ProjectViewProps) {
         </div>
 
         <div className="studio-wallet">
+          <button className="sd-btn sd-btn--ghost" onClick={() => setShowSettings((s) => !s)}>
+            Settings
+          </button>
+          <button
+            className="sd-btn sd-btn--ghost"
+            onClick={() => downloadJson(`${project.name || 'manifest'}.manifest.json`, manifest)}
+          >
+            Export manifest
+          </button>
           <button className="sd-btn sd-btn--ghost" onClick={reanalyze}>
             Re-analyze
           </button>
@@ -74,14 +115,36 @@ export function ProjectView({ project, onBack }: ProjectViewProps) {
         </div>
       </header>
 
+      {wrongNetwork ? (
+        <div className="studio-banner studio-banner--warn">
+          <span>
+            Wallet is on chain {walletChainId}, but this project targets chain{' '}
+            {project.contract.chainId}.
+          </span>
+          {runtime.wallet.switchChain ? (
+            <button className="sd-btn sd-btn--write" onClick={runtime.wallet.switchChain}>
+              Switch network
+            </button>
+          ) : null}
+        </div>
+      ) : null}
+
+      {showSettings ? (
+        <SettingsPanel
+          project={project}
+          onSave={saveSettings}
+          onClose={() => setShowSettings(false)}
+        />
+      ) : null}
+
       <GeneratedApp
         manifest={manifest}
         model={model}
         runtime={runtime}
         contractId={CONTRACT_ID}
         review={{
-          onConfirm: (id) => persist(applyReview(manifest, id, { type: 'confirm' })),
-          onMoveToRaw: (id) => persist(applyReview(manifest, id, { type: 'move-to-raw' })),
+          onConfirm: (id) => persistManifest(applyReview(manifest, id, { type: 'confirm' })),
+          onMoveToRaw: (id) => persistManifest(applyReview(manifest, id, { type: 'move-to-raw' })),
         }}
       />
     </div>

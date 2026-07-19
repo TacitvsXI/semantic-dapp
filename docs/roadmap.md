@@ -57,6 +57,36 @@ active phase checklist.
 - Arbitrary LLM-generated frontend code
 - Full multi-tenant SaaS, billing and enterprise SSO
 
+## Tech stack & rationale
+
+Chosen to match the execution plan and to stay self-hostable, deterministic and
+type-safe end to end.
+
+| Concern           | Choice                           | Why                                             |
+| ----------------- | -------------------------------- | ----------------------------------------------- |
+| Monorepo          | pnpm workspaces + Turborepo      | Standard TS monorepo; cached task graph         |
+| Language          | TypeScript (strict)              | UI is generated from ABI types; safety is core  |
+| Web3 core         | viem + wagmi + react-query       | De-facto 2026 standard; typed, tree-shakeable   |
+| ABI types         | abitype                          | Native to viem; typed ABIs                      |
+| Frontend          | React + Vite                     | Fast SPA; fits future static/self-hosted export |
+| Schema/validation | Zod + zod-to-json-schema         | Backs the manifest-as-IR (ADR-002)              |
+| Contracts/testing | Foundry (forge/anvil)            | Modern Solidity standard; ephemeral local chain |
+| Tests             | Vitest + Playwright              | Fast unit + real integration/e2e                |
+| Quality           | ESLint (flat) + Prettier + husky | Consistent, enforced in CI                      |
+
+### Planned stack reinforcements (additive, no rewrite)
+
+- **Wallet connectors**: today only the `injected` connector (no WalletConnect
+  projectId needed). Add an aggregator — Reown AppKit or RainbowKit over wagmi —
+  for the public beta.
+- **Bundle size**: web3 libs are heavy; vendors are code-split via Vite
+  `manualChunks`. Revisit with route-level lazy loading as the app grows.
+- **Untrusted metadata**: when rendering NatSpec/metadata (Phases 4+), sanitize
+  input (e.g. DOMPurify or strict text-only rendering) — see `SECURITY.md`.
+- **State management**: React state + react-query suffice now; consider Zustand
+  or Jotai for the manifest editor (Phase 3) only if needed.
+- **Zod**: pinned to v3 (abitype peer); migrate to v4 as a dedicated task.
+
 ## Backlog after the vertical slice (Phases 2+)
 
 Captured in [`progress/backlog.md`](progress/backlog.md).

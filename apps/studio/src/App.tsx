@@ -52,8 +52,15 @@ export function App() {
         ) : null}
 
         {view.kind === 'project' && activeProject ? (
-          <ProjectProviders key={activeProject.id} project={activeProject}>
-            <ProjectView project={activeProject} onBack={() => setView({ kind: 'list' })} />
+          <ProjectProviders
+            key={`${activeProject.id}:${activeProject.contract.chainId}:${activeProject.rpcUrl}`}
+            project={activeProject}
+          >
+            <ProjectView
+              project={activeProject}
+              onBack={() => setView({ kind: 'list' })}
+              onUpdated={refresh}
+            />
           </ProjectProviders>
         ) : null}
 

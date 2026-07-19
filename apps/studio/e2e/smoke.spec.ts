@@ -24,4 +24,9 @@ test('import an ERC-20 ABI and generate User/Raw tabs', async ({ page }) => {
   // The Raw tab lists every function losslessly.
   await page.getByRole('tab', { name: /Raw/ }).click();
   await expect(page.getByText('transfer(address,uint256)').first()).toBeVisible();
+
+  // Project controls are available (settings + manifest export).
+  await expect(page.getByRole('button', { name: 'Export manifest' })).toBeVisible();
+  await page.getByRole('button', { name: 'Settings' }).click();
+  await expect(page.getByRole('heading', { name: 'Connection settings' })).toBeVisible();
 });

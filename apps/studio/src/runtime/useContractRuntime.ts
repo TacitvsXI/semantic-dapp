@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { useAccount, useConnect, useDisconnect, useWalletClient } from 'wagmi';
+import { useAccount, useConnect, useDisconnect, useSwitchChain, useWalletClient } from 'wagmi';
 import type { Abi, Address } from 'viem';
 import type { ContractFunction } from '@semantic-dapp/spec';
 import {
@@ -30,6 +30,7 @@ export function useContractRuntime(project: Project): ContractRuntime {
   const { address, isConnected, chainId } = useAccount();
   const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
+  const { switchChain } = useSwitchChain();
   const { data: walletClient } = useWalletClient();
 
   const [txStates, setTxStates] = useState<Record<string, TxState>>({});
@@ -146,6 +147,7 @@ export function useContractRuntime(project: Project): ContractRuntime {
       ...(chainId !== undefined ? { chainId } : {}),
       connect: connectWallet,
       disconnect: () => disconnect(),
+      switchChain: () => switchChain({ chainId: project.contract.chainId }),
     },
     callRead,
     submitWrite,
