@@ -1,0 +1,23 @@
+# Issue labels for semantic-dapp.
+# Apply with a label-sync action or `gh label create`.
+- name: core
+  color: '1d76db'
+  description: Core runtime, spec, and shared types
+- name: resolver
+  color: '0e8a16'
+  description: Address / ABI / source / proxy resolution
+- name: analyzer
+  color: '5319e7'
+  description: Standards, roles and risk detection
+- name: ui
+  color: 'fbca04'
+  description: Generated UI, components and studio
+- name: security
+  color: 'd93f0b'
+  description: Security, sanitization and safe execution
+- name: docs
+  color: '0075ca'
+  description: Documentation and examples
+- name: good-first-issue
+  color: '7057ff'
+  description: Good for newcomers

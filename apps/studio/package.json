@@ -1,0 +1,37 @@
+{
+  "name": "@semantic-dapp/studio",
+  "version": "0.0.1",
+  "description": "Semantic Dapp Studio — import, review and preview generated dApps.",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit -p tsconfig.json && vite build",
+    "preview": "vite preview --port 4173",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint src",
+    "test:e2e": "playwright test",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "@semantic-dapp/analyzer": "workspace:*",
+    "@semantic-dapp/classifier": "workspace:*",
+    "@semantic-dapp/components": "workspace:*",
+    "@semantic-dapp/execution": "workspace:*",
+    "@semantic-dapp/renderer": "workspace:*",
+    "@semantic-dapp/spec": "workspace:*",
+    "@tanstack/react-query": "^5.62.7",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "viem": "^2.21.55",
+    "wagmi": "^2.14.6"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.1",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^6.0.7"
+  }
+}
