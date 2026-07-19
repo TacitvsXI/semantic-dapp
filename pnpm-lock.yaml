@@ -287,6 +287,9 @@ importers:
       '@semantic-dapp/spec':
         specifier: workspace:*
         version: link:../spec
+      viem:
+        specifier: ^2.21.55
+        version: 2.55.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.4.3)
     devDependencies:
       '@testing-library/react':
         specifier: ^16.1.0

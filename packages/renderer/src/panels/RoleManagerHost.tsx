@@ -1,8 +1,22 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { keccak256, toBytes } from 'viem';
 import type { ContractFunction, ContractModel } from '@semantic-dapp/spec';
 import { RoleManager, TxStatusView, type RoleOption } from '@semantic-dapp/components';
 import type { ContractRuntime } from '../runtime.js';
 import { useConfirm } from '../useConfirm.js';
+
+const ZERO_ROLE = `0x${'00'.repeat(32)}` as const;
+
+/**
+ * Compute a role's bytes32 id from its constant name using the OpenZeppelin
+ * convention: `DEFAULT_ADMIN_ROLE` is `0x00…0`; every other role constant is
+ * `keccak256(bytes(NAME))`. Used as an offline fallback so the role dropdown
+ * works even before an on-chain read confirms the exact value.
+ */
+function computeRoleValue(name: string): `0x${string}` {
+  if (name === 'DEFAULT_ADMIN_ROLE') return ZERO_ROLE;
+  return keccak256(toBytes(name));
+}
 
 export interface RoleManagerHostProps {
   model: ContractModel;
@@ -47,35 +61,42 @@ export function RoleManagerHost({ model, runtime }: RoleManagerHostProps) {
   const hasRoleFn = findFn(model, 'hasRole(bytes32,address)');
   const { confirm, dialog } = useConfirm();
 
-  // Discover the contract's role constants and read their bytes32 values so the
-  // user can pick a role by name. Reads need a target address + RPC; if they
-  // fail (e.g. offline), the manager falls back to manual role entry.
+  // Discover the contract's role constants from the ABI and populate the role
+  // dropdown immediately with locally-computed bytes32 ids (OZ convention), then
+  // refine each with its exact on-chain value when a read succeeds. This keeps
+  // the picker working even before/without a live RPC, so role getters never
+  // silently fall back to a bare hash field.
   const getters = useMemo(() => roleGetters(model), [model]);
-  const [roles, setRoles] = useState<RoleOption[]>([]);
+  const initialRoles = useMemo<RoleOption[]>(
+    () => getters.map((fn) => ({ name: fn.name, value: computeRoleValue(fn.name) })),
+    [getters],
+  );
+  const [roles, setRoles] = useState<RoleOption[]>(initialRoles);
   const { callRead } = runtime;
   useEffect(() => {
-    if (getters.length === 0) {
-      setRoles([]);
-      return;
-    }
+    setRoles(initialRoles);
+    if (getters.length === 0) return;
     let cancelled = false;
     void (async () => {
-      const found: RoleOption[] = [];
+      const refined: RoleOption[] = [];
       for (const fn of getters) {
         try {
           const result = await callRead(fn, []);
           const value = result[0]?.value;
-          if (isBytes32(value)) found.push({ name: fn.name, value });
+          refined.push({
+            name: fn.name,
+            value: isBytes32(value) ? value : computeRoleValue(fn.name),
+          });
         } catch {
-          /* getter unreadable (no address/RPC) — skip; manual entry remains */
+          refined.push({ name: fn.name, value: computeRoleValue(fn.name) });
         }
       }
-      if (!cancelled) setRoles(found);
+      if (!cancelled) setRoles(refined);
     })();
     return () => {
       cancelled = true;
     };
-  }, [getters, callRead]);
+  }, [getters, initialRoles, callRead]);
 
   // Resolve which discovered roles an account currently holds via `hasRole`.
   const checkMembership = useCallback(

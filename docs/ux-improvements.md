@@ -37,10 +37,13 @@ form, so they need no further work — listed here so the baseline is clear:
 
 ## Recently shipped
 
-- **Role picker by name** — the Role manager now reads the contract's role
-  constants (`MINTER_ROLE`, `PAUSER_ROLE`, `DEFAULT_ADMIN_ROLE`, …) on-chain and
-  offers them in a **dropdown mapped to their bytes32 id**, so you grant/revoke a
-  role by name instead of pasting a hash. A “Custom…” option keeps raw
+- **Role picker by name** — the Role manager discovers the contract's role
+  constants (`MINTER_ROLE`, `PAUSER_ROLE`, `DEFAULT_ADMIN_ROLE`, …) **from the
+  ABI** and offers them in a **dropdown mapped to their bytes32 id**, so you
+  grant/revoke a role by name instead of pasting a hash. Values are computed
+  locally from the OZ convention (`keccak256(name)`, `DEFAULT_ADMIN_ROLE` =
+  `0x00…0`) so the picker works even without a live RPC, then refined with the
+  exact on-chain value when a read succeeds. A “Custom…” option keeps raw
   bytes32 / keccak256-name entry for anything not discovered.
 - **Role membership badges** — once you enter an account, the manager runs
   `hasRole` for every discovered role and shows which ones it holds (✓/·), then
