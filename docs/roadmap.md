@@ -76,11 +76,13 @@ type-safe end to end.
 
 ### Planned stack reinforcements (additive, no rewrite)
 
-- **Wallet connectors**: today only the `injected` connector (no WalletConnect
-  projectId needed). Add an aggregator — Reown AppKit or RainbowKit over wagmi —
-  for the public beta.
-- **Bundle size**: web3 libs are heavy; vendors are code-split via Vite
-  `manualChunks`. Revisit with route-level lazy loading as the app grows.
+- **Wallet connectors** _(done)_: RainbowKit over wagmi provides the connect
+  modal, account UI and network switching. Injected-only by default (no secret);
+  set `VITE_WALLETCONNECT_PROJECT_ID` to enable the full wallet list +
+  WalletConnect QR.
+- **Bundle size**: web3/wallet libs are heavy; eager vendors are code-split via
+  Vite `manualChunks` (react / web3 / rainbowkit) and RainbowKit lazy-loads its
+  per-wallet and per-locale chunks. Revisit with route-level lazy loading.
 - **Untrusted metadata**: when rendering NatSpec/metadata (Phases 4+), sanitize
   input (e.g. DOMPurify or strict text-only rendering) — see `SECURITY.md`.
 - **State management**: React state + react-query suffice now; consider Zustand

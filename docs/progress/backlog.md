@@ -5,15 +5,17 @@ roadmap. Each becomes a GitHub issue with the matching label.
 
 ## Post-v0.0.1 polish (delivered)
 
-- [x] Vite `manualChunks` code-splitting (react / web3 vendors)
+- [x] Vite `manualChunks` code-splitting (react / web3 / rainbowkit vendors)
 - [x] Editable connection settings (address / chain / RPC) after import
-- [x] Wrong-network detection + "Switch network" button
 - [x] Export semantic manifest as JSON (client-side download)
 - [x] "Tech stack & rationale" section in the roadmap
+- [x] Wallet connector aggregator: RainbowKit over wagmi. Injected-only by
+      default (no secret needed); set `VITE_WALLETCONNECT_PROJECT_ID` to enable
+      the full wallet list + WalletConnect QR. `ConnectButton` also handles
+      account display and wrong-network switching.
 
 ## Post-v0.0.1 polish (still open)
 
-- [ ] Wallet connector aggregator (Reown AppKit / RainbowKit over wagmi)
 - [ ] Route-level lazy loading for the studio
 - [ ] Import manifest JSON (round-trip with export) — folds into Phase 3
 

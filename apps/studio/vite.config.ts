@@ -7,12 +7,16 @@ export default defineConfig({
     port: 5173,
   },
   build: {
-    // Split heavy vendors so the web3 stack doesn't inflate the main chunk.
+    // The web3 + wallet stack is inherently large. Split the eagerly-used cores
+    // into cacheable vendor chunks; RainbowKit still lazy-loads its per-wallet
+    // and per-locale chunks on demand (only when the connect modal is opened).
+    chunkSizeWarningLimit: 700,
     rollupOptions: {
       output: {
         manualChunks: {
           react: ['react', 'react-dom'],
           web3: ['viem', 'wagmi', '@tanstack/react-query'],
+          rainbowkit: ['@rainbow-me/rainbowkit'],
         },
       },
     },

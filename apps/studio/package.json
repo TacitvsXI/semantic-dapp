@@ -15,6 +15,7 @@
     "clean": "rm -rf dist .turbo"
   },
   "dependencies": {
+    "@rainbow-me/rainbowkit": "^2.2.11",
     "@semantic-dapp/analyzer": "workspace:*",
     "@semantic-dapp/classifier": "workspace:*",
     "@semantic-dapp/components": "workspace:*",

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { normalizeAbi, type SemanticManifest } from '@semantic-dapp/spec';
 import { applyReview } from '@semantic-dapp/classifier';
 import { GeneratedApp } from '@semantic-dapp/renderer';
@@ -13,11 +14,6 @@ export interface ProjectViewProps {
   project: Project;
   onBack: () => void;
   onUpdated: () => void;
-}
-
-function shorten(address?: string): string {
-  if (!address) return '';
-  return `${address.slice(0, 6)}…${address.slice(-4)}`;
 }
 
 /** Renders a project's generated app. Must be wrapped in ProjectProviders. */
@@ -62,11 +58,6 @@ export function ProjectView({ project: initialProject, onBack, onUpdated }: Proj
   };
 
   const standards = manifest.contracts[0]?.standards ?? [];
-  const walletChainId = runtime.wallet.chainId;
-  const wrongNetwork =
-    runtime.wallet.isConnected &&
-    walletChainId !== undefined &&
-    walletChainId !== project.contract.chainId;
 
   return (
     <div className="studio-project">
@@ -100,34 +91,9 @@ export function ProjectView({ project: initialProject, onBack, onUpdated }: Proj
           <button className="sd-btn sd-btn--ghost" onClick={reanalyze}>
             Re-analyze
           </button>
-          {runtime.wallet.isConnected ? (
-            <>
-              <span className="studio-wallet__addr">{shorten(runtime.wallet.address)}</span>
-              <button className="sd-btn sd-btn--ghost" onClick={runtime.wallet.disconnect}>
-                Disconnect
-              </button>
-            </>
-          ) : (
-            <button className="sd-btn sd-btn--write" onClick={runtime.wallet.connect}>
-              Connect wallet
-            </button>
-          )}
+          <ConnectButton showBalance={false} chainStatus="icon" accountStatus="address" />
         </div>
       </header>
-
-      {wrongNetwork ? (
-        <div className="studio-banner studio-banner--warn">
-          <span>
-            Wallet is on chain {walletChainId}, but this project targets chain{' '}
-            {project.contract.chainId}.
-          </span>
-          {runtime.wallet.switchChain ? (
-            <button className="sd-btn sd-btn--write" onClick={runtime.wallet.switchChain}>
-              Switch network
-            </button>
-          ) : null}
-        </div>
-      ) : null}
 
       {showSettings ? (
         <SettingsPanel

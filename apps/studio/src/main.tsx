@@ -1,5 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import '@rainbow-me/rainbowkit/styles.css';
 import '@semantic-dapp/components/styles.css';
 import './styles.css';
 import { App } from './App.js';
