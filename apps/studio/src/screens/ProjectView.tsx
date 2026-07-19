@@ -172,49 +172,68 @@ export function ProjectView({ project: initialProject, onBack, onUpdated }: Proj
   ]);
 
   const standards = manifest.contracts[0]?.standards ?? [];
+  const address = project.contract.address;
+  const shortAddress = address ? `${address.slice(0, 6)}…${address.slice(-4)}` : null;
 
   return (
     <div className="studio-project">
       <header className="studio-project__bar">
-        <div className="studio-project__id">
-          <button className="sd-btn sd-btn--ghost" onClick={onBack}>
-            ← Projects
-          </button>
-          <div>
-            <h2>{project.name}</h2>
-            <span className="studio-project__meta">
-              chain {project.contract.chainId} ·{' '}
-              {project.contract.address
-                ? project.contract.address
-                : 'no address (read/write disabled)'}
-              {standards.length > 0 ? ` · ${standards.join(', ')}` : ''}
-            </span>
-            {project.provenance ? (
-              <span className="studio-provenance">
-                <span
-                  className={`studio-provenance__tag ${
-                    project.provenance.verified
-                      ? 'studio-provenance__tag--ok'
-                      : 'studio-provenance__tag--warn'
-                  }`}
-                >
-                  {project.provenance.verified ? 'verified' : 'unverified'}
-                </span>
-                via {project.provenance.sourceName}
-                {project.provenance.matchType ? ` (${project.provenance.matchType})` : ''}
-                {project.proxy?.isProxy
-                  ? ` · ${project.proxy.kind}${
-                      project.proxy.implementation
-                        ? ` → ${project.proxy.implementation.slice(0, 10)}…`
-                        : ''
-                    }`
-                  : ''}
+        <div className="studio-project__top">
+          <div className="studio-project__id">
+            <button className="sd-btn sd-btn--ghost" onClick={onBack}>
+              ← Projects
+            </button>
+            <div className="studio-project__idtext">
+              <h2>{project.name}</h2>
+              <span className="studio-project__meta">
+                <span>chain {project.contract.chainId}</span>
+                {shortAddress ? (
+                  <>
+                    <span className="studio-project__dot">·</span>
+                    <code title={address}>{shortAddress}</code>
+                  </>
+                ) : (
+                  <>
+                    <span className="studio-project__dot">·</span>
+                    <span>no address (read/write disabled)</span>
+                  </>
+                )}
+                {standards.length > 0 ? (
+                  <>
+                    <span className="studio-project__dot">·</span>
+                    <span>{standards.join(', ')}</span>
+                  </>
+                ) : null}
               </span>
-            ) : null}
+              {project.provenance ? (
+                <span className="studio-provenance">
+                  <span
+                    className={`studio-provenance__tag ${
+                      project.provenance.verified
+                        ? 'studio-provenance__tag--ok'
+                        : 'studio-provenance__tag--warn'
+                    }`}
+                  >
+                    {project.provenance.verified ? 'verified' : 'unverified'}
+                  </span>
+                  via {project.provenance.sourceName}
+                  {project.provenance.matchType ? ` (${project.provenance.matchType})` : ''}
+                  {project.proxy?.isProxy
+                    ? ` · ${project.proxy.kind}${
+                        project.proxy.implementation
+                          ? ` → ${project.proxy.implementation.slice(0, 10)}…`
+                          : ''
+                      }`
+                    : ''}
+                </span>
+              ) : null}
+            </div>
           </div>
+
+          <ConnectButton showBalance={false} chainStatus="icon" accountStatus="address" />
         </div>
 
-        <div className="studio-wallet">
+        <div className="studio-project__actions">
           <button className="sd-btn sd-btn--ghost" onClick={() => setShowSettings((s) => !s)}>
             Settings
           </button>
@@ -246,7 +265,6 @@ export function ProjectView({ project: initialProject, onBack, onUpdated }: Proj
           <button className="sd-btn sd-btn--ghost" onClick={() => setShowHistory((s) => !s)}>
             History{history.length > 0 ? ` (${history.length})` : ''}
           </button>
-          <ConnectButton showBalance={false} chainStatus="icon" accountStatus="address" />
         </div>
       </header>
 
