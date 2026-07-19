@@ -1,5 +1,9 @@
 import type { ContractModel, OperationDefinition, SemanticManifest } from '@semantic-dapp/spec';
-import { detectErc20, type StandardDetection } from '@semantic-dapp/analyzer';
+import {
+  resolveSemantics,
+  detectAccessModel,
+  type StandardDetection,
+} from '@semantic-dapp/analyzer';
 import { classifyFunction } from './rules.js';
 
 export interface ClassificationResult {
@@ -13,15 +17,14 @@ export interface ClassificationResult {
  * semantic operations. Deterministic and network-free.
  */
 export function classifyContract(model: ContractModel, contractId: string): ClassificationResult {
-  const erc20 = detectErc20(model);
-  const detections: StandardDetection[] = [erc20];
-  const standards = detections.filter((d) => d.detected).map((d) => d.standard);
+  const { detections, detected, semantics } = resolveSemantics(model);
+  const access = detectAccessModel(model);
 
   const operations = model.functions.map((func) =>
-    classifyFunction(func, contractId, erc20.detected ? erc20 : undefined),
+    classifyFunction(func, contractId, semantics.get(func.signature), access),
   );
 
-  return { operations, standards, detections };
+  return { operations, standards: detected, detections };
 }
 
 export interface BuildManifestOptions {

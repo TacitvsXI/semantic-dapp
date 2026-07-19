@@ -1,5 +1,5 @@
 import type { ContractModel, Evidence } from '@semantic-dapp/spec';
-import type { FunctionSemantic, StandardDetection } from './types.js';
+import type { FunctionSemantic, StandardDetection, StandardDetector } from './types.js';
 
 /** ERC-20 members with their contribution to the confidence score. */
 interface Erc20Member {
@@ -160,3 +160,10 @@ export const ERC20_FUNCTION_SEMANTICS: Record<string, FunctionSemantic> = {
 export function erc20Semantic(signature: string): FunctionSemantic | undefined {
   return ERC20_FUNCTION_SEMANTICS[signature];
 }
+
+/** ERC-20 as a pluggable detector for the standards registry. */
+export const erc20Detector: StandardDetector = {
+  id: 'erc-20',
+  detect: detectErc20,
+  semantics: ERC20_FUNCTION_SEMANTICS,
+};

@@ -58,13 +58,17 @@ Pick these up between phases or when they naturally fold into a larger workstrea
 - [x] Stale detection by implementation code hash
 - [ ] YAML tab (JSON only for now)
 
-## Phase 4 — Standards analyzer (`analyzer`)
+## Phase 4 — Standards analyzer (`analyzer`) — done (slice)
 
-- ERC-165 / selector-set utilities
-- ERC-721, ERC-1155, ERC-4626 detectors (incl. preview methods)
-- Ownable, AccessControl (role model), Pausable
-- UUPS / upgrade function detector
-- Unit tests against canonical OpenZeppelin fixtures
+- [x] Generic member-based detection engine (`detectByMembers`) + registry
+- [x] ERC-721, ERC-1155, ERC-4626 detectors + semantics
+- [x] Ownable, AccessControl (role model), Pausable
+- [x] UUPS / upgrade function detector
+- [x] Access model (`ownable` / `access-control`) → operation permissions
+- [x] Unit tests against canonical ABIs + classifier routing tests
+- [ ] Runtime ERC-165 `supportsInterface` cross-check (interface IDs currently
+      recorded as evidence only, detection is ABI-shape based)
+- [ ] More extensions: ERC-2612 permit, ERC-777, ERC-20 votes/snapshot
 
 ## Phase 5 — Classification (`classifier`)
 

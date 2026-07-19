@@ -11,14 +11,27 @@ for the full plan.
 | 1     | Raw ABI runtime (slice)  | ✅ Done (`v0.0.1`) |
 | 2     | Address resolver         | ✅ Done (slice)    |
 | 3     | Semantic manifest        | ✅ Done (slice)    |
-| 4     | Standards analyzer       | ⬜ Not started     |
+| 4     | Standards analyzer       | ✅ Done (slice)    |
 | 5     | Classification & routing | ⬜ Not started     |
 | 6     | Trusted UI components    | ⬜ Not started     |
 | 7     | Safety & diagnostics     | ⬜ Not started     |
 | 8     | Export & CLI             | ⬜ Not started     |
 | 9     | Fixtures, docs, beta     | ⬜ Not started     |
 
-## Current phase: Phase 3 — Semantic Manifest
+## Current phase: Phase 4 — Standards Analyzer
+
+Detailed checklist: [`docs/progress/phase-4-standards-analyzer.md`](docs/progress/phase-4-standards-analyzer.md).
+
+Detection now goes well beyond ERC-20. A **generic member-based engine** powers
+detectors for **ERC-721 / ERC-1155 / ERC-4626** and the **Ownable /
+AccessControl / Pausable / Upgradeable (UUPS)** capabilities. A **registry**
+merges the semantics of all detected standards, the classifier routes each
+function accordingly (NFT transfers → User, roles → Admin, pause/unpause →
+Emergency, upgrade → critical) and attaches an **access-model permission**
+(`ownable` / `access-control`). See
+[ADR-005](docs/adr/ADR-005-standards-detection.md).
+
+## Previous phase: Phase 3 — Semantic Manifest
 
 Detailed checklist: [`docs/progress/phase-3-semantic-manifest.md`](docs/progress/phase-3-semantic-manifest.md).
 

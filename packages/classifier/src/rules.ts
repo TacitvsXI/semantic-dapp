@@ -3,54 +3,99 @@ import type {
   Evidence,
   InputDefinition,
   OperationDefinition,
+  Permission,
 } from '@semantic-dapp/spec';
 import { inputWidgetForType, operationId } from '@semantic-dapp/spec';
-import { erc20Semantic, type StandardDetection } from '@semantic-dapp/analyzer';
+import type { AccessModel, FunctionSemantic, ResolvedSemantic } from '@semantic-dapp/analyzer';
 
 /** Confidence assigned to an unmatched function (raw fallback). */
 export const RAW_FALLBACK_CONFIDENCE = 0.2;
 
-function buildInputs(func: ContractFunction, operationType: string): InputDefinition[] {
-  return func.inputs.map((param) => {
-    const base: InputDefinition = {
-      name: param.name,
-      type: param.type,
-      widget: inputWidgetForType(param),
-    };
-    // Refine amount inputs for token operations.
-    if (
-      (operationType === 'token-transfer' ||
-        operationType === 'token-approve' ||
-        operationType === 'token-mint' ||
-        operationType === 'token-burn') &&
-      /^uint\d*$/.test(param.type)
-    ) {
-      return { ...base, widget: 'token-amount', token: 'self' };
-    }
+const FUNGIBLE_STANDARDS = new Set(['erc-20', 'erc-4626']);
+const NFT_STANDARDS = new Set(['erc-721', 'erc-1155']);
+
+const AMOUNT_NAME = /amount|value|assets|shares|wad/i;
+const ID_NAME = /id/i;
+
+function refineInput(
+  param: ContractFunction['inputs'][number],
+  operationType: string,
+  standard: string | undefined,
+): InputDefinition {
+  const base: InputDefinition = {
+    name: param.name,
+    type: param.type,
+    widget: inputWidgetForType(param),
+  };
+  if (!/^uint\d*$/.test(param.type)) return base;
+
+  // NFT ids vs amounts are name-driven (ERC-721/1155 use uint256 for both).
+  if (standard && NFT_STANDARDS.has(standard)) {
+    if (ID_NAME.test(param.name)) return { ...base, widget: 'token-id' };
+    if (AMOUNT_NAME.test(param.name)) return { ...base, widget: 'token-amount', token: 'self' };
     return base;
-  });
+  }
+
+  // Fungible value inputs render as token amounts (decimals-aware).
+  const valueOp =
+    operationType === 'token-transfer' ||
+    operationType === 'token-approve' ||
+    operationType === 'token-mint' ||
+    operationType === 'token-burn' ||
+    operationType === 'vault-deposit' ||
+    operationType === 'vault-withdraw';
+  if (valueOp && (standard === undefined || FUNGIBLE_STANDARDS.has(standard))) {
+    return { ...base, widget: 'token-amount', token: 'self' };
+  }
+  return base;
+}
+
+function buildInputs(
+  func: ContractFunction,
+  operationType: string,
+  standard?: string,
+): InputDefinition[] {
+  return func.inputs.map((param) => refineInput(param, operationType, standard));
+}
+
+/** Derive the on-chain permission gating a privileged operation, if any. */
+function permissionFor(
+  semantic: FunctionSemantic,
+  access: AccessModel | undefined,
+): Permission | undefined {
+  const privileged =
+    !semantic.isRead && semantic.audience !== 'user' && semantic.audience !== 'developer';
+  if (!privileged) return undefined;
+
+  // Role-based operations are always AccessControl-gated by definition.
+  if (semantic.operationType.startsWith('role-')) return { kind: 'access-control' };
+
+  if (access?.kind === 'ownable') return { kind: 'ownable' };
+  if (access?.kind === 'access-control') return { kind: 'access-control' };
+  return { kind: 'custom' };
 }
 
 /**
  * Classify a single function into a semantic operation. If a known rule matches
- * (currently ERC-20), it is routed by audience/type with the standard's
- * confidence. Otherwise it falls back to the Raw/Developer view (ADR-001) — it
- * is never dropped.
+ * (from any detected standard), it is routed by audience/type with the standard's
+ * confidence and a permission from the access model. Otherwise it falls back to
+ * the Raw/Developer view (ADR-001) — it is never dropped.
  */
 export function classifyFunction(
   func: ContractFunction,
   contractId: string,
-  detection?: StandardDetection,
+  resolved?: ResolvedSemantic,
+  access?: AccessModel,
 ): OperationDefinition {
   const id = operationId(contractId, func.signature);
-  const semantic = detection?.detected ? erc20Semantic(func.signature) : undefined;
 
-  if (semantic) {
-    const confidence = Math.min(1, detection?.confidence ?? 0.9);
+  if (resolved) {
+    const { semantic, standard, confidence: standardConfidence } = resolved;
+    const confidence = Math.min(1, standardConfidence || 0.9);
     const evidence: Evidence[] = [
       {
         source: 'signature',
-        detail: `Matches ERC-20 rule for ${func.signature}`,
+        detail: `Matches ${standard} rule for ${func.signature}`,
         weight: confidence,
       },
     ];
@@ -65,12 +110,14 @@ export function classifyFunction(
       isRead: func.isRead,
       confidence,
       evidence,
-      inputs: buildInputs(func, semantic.operationType),
+      inputs: buildInputs(func, semantic.operationType, standard),
       visibility: 'visible',
       reviewed: false,
     };
     if (semantic.description) operation.description = semantic.description;
     if (semantic.risk) operation.risk = { level: semantic.risk };
+    const permission = permissionFor(semantic, access);
+    if (permission) operation.permission = permission;
     return operation;
   }
 

@@ -125,6 +125,86 @@ describe('mergeReviewed', () => {
   });
 });
 
+const adminAbi = [
+  fn('hasRole', ['bytes32', 'address'], ['bool'], 'view'),
+  fn('getRoleAdmin', ['bytes32'], ['bytes32'], 'view'),
+  fn('grantRole', ['bytes32', 'address'], []),
+  fn('revokeRole', ['bytes32', 'address'], []),
+  fn('renounceRole', ['bytes32', 'address'], []),
+  fn('paused', [], ['bool'], 'view'),
+  fn('pause', [], []),
+  fn('unpause', [], []),
+  fn('upgradeToAndCall', ['address', 'bytes'], [], 'payable'),
+] as const satisfies Abi;
+
+describe('classifyContract — access-controlled admin contract', () => {
+  const adminModel = normalizeAbi(adminAbi as unknown as Abi);
+  const result = classifyContract(adminModel, 'admin');
+
+  it('detects access-control, pausable and upgradeable', () => {
+    expect(result.standards).toEqual(
+      expect.arrayContaining(['access-control', 'pausable', 'upgradeable']),
+    );
+  });
+
+  it('routes grantRole to admin as an access-control permission', () => {
+    const grant = result.operations.find((o) => o.function === 'grantRole(bytes32,address)');
+    expect(grant?.audience).toBe('admin');
+    expect(grant?.operationType).toBe('role-grant');
+    expect(grant?.permission?.kind).toBe('access-control');
+  });
+
+  it('routes pause/unpause to the emergency audience', () => {
+    const pause = result.operations.find((o) => o.function === 'pause()');
+    expect(pause?.audience).toBe('emergency');
+    expect(pause?.operationType).toBe('pause');
+    expect(pause?.permission?.kind).toBe('access-control');
+  });
+
+  it('flags upgrade as critical for the admin audience', () => {
+    const upgrade = result.operations.find((o) => o.function === 'upgradeToAndCall(address,bytes)');
+    expect(upgrade?.audience).toBe('admin');
+    expect(upgrade?.operationType).toBe('upgrade');
+    expect(upgrade?.risk?.level).toBe('critical');
+  });
+});
+
+const nftAbi = [
+  fn('balanceOf', ['address'], ['uint256'], 'view'),
+  fn('ownerOf', ['uint256'], ['address'], 'view'),
+  fn('getApproved', ['uint256'], ['address'], 'view'),
+  fn('isApprovedForAll', ['address', 'address'], ['bool'], 'view'),
+  fn('approve', ['address', 'uint256'], []),
+  fn('setApprovalForAll', ['address', 'bool'], []),
+  fn('transferFrom', ['address', 'address', 'uint256'], []),
+  fn('safeTransferFrom', ['address', 'address', 'uint256'], []),
+  fn('safeTransferFrom', ['address', 'address', 'uint256', 'bytes'], []),
+] as const satisfies Abi;
+
+describe('classifyContract — ERC-721', () => {
+  const nftModel = normalizeAbi(nftAbi as unknown as Abi);
+  const result = classifyContract(nftModel, 'nft');
+
+  it('detects erc-721', () => {
+    expect(result.standards).toContain('erc-721');
+  });
+
+  it('routes safeTransferFrom to the user audience', () => {
+    const op = result.operations.find(
+      (o) => o.function === 'safeTransferFrom(address,address,uint256)',
+    );
+    expect(op?.audience).toBe('user');
+    expect(op?.operationType).toBe('token-transfer');
+  });
+
+  it('renders the tokenId input as a token-id widget (not an amount)', () => {
+    const op = result.operations.find((o) => o.function === 'approve(address,uint256)');
+    const tokenId = op?.inputs.find((i) => i.type === 'uint256');
+    // ERC-721 approve's uint256 is a token id, not a fungible amount.
+    expect(tokenId?.widget).not.toBe('token-amount');
+  });
+});
+
 describe('applyReview', () => {
   it('confirms and moves operations, marking them reviewed', () => {
     const manifest = buildManifest(model, { projectName: 'FIX', contractId: 'token' });

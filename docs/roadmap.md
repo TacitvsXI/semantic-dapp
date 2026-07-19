@@ -39,7 +39,12 @@ block-explorer adapters and EIP-1967 proxy detection, wired into the studio's
 ([checklist](progress/phase-3-semantic-manifest.md),
 [ADR-004](adr/ADR-004-manifest-versioning.md)): manifest import/export round-trip,
 a form + raw-JSON editor, reviewed-edit preservation on re-analyze, staleness
-detection by code hash, and a schema migration framework.
+detection by code hash, and a schema migration framework. Phase 4 (standards
+analyzer) is implemented ([checklist](progress/phase-4-standards-analyzer.md),
+[ADR-005](adr/ADR-005-standards-detection.md)): a generic member-based detection
+engine with ERC-721/1155/4626 detectors, Ownable/AccessControl/Pausable/
+Upgradeable capabilities, an access model, and a semantics registry the
+classifier uses to route and permission every function.
 
 ## In scope for the open-source MVP
 
