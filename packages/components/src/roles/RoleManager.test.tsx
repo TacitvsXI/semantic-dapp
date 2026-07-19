@@ -42,6 +42,32 @@ describe('RoleManager', () => {
     expect(call?.role).toBe(keccak256(toBytes('MINTER_ROLE')));
   });
 
+  it('grants a role picked by name from the discovered roles dropdown', () => {
+    let call: { role: string; account: string } | undefined;
+    render(
+      <RoleManager
+        canGrant
+        roles={[{ name: 'MINTER_ROLE', value: ROLE }]}
+        onGrant={(role, account) => (call = { role, account })}
+      />,
+    );
+    // Role is a dropdown now, so the only textbox is the account.
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: ADDR } });
+    fireEvent.click(screen.getByRole('button', { name: 'Grant' }));
+    expect(call?.role).toBe(ROLE);
+    expect(call?.account.toLowerCase()).toBe(ADDR);
+  });
+
+  it('falls back to manual entry when "Custom…" is selected', () => {
+    render(
+      <RoleManager canGrant roles={[{ name: 'MINTER_ROLE', value: ROLE }]} onGrant={() => {}} />,
+    );
+    expect(screen.getAllByRole('textbox')).toHaveLength(1);
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: '__custom__' } });
+    // A custom role textbox appears alongside the account field.
+    expect(screen.getAllByRole('textbox')).toHaveLength(2);
+  });
+
   it('applies the DEFAULT_ADMIN_ROLE preset', () => {
     let call: { role: string } | undefined;
     render(<RoleManager canRevoke onRevoke={(role) => (call = { role })} />);

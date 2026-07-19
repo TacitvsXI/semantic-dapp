@@ -1,5 +1,6 @@
+import { useEffect, useMemo, useState } from 'react';
 import type { ContractFunction, ContractModel } from '@semantic-dapp/spec';
-import { RoleManager, TxStatusView } from '@semantic-dapp/components';
+import { RoleManager, TxStatusView, type RoleOption } from '@semantic-dapp/components';
 import type { ContractRuntime } from '../runtime.js';
 import { useConfirm } from '../useConfirm.js';
 
@@ -10,6 +11,26 @@ export interface RoleManagerHostProps {
 
 function findFn(model: ContractModel, signature: string): ContractFunction | undefined {
   return model.functions.find((f) => f.signature === signature);
+}
+
+/**
+ * Role constant getters: no-arg view functions returning a single bytes32 whose
+ * name mentions "role" (e.g. MINTER_ROLE, DEFAULT_ADMIN_ROLE). Their on-chain
+ * values populate the role dropdown so users pick a role by name, not by hash.
+ */
+function roleGetters(model: ContractModel): ContractFunction[] {
+  return model.functions.filter(
+    (f) =>
+      f.isRead &&
+      f.inputs.length === 0 &&
+      f.outputs.length === 1 &&
+      f.outputs[0]!.type === 'bytes32' &&
+      /role/i.test(f.name),
+  );
+}
+
+function isBytes32(value: unknown): value is `0x${string}` {
+  return typeof value === 'string' && /^0x[0-9a-fA-F]{64}$/.test(value);
 }
 
 function isBusy(runtime: ContractRuntime, fn?: ContractFunction): boolean {
@@ -24,6 +45,36 @@ export function RoleManagerHost({ model, runtime }: RoleManagerHostProps) {
   const revokeFn = findFn(model, 'revokeRole(bytes32,address)');
   const renounceFn = findFn(model, 'renounceRole(bytes32,address)');
   const { confirm, dialog } = useConfirm();
+
+  // Discover the contract's role constants and read their bytes32 values so the
+  // user can pick a role by name. Reads need a target address + RPC; if they
+  // fail (e.g. offline), the manager falls back to manual role entry.
+  const getters = useMemo(() => roleGetters(model), [model]);
+  const [roles, setRoles] = useState<RoleOption[]>([]);
+  const { callRead } = runtime;
+  useEffect(() => {
+    if (getters.length === 0) {
+      setRoles([]);
+      return;
+    }
+    let cancelled = false;
+    void (async () => {
+      const found: RoleOption[] = [];
+      for (const fn of getters) {
+        try {
+          const result = await callRead(fn, []);
+          const value = result[0]?.value;
+          if (isBytes32(value)) found.push({ name: fn.name, value });
+        } catch {
+          /* getter unreadable (no address/RPC) — skip; manual entry remains */
+        }
+      }
+      if (!cancelled) setRoles(found);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [getters, callRead]);
 
   const run = async (
     fn: ContractFunction | undefined,
@@ -58,6 +109,7 @@ export function RoleManagerHost({ model, runtime }: RoleManagerHostProps) {
         canRenounce={Boolean(renounceFn)}
         connectedAddress={runtime.wallet.address}
         busy={busy}
+        roles={roles}
         onGrant={(role, account) => void run(grantFn, 'Grant role', 'high', role, account)}
         onRevoke={(role, account) => void run(revokeFn, 'Revoke role', 'high', role, account)}
         onRenounce={(role, account) =>

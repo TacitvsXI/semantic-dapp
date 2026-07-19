@@ -19,8 +19,29 @@ Ordered by impact-to-effort; check items off here when they ship.
 - **Accessible by default.** WCAG AA contrast, keyboard paths, and labelled
   controls are requirements, not polish.
 
+## What already works (form UX)
+
+These are implemented in `@semantic-dapp/components` and used by every generated
+form, so they need no further work — listed here so the baseline is clear:
+
+- **Per-field validation on submit** (`inputs/encode.ts`): addresses are checksum-
+  validated with viem (`isAddress`/`getAddress`), integers parsed as `bigint`
+  with sign checks, `bytesN` length-checked, `bool` coerced — each field shows its
+  own error and the write is blocked until all inputs encode.
+- **Dynamic array inputs** (`InputField` → `ArrayInput`): `type[]` renders an
+  editable list with **“+ Add <elem>”** and per-row **Remove**, one item after
+  another, for any element type (including nested arrays).
+- **Tuple/struct inputs** render their components recursively with labels.
+- **Type-aware controls**: numeric keyboards for integers, a checkbox for `bool`,
+  and `0x…` placeholders for address/bytes.
+
 ## Recently shipped
 
+- **Role picker by name** — the Role manager now reads the contract's role
+  constants (`MINTER_ROLE`, `PAUSER_ROLE`, `DEFAULT_ADMIN_ROLE`, …) on-chain and
+  offers them in a **dropdown mapped to their bytes32 id**, so you grant/revoke a
+  role by name instead of pasting a hash. A “Custom…” option keeps raw
+  bytes32 / keccak256-name entry for anything not discovered.
 - **Accessibility gate** — `@axe-core/playwright` fails the build on
   serious/critical violations on the standalone app (User + Raw tabs).
 - **WCAG AA contrast** — audience/risk badge text, the connect button
@@ -61,6 +82,9 @@ Ordered by impact-to-effort; check items off here when they ship.
 - [ ] **Amount widgets with decimals** — render `token-amount` inputs with human
       units (respecting `decimals`), a MAX button, and balance hints; wire the
       manifest `InputDefinition` widgets into the generic form. (backlog: Phase 6)
+- [ ] **Role membership display** — after entering an account, show which of the
+      discovered roles it currently holds (`hasRole` reads) with a badge, and
+      disable grant/revoke when it would be a no-op. Builds on the new role picker.
 - [ ] **Diagnostics panel** — a green/warn/fail checklist (verified source,
       proxy, staleness, standards confidence, network) beyond the Overview
       summary, so a reviewer can judge trust at a glance. (backlog: Phase 7)

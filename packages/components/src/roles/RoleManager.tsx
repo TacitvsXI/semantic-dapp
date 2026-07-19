@@ -2,6 +2,13 @@ import { useState } from 'react';
 import { getAddress, isAddress, isHex, keccak256, toBytes } from 'viem';
 
 const DEFAULT_ADMIN_ROLE = '0x0000000000000000000000000000000000000000000000000000000000000000';
+const CUSTOM_ROLE = '__custom__';
+
+/** A role discovered from the contract: a human name mapped to its bytes32 id. */
+export interface RoleOption {
+  name: string;
+  value: `0x${string}`;
+}
 
 export interface RoleManagerProps {
   canGrant?: boolean;
@@ -10,6 +17,12 @@ export interface RoleManagerProps {
   /** The connected wallet, used as the default account for renounce. */
   connectedAddress?: string;
   busy?: boolean;
+  /**
+   * Roles discovered from the contract (name → bytes32). When present, the user
+   * picks a role by name from a dropdown instead of pasting a hash; a "Custom…"
+   * option still allows a raw bytes32 / hashed name.
+   */
+  roles?: RoleOption[];
   onGrant?: (role: `0x${string}`, account: `0x${string}`) => void;
   onRevoke?: (role: `0x${string}`, account: `0x${string}`) => void;
   onRenounce?: (role: `0x${string}`, account: `0x${string}`) => void;
@@ -21,8 +34,10 @@ function isBytes32(value: string): value is `0x${string}` {
 
 /**
  * AccessControl role console: grant / revoke / renounce a role for an account.
- * Roles can be entered as a raw bytes32 or as a human name that is hashed with
- * keccak256 (the OpenZeppelin convention). Presentational — the host wires calls.
+ * When the host supplies the contract's `roles`, the role is chosen by name from
+ * a dropdown (values read from the contract); otherwise a role can be entered as
+ * a raw bytes32 or a human name hashed with keccak256 (the OpenZeppelin
+ * convention). Presentational — the host wires the calls.
  */
 export function RoleManager({
   canGrant,
@@ -30,6 +45,7 @@ export function RoleManager({
   canRenounce,
   connectedAddress,
   busy,
+  roles,
   onGrant,
   onRevoke,
   onRenounce,
@@ -38,8 +54,22 @@ export function RoleManager({
   const [hashName, setHashName] = useState(false);
   const [account, setAccount] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [selected, setSelected] = useState('');
+
+  const knownRoles = roles ?? [];
+  const hasKnownRoles = knownRoles.length > 0;
+  const effectiveSelected = selected || (hasKnownRoles ? knownRoles[0]!.name : CUSTOM_ROLE);
+  const isCustom = effectiveSelected === CUSTOM_ROLE;
+  const knownRole = hasKnownRoles
+    ? knownRoles.find((r) => r.name === effectiveSelected)
+    : undefined;
 
   const resolveRole = (): `0x${string}` | undefined => {
+    if (hasKnownRoles && !isCustom) {
+      if (knownRole) return knownRole.value;
+      setError('Select a role.');
+      return undefined;
+    }
     const raw = role.trim();
     if (!raw) {
       setError('Enter a role (bytes32 or a name to hash).');
@@ -85,29 +115,61 @@ export function RoleManager({
         privileged actions.
       </p>
 
-      <label className="sd-field">
-        <span className="sd-field__name">Role</span>
-        <input
-          className="sd-input"
-          value={role}
-          onChange={(e) => setRole(e.target.value)}
-          placeholder={hashName ? 'MINTER_ROLE' : `${DEFAULT_ADMIN_ROLE.slice(0, 10)}…`}
-        />
-      </label>
-      <label className="sd-bool sd-roles__hash">
-        <input type="checkbox" checked={hashName} onChange={(e) => setHashName(e.target.checked)} />
-        <span>Hash name with keccak256 (OpenZeppelin style)</span>
-      </label>
-      <button
-        type="button"
-        className="sd-btn sd-btn--ghost sd-roles__preset"
-        onClick={() => {
-          setHashName(false);
-          setRole(DEFAULT_ADMIN_ROLE);
-        }}
-      >
-        Use DEFAULT_ADMIN_ROLE
-      </button>
+      {hasKnownRoles ? (
+        <label className="sd-field">
+          <span className="sd-field__name">Role</span>
+          <select
+            className="sd-input"
+            value={effectiveSelected}
+            onChange={(e) => {
+              setSelected(e.target.value);
+              setError(null);
+            }}
+          >
+            {knownRoles.map((r) => (
+              <option key={r.name} value={r.name}>
+                {r.name}
+              </option>
+            ))}
+            <option value={CUSTOM_ROLE}>Custom…</option>
+          </select>
+          {knownRole ? <code className="sd-roles__value">{knownRole.value}</code> : null}
+        </label>
+      ) : null}
+
+      {isCustom ? (
+        <>
+          <label className="sd-field">
+            <span className="sd-field__name">{hasKnownRoles ? 'Custom role' : 'Role'}</span>
+            <input
+              className="sd-input"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              placeholder={hashName ? 'MINTER_ROLE' : `${DEFAULT_ADMIN_ROLE.slice(0, 10)}…`}
+            />
+          </label>
+          <label className="sd-bool sd-roles__hash">
+            <input
+              type="checkbox"
+              checked={hashName}
+              onChange={(e) => setHashName(e.target.checked)}
+            />
+            <span>Hash name with keccak256 (OpenZeppelin style)</span>
+          </label>
+          {!hasKnownRoles ? (
+            <button
+              type="button"
+              className="sd-btn sd-btn--ghost sd-roles__preset"
+              onClick={() => {
+                setHashName(false);
+                setRole(DEFAULT_ADMIN_ROLE);
+              }}
+            >
+              Use DEFAULT_ADMIN_ROLE
+            </button>
+          ) : null}
+        </>
+      ) : null}
 
       <label className="sd-field">
         <span className="sd-field__name">Account</span>

@@ -552,6 +552,14 @@
 .sd-roles__preset {
   margin-bottom: 8px;
 }
+.sd-roles__value {
+  display: block;
+  margin-top: 4px;
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--sd-muted);
+  overflow-wrap: anywhere;
+}
 
 /* Overview */
 .sd-overview__chips {
