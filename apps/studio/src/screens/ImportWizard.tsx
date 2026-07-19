@@ -138,6 +138,7 @@ export function ImportWizard({ onCancel, onCreated }: ImportWizardProps) {
       rpcUrl: rpcUrl.trim(),
       provenance: resolved.provenance,
       ...(resolved.proxy ? { proxy: resolved.proxy } : {}),
+      ...(resolved.codeHash ? { codeHash: resolved.codeHash } : {}),
     };
     saveProject(project);
     onCreated(project);

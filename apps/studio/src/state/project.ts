@@ -20,6 +20,8 @@ export interface Project {
   provenance?: Provenance;
   /** Proxy details, when the resolved address is a proxy. */
   proxy?: ProxyInfo;
+  /** keccak256 of the (implementation) bytecode at resolve time (staleness). */
+  codeHash?: string;
   /** Computed semantic manifest (operations filled in by analyzer/classifier). */
   manifest?: SemanticManifest;
 }

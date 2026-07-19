@@ -31,6 +31,8 @@ export interface BuildManifestOptions {
   address?: string;
   contractName?: string;
   abiSource?: SemanticManifest['contracts'][number]['abiSource'];
+  implementationAddress?: string;
+  implementationCodeHash?: string;
 }
 
 /**
@@ -51,6 +53,12 @@ export function buildManifest(
         ...(options.chainId !== undefined ? { chainId: options.chainId } : {}),
         ...(options.address ? { address: options.address } : {}),
         ...(options.contractName ? { name: options.contractName } : {}),
+        ...(options.implementationAddress
+          ? { implementationAddress: options.implementationAddress }
+          : {}),
+        ...(options.implementationCodeHash
+          ? { implementationCodeHash: options.implementationCodeHash }
+          : {}),
         abiSource: options.abiSource ?? 'manual',
         standards,
       },

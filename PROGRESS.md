@@ -10,7 +10,7 @@ for the full plan.
 | 0     | Foundation & repo setup  | ✅ Done            |
 | 1     | Raw ABI runtime (slice)  | ✅ Done (`v0.0.1`) |
 | 2     | Address resolver         | ✅ Done (slice)    |
-| 3     | Semantic manifest        | ⬜ Not started     |
+| 3     | Semantic manifest        | ✅ Done (slice)    |
 | 4     | Standards analyzer       | ⬜ Not started     |
 | 5     | Classification & routing | ⬜ Not started     |
 | 6     | Trusted UI components    | ⬜ Not started     |
@@ -18,19 +18,27 @@ for the full plan.
 | 8     | Export & CLI             | ⬜ Not started     |
 | 9     | Fixtures, docs, beta     | ⬜ Not started     |
 
-## Current phase: Phase 2 — Address Resolver
+## Current phase: Phase 3 — Semantic Manifest
+
+Detailed checklist: [`docs/progress/phase-3-semantic-manifest.md`](docs/progress/phase-3-semantic-manifest.md).
+
+The manifest (ADR-002) is now a first-class artifact: **import/export round-trip**,
+a **form + raw-JSON editor**, **reviewed edits survive re-analyze**
+(`mergeReviewed`), **staleness detection** by implementation code hash, and a
+**versioned schema with a migration framework**. See
+[ADR-004](docs/adr/ADR-004-manifest-versioning.md).
+
+## Previous phase: Phase 2 — Address Resolver
 
 Detailed checklist: [`docs/progress/phase-2-address-resolver.md`](docs/progress/phase-2-address-resolver.md).
 
 `address + chainId → resolver (Sourcify / block-explorer) → EIP-1967 proxy
-detection → ABI + provenance → normalize → classify → generated app`. New package
-`packages/resolver` (18 unit tests); studio gains a **By address** import tab and
-a provenance badge. See [ADR-003](docs/adr/ADR-003-resolver-adapters.md).
+detection → ABI + provenance → normalize → classify → generated app`. Package
+`packages/resolver` (18 unit tests); studio **By address** import + provenance
+badge. See [ADR-003](docs/adr/ADR-003-resolver-adapters.md). Deferred small
+enhancements: [`docs/progress/backlog.md`](docs/progress/backlog.md).
 
-Deferred small enhancements are tracked in
-[`docs/progress/backlog.md`](docs/progress/backlog.md).
-
-## Previous phase: Phase 1 — Vertical Slice to v0.0.1
+## Phase 1 — Vertical Slice to v0.0.1
 
 Detailed checklist: [`docs/progress/phase-1-vertical-slice.md`](docs/progress/phase-1-vertical-slice.md).
 

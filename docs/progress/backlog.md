@@ -19,9 +19,11 @@ roadmap. Each becomes a GitHub issue with the matching label.
 Small, non-blocking enhancements intentionally deferred so we can start Phase 2.
 Pick these up between phases or when they naturally fold into a larger workstream.
 
-- [ ] **Import manifest JSON** — round-trip with the existing Export button; load
-      a previously exported/edited manifest into a project. Folds into the
-      Phase 3 manifest editor.
+- [x] **Import manifest JSON** — round-trip with Export; loads a previously
+      exported/edited manifest via `migrateManifest` (delivered in Phase 3).
+- [ ] **Full re-resolution after upgrade** — when a manifest is stale, re-fetch a
+      fresh ABI via the Phase 2 resolver (today Re-analyze refreshes
+      classification + code hash on the current ABI only).
 - [ ] **Route-level lazy loading** — `React.lazy` the `ProjectView` (wallet +
       renderer stack) so the initial load ships mostly app code; the heavy
       web3/rainbowkit chunks load when a project is opened.
@@ -48,12 +50,13 @@ Pick these up between phases or when they naturally fold into a larger workstrea
 - Show ABI/source provenance and confidence
 - Fallback when ABI is not found
 
-## Phase 3 — Semantic manifest (`spec` + `studio`)
+## Phase 3 — Semantic manifest (`spec` + `studio`) — done (slice)
 
-- Manifest editor with form and raw YAML/JSON tabs
-- Import/export manifest round-trip
-- Migration framework (`spec/migrations`)
-- Stale detection by implementation code hash
+- [x] Manifest editor with form and raw JSON tabs
+- [x] Import/export manifest round-trip
+- [x] Migration framework (`spec/migrations`)
+- [x] Stale detection by implementation code hash
+- [ ] YAML tab (JSON only for now)
 
 ## Phase 4 — Standards analyzer (`analyzer`)
 

@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import type { Abi } from 'abitype';
 import { normalizeAbi } from '@semantic-dapp/spec';
 import { classifyContract, buildManifest } from './classify.js';
-import { applyReview } from './review.js';
+import { applyReview, mergeReviewed } from './review.js';
 
 function fn(name: string, inputs: string[], outputs: string[], mut = 'nonpayable') {
   return {
@@ -80,6 +80,48 @@ describe('buildManifest', () => {
     expect(manifest.version).toBe(1);
     expect(manifest.contracts[0]?.standards).toContain('erc-20');
     expect(manifest.operations.length).toBe(model.functions.length);
+  });
+
+  it('records implementation binding fields', () => {
+    const manifest = buildManifest(model, {
+      projectName: 'FIX',
+      contractId: 'token',
+      abiSource: 'sourcify',
+      implementationAddress: '0x2222222222222222222222222222222222222222',
+      implementationCodeHash: '0xdeadbeef',
+    });
+    expect(manifest.contracts[0]?.abiSource).toBe('sourcify');
+    expect(manifest.contracts[0]?.implementationAddress).toBe(
+      '0x2222222222222222222222222222222222222222',
+    );
+    expect(manifest.contracts[0]?.implementationCodeHash).toBe('0xdeadbeef');
+  });
+});
+
+describe('mergeReviewed', () => {
+  it('preserves reviewed display fields but refreshes analysis', () => {
+    const previous0 = buildManifest(model, { projectName: 'FIX', contractId: 'token' });
+    const transferId = previous0.operations.find(
+      (o) => o.function === 'transfer(address,uint256)',
+    )!.id;
+
+    // Human edits an operation.
+    let previous = applyReview(previous0, transferId, { type: 'set-title', title: 'Send tokens' });
+    previous = applyReview(previous, transferId, { type: 'set-audience', audience: 'operator' });
+
+    // A fresh analysis (defaults) is merged in.
+    const fresh = buildManifest(model, { projectName: 'FIX', contractId: 'token' });
+    const merged = mergeReviewed(previous, fresh);
+
+    const mergedTransfer = merged.operations.find((o) => o.id === transferId);
+    expect(mergedTransfer?.title).toBe('Send tokens');
+    expect(mergedTransfer?.audience).toBe('operator');
+    expect(mergedTransfer?.reviewed).toBe(true);
+
+    // Non-reviewed operations come straight from the fresh analysis.
+    const mint = merged.operations.find((o) => o.function === 'mint(address,uint256)');
+    expect(mint?.reviewed).toBe(false);
+    expect(mint?.audience).toBe('admin');
   });
 });
 

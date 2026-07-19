@@ -30,8 +30,15 @@ test('import an ERC-20 ABI and generate User/Raw tabs', async ({ page }) => {
   await page.getByRole('tab', { name: /Raw/ }).click();
   await expect(page.getByText('transfer(address,uint256)').first()).toBeVisible();
 
-  // Project controls are available (settings + manifest export).
+  // Project controls are available (settings + manifest export/import/edit).
   await expect(page.getByRole('button', { name: 'Export manifest' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Import manifest' })).toBeVisible();
   await page.getByRole('button', { name: 'Settings' }).click();
   await expect(page.getByRole('heading', { name: 'Connection settings' })).toBeVisible();
+
+  // The manifest editor opens with Operations/JSON tabs.
+  await page.getByRole('button', { name: 'Edit manifest' }).click();
+  await expect(page.getByRole('heading', { name: 'Edit manifest' })).toBeVisible();
+  await page.getByRole('tab', { name: 'JSON' }).click();
+  await expect(page.getByRole('button', { name: /Validate .* apply JSON/ })).toBeVisible();
 });

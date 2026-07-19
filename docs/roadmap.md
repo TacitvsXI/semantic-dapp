@@ -35,7 +35,11 @@ See [`../PROGRESS.md`](../PROGRESS.md) for the live dashboard. Phase 1 shipped a
 resolver) is implemented ([checklist](progress/phase-2-address-resolver.md),
 [ADR-003](adr/ADR-003-resolver-adapters.md)): `packages/resolver` with Sourcify +
 block-explorer adapters and EIP-1967 proxy detection, wired into the studio's
-**By address** import.
+**By address** import. Phase 3 (semantic manifest) is implemented
+([checklist](progress/phase-3-semantic-manifest.md),
+[ADR-004](adr/ADR-004-manifest-versioning.md)): manifest import/export round-trip,
+a form + raw-JSON editor, reviewed-edit preservation on re-analyze, staleness
+detection by code hash, and a schema migration framework.
 
 ## In scope for the open-source MVP
 
