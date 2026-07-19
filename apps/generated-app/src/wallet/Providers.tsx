@@ -32,7 +32,9 @@ export function AppProviders({ chainId, rpcUrl, name, children }: AppProvidersPr
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider theme={rkTheme} modalSize="compact">
+        {/* Default the connect/switch flow to the bundle's chain to cut down on
+            wrong-network prompts. */}
+        <RainbowKitProvider theme={rkTheme} modalSize="compact" initialChain={chainId}>
           {children}
         </RainbowKitProvider>
       </QueryClientProvider>

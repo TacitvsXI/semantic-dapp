@@ -67,8 +67,7 @@ export function ProjectView({ project: initialProject, onBack, onUpdated }: Proj
     const bundle = buildBundle({
       name: project.name,
       chainId: project.contract.chainId,
-      // `Abi` (viem) is readonly; the bundle schema validates a mutable copy.
-      abi: project.abi as never,
+      abi: project.abi,
       manifest,
       rpcUrl: project.rpcUrl,
       ...(project.contract.address ? { address: project.contract.address } : {}),

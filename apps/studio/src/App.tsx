@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
+import { ConfirmDialog } from '@semantic-dapp/components';
 import { ProjectProviders } from './wallet/Providers.js';
 import { ImportWizard } from './screens/ImportWizard.js';
 import { ProjectList } from './screens/ProjectList.js';
 import { ProjectView } from './screens/ProjectView.js';
+import { clearHistory } from './state/history.js';
 import { deleteProject, getProject, listProjects } from './state/storage.js';
 import type { Project } from './state/project.js';
 
@@ -11,9 +13,18 @@ type View = { kind: 'list' } | { kind: 'import' } | { kind: 'project'; id: strin
 export function App() {
   const [view, setView] = useState<View>({ kind: 'list' });
   const [projects, setProjects] = useState<Project[]>([]);
+  const [pendingDelete, setPendingDelete] = useState<Project | null>(null);
 
   const refresh = useCallback(() => setProjects(listProjects()), []);
   useEffect(() => refresh(), [refresh]);
+
+  const confirmDelete = useCallback(() => {
+    if (!pendingDelete) return;
+    deleteProject(pendingDelete.id);
+    clearHistory(pendingDelete.id);
+    setPendingDelete(null);
+    refresh();
+  }, [pendingDelete, refresh]);
 
   const activeProject = view.kind === 'project' ? getProject(view.id) : undefined;
 
@@ -34,10 +45,7 @@ export function App() {
             projects={projects}
             onNew={() => setView({ kind: 'import' })}
             onOpen={(p) => setView({ kind: 'project', id: p.id })}
-            onDelete={(id) => {
-              deleteProject(id);
-              refresh();
-            }}
+            onDelete={(id) => setPendingDelete(projects.find((p) => p.id === id) ?? null)}
           />
         ) : null}
 
@@ -72,6 +80,20 @@ export function App() {
       <footer className="studio-footer">
         Local-first · projects stored in your browser · AGPL-3.0
       </footer>
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        title="Delete project?"
+        message={
+          pendingDelete
+            ? `"${pendingDelete.name}" and its local execution history will be permanently removed from this browser. This cannot be undone.`
+            : ''
+        }
+        risk="high"
+        confirmLabel="Delete project"
+        onConfirm={confirmDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
     </div>
   );
 }

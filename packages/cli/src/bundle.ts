@@ -49,8 +49,7 @@ export function bundleFromInputs(inputs: BundleInputs): SemanticBundle {
   return buildBundle({
     name: inputs.name,
     chainId: inputs.chainId,
-    // `Abi` (abitype) is readonly; the bundle schema validates a mutable copy.
-    abi: inputs.abi as unknown as SemanticBundle['abi'],
+    abi: inputs.abi,
     manifest,
     ...(inputs.rpcUrl ? { rpcUrl: inputs.rpcUrl } : {}),
     ...(inputs.address ? { address: inputs.address } : {}),

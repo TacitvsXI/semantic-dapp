@@ -1,7 +1,9 @@
 # Backlog (Phases 2+)
 
 Captured while building the Phase 1 vertical slice. Ordered roughly by the
-roadmap. Each becomes a GitHub issue with the matching label.
+roadmap. Each becomes a GitHub issue with the matching label. UX-specific
+polish (toasts, explorer links, read grid, vault panel, …) is tracked and
+prioritized in [`docs/ux-improvements.md`](../ux-improvements.md).
 
 ## Post-v0.0.1 polish (delivered)
 
@@ -30,14 +32,14 @@ Pick these up between phases or when they naturally fold into a larger workstrea
 - [ ] **Empty `react` vendor chunk** — the manualChunks split emits a 0 KB
       `react` chunk; refine the split (function form) so React lands in its own
       cacheable chunk.
-- [ ] **RainbowKit `initialChain`** — default the connect modal to the project's
-      configured chain to reduce wrong-network prompts.
+- [x] **RainbowKit `initialChain`** — connect/switch flow now defaults to the
+      project's / bundle's chain in both apps to reduce wrong-network prompts.
 - [ ] **Unit tests for studio utilities** — cover `lib/download.ts` and the
       `SettingsPanel` validation logic (currently only e2e-smoke touches them).
-- [ ] **Project delete confirmation** — guard against accidental loss of a
-      locally-stored project.
+- [x] **Project delete confirmation** — deleting a project opens a high-risk
+      `ConfirmDialog` and clears its local execution history (no one-click loss).
 - [ ] **Tx notifications** — lightweight toast on success/error in addition to
-      the inline `TxStatusView`.
+      the inline `TxStatusView`. Tracked in [UX improvements](../ux-improvements.md) (P0).
 - [x] **A11y pass** — `@axe-core/playwright` gate on the standalone app (User +
       Raw tabs, no serious/critical violations); raised badge/button text contrast
       to WCAG AA (Phase 9).
@@ -140,8 +142,8 @@ Pick these up between phases or when they naturally fold into a larger workstrea
 - [x] Accessibility gate (`@axe-core/playwright`) + contrast fixes
 - [x] CI: forge fixtures job (+ ABI drift check) and generated-app e2e
 - [x] `v0.1.0-beta` version bump + `CHANGELOG.md` + README beta status
-- [ ] Emergency/write **button** white-on-color contrast (pause/emergency panels
-      only reach ~4:1; the a11y gate scans User + Raw tabs, not the Emergency tab)
+- [x] Emergency/write **button** white-on-color contrast — filled emergency
+      buttons use a darker `--sd-emergency-fill` (#b3261e) so white text clears AA
 - [ ] Dependency/security review + Dependabot before tagging `v0.1.0`
 - [ ] Fund the demos against a public testnet so writes work without local Anvil
 - [ ] Screenshots/GIFs of the vault and RWA demos in `docs/demos.md`

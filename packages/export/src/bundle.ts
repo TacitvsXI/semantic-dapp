@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { abiSchema, semanticManifestSchema } from '@semantic-dapp/spec';
+import { abiSchema, semanticManifestSchema, type Abi } from '@semantic-dapp/spec';
 
 /** Current bundle format version. Bump when the shape changes incompatibly. */
 export const BUNDLE_VERSION = 1;
@@ -38,7 +38,8 @@ const DEFAULT_GENERATOR: Generator = { name: 'semantic-dapp', version: '0.1.0-be
 export interface BuildBundleInput {
   name: string;
   chainId: number;
-  abi: SemanticBundle['abi'];
+  /** viem's `Abi` is `readonly`; the schema validates a mutable copy at runtime. */
+  abi: Abi;
   manifest: SemanticBundle['manifest'];
   rpcUrl?: string;
   address?: string;

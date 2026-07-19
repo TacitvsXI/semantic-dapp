@@ -17,6 +17,10 @@
   --sd-user-text: #5b9be6;
   --sd-emergency-text: #ef8a86;
   --sd-danger-text: #f08a5d;
+  /* Solid fill for filled danger/emergency buttons: dark enough that white
+     button text clears WCAG AA 4.5:1 (the vivid --sd-emergency is kept for the
+     recognisable outline). */
+  --sd-emergency-fill: #b3261e;
   --sd-radius: 10px;
 }
 
@@ -426,7 +430,7 @@
 /* ---- Phase 6: trusted UI (ADR-007) ---- */
 
 .sd-btn--emergency {
-  background: var(--sd-emergency);
+  background: var(--sd-emergency-fill);
   border-color: var(--sd-emergency);
   color: #fff;
 }
