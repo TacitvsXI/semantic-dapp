@@ -39,6 +39,39 @@ jobs:
       - name: Build
         run: pnpm build
 
+  contracts:
+    name: forge fixtures
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Install forge-std
+        working-directory: contracts/fixtures
+        run: forge install foundry-rs/forge-std --no-git
+
+      - name: Forge build & test
+        working-directory: contracts/fixtures
+        run: forge test -vvv
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check committed ABIs are up to date
+        run: |
+          pnpm gen:abi
+          git diff --exit-code contracts/fixtures/abi \
+            || (echo "::error::contracts/fixtures/abi is stale — run 'forge build' + 'pnpm gen:abi'" && exit 1)
+
   integration:
     name: anvil integration
     runs-on: ubuntu-latest
@@ -86,5 +119,8 @@ jobs:
       - name: Install Playwright browsers
         run: pnpm --filter @semantic-dapp/studio exec playwright install --with-deps chromium
 
-      - name: E2E smoke test
+      - name: E2E smoke test (studio)
         run: pnpm --filter @semantic-dapp/studio test:e2e
+
+      - name: E2E smoke + a11y (generated-app)
+        run: pnpm --filter @semantic-dapp/generated-app test:e2e

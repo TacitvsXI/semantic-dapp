@@ -1,6 +1,6 @@
 {
   "name": "@semantic-dapp/cli",
-  "version": "0.0.1",
+  "version": "0.1.0-beta",
   "description": "semantic-dapp CLI: turn an ABI into a bundle and export a standalone app.",
   "license": "AGPL-3.0-only",
   "type": "module",

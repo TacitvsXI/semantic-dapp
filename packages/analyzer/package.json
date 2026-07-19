@@ -1,6 +1,6 @@
 {
   "name": "@semantic-dapp/analyzer",
-  "version": "0.0.1",
+  "version": "0.1.0-beta",
   "description": "Deterministic standards detection (ERC-20, …) for Semantic Dapp.",
   "license": "AGPL-3.0-only",
   "type": "module",

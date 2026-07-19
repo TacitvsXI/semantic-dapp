@@ -66,7 +66,14 @@ exportable execution history (audit trail) of every transaction. Phase 8 (export
 `SemanticBundle` (`packages/export`), a `semantic-dapp` CLI (`packages/cli`) that
 turns an ABI into a bundle, scaffolds a standalone app and serves it, and a
 `generated-app` template (`apps/generated-app`) that renders any bundle at runtime
-without the studio.
+without the studio. Phase 9 (fixtures, docs & public beta) is implemented
+([checklist](progress/phase-9-fixtures-docs-beta.md),
+[ADR-010](adr/ADR-010-fixtures-demos-release.md), [demos](demos.md)): `MockVault`
+(ERC-4626) and `MockRWA` (roles + pause) Foundry fixtures with tests drive
+analyzer/classifier detection tests from their real compiled ABIs; three committed
+demo bundles render in the standalone app; an `@axe-core/playwright` gate enforces
+accessibility; CI runs the Solidity fixtures and standalone e2e; and the packages
+are cut as **`v0.1.0-beta`** with a [`CHANGELOG.md`](../CHANGELOG.md).
 
 ## In scope for the open-source MVP
 

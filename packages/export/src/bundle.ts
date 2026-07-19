@@ -33,7 +33,7 @@ export const semanticBundleSchema = z.object({
 export type SemanticBundle = z.infer<typeof semanticBundleSchema>;
 export type Generator = z.infer<typeof generatorSchema>;
 
-const DEFAULT_GENERATOR: Generator = { name: 'semantic-dapp', version: '0.0.1' };
+const DEFAULT_GENERATOR: Generator = { name: 'semantic-dapp', version: '0.1.0-beta' };
 
 export interface BuildBundleInput {
   name: string;

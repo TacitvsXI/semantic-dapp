@@ -18,17 +18,22 @@ npx semantic-dapp import --chain 1 --address 0x...
 
 ## Status
 
-`v0.x` — early development. See the [roadmap](docs/roadmap.md) and current
+`v0.1.0-beta` — public beta. The full pipeline works end to end: import by
+address or ABI → standards/permission/risk analysis → reviewed semantic manifest
+→ generated User/Admin/Raw UI → wallet execution → export a standalone dApp (or
+build one headlessly with the `semantic-dapp` CLI). See the
+[roadmap](docs/roadmap.md), the [changelog](CHANGELOG.md) and the current
 [progress dashboard](PROGRESS.md).
-
-The **first phase** delivers a vertical slice: manual ABI import → normalized
-contract model → first ERC-20 detector → generated User/Admin/Raw UI → wallet
-transaction. Track it in
-[`docs/progress/phase-1-vertical-slice.md`](docs/progress/phase-1-vertical-slice.md).
 
 ![Generated app from an ERC-20 ABI](docs/demo/generated-app.png)
 
-See [`docs/demo.md`](docs/demo.md) for the full ABI → generated app → transfer walkthrough.
+- [`docs/demo.md`](docs/demo.md) — the ABI → generated app → transfer walkthrough.
+- [`docs/demos.md`](docs/demos.md) — three ready-to-render demos (ERC-20, ERC-4626
+  vault, role-gated RWA) built from the Foundry fixtures.
+- [`docs/export.md`](docs/export.md) — export a bundle and host it, or use the CLI.
+
+Beta means the surface is usable but still moving: while in `0.x`, minor versions
+may include breaking changes.
 
 ## Design principles
 

@@ -5,20 +5,36 @@ for the full plan.
 
 ## Phases
 
-| Phase | Focus                    | Status             |
-| ----- | ------------------------ | ------------------ |
-| 0     | Foundation & repo setup  | ✅ Done            |
-| 1     | Raw ABI runtime (slice)  | ✅ Done (`v0.0.1`) |
-| 2     | Address resolver         | ✅ Done (slice)    |
-| 3     | Semantic manifest        | ✅ Done (slice)    |
-| 4     | Standards analyzer       | ✅ Done (slice)    |
-| 5     | Classification & routing | ✅ Done (slice)    |
-| 6     | Trusted UI components    | ✅ Done (slice)    |
-| 7     | Safety & diagnostics     | ✅ Done (slice)    |
-| 8     | Export & CLI             | ✅ Done (slice)    |
-| 9     | Fixtures, docs, beta     | ⬜ Not started     |
+| Phase | Focus                    | Status                  |
+| ----- | ------------------------ | ----------------------- |
+| 0     | Foundation & repo setup  | ✅ Done                 |
+| 1     | Raw ABI runtime (slice)  | ✅ Done (`v0.0.1`)      |
+| 2     | Address resolver         | ✅ Done (slice)         |
+| 3     | Semantic manifest        | ✅ Done (slice)         |
+| 4     | Standards analyzer       | ✅ Done (slice)         |
+| 5     | Classification & routing | ✅ Done (slice)         |
+| 6     | Trusted UI components    | ✅ Done (slice)         |
+| 7     | Safety & diagnostics     | ✅ Done (slice)         |
+| 8     | Export & CLI             | ✅ Done (slice)         |
+| 9     | Fixtures, docs, beta     | ✅ Done (`v0.1.0-beta`) |
 
-## Current phase: Phase 8 — Export & CLI
+## Current phase: Phase 9 — Fixtures, Docs & Public Beta
+
+Detailed checklist: [`docs/progress/phase-9-fixtures-docs-beta.md`](docs/progress/phase-9-fixtures-docs-beta.md).
+
+The pipeline is now proven on **production-like fixtures** and cut as a public
+beta (ADR-010). Two new Foundry fixtures — **`MockVault`** (ERC-4626) and
+**`MockRWA`** (AccessControl roles + Pausable + mint/burn) — join `MockERC20`,
+each with `forge` tests. Their **real compiled ABIs** (committed under
+`contracts/fixtures/abi`) drive analyzer/classifier detection tests, so coverage
+reflects what the compiler emits. Three committed **demo bundles** (ERC-20, vault,
+RWA) render in the standalone app (see [`docs/demos.md`](docs/demos.md)), an
+**`@axe-core/playwright` gate** keeps the generated UI accessible, and CI now runs
+the Solidity fixtures and the standalone e2e. Packages are versioned
+**`0.1.0-beta`** with a [`CHANGELOG.md`](CHANGELOG.md). See
+[ADR-010](docs/adr/ADR-010-fixtures-demos-release.md).
+
+## Previous phase: Phase 8 — Export & CLI
 
 Detailed checklist: [`docs/progress/phase-8-export-cli.md`](docs/progress/phase-8-export-cli.md).
 

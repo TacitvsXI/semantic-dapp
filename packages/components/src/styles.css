@@ -11,6 +11,12 @@
   --sd-emergency: #d9534f;
   --sd-danger: #d93f0b;
   --sd-ok: #2e9e5b;
+  /* Lighter variants used for small text on dark surfaces so it clears the
+     WCAG AA 4.5:1 contrast threshold; the vivid tokens above stay for
+     borders/backgrounds where they pair with white or the base bg. */
+  --sd-user-text: #5b9be6;
+  --sd-emergency-text: #ef8a86;
+  --sd-danger-text: #f08a5d;
   --sd-radius: 10px;
 }
 
@@ -35,7 +41,7 @@
   color: var(--sd-muted);
 }
 .sd-field__error {
-  color: var(--sd-danger);
+  color: var(--sd-danger-text);
   font-size: 12px;
   margin: 2px 0 0;
 }
@@ -183,7 +189,7 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
-  color: var(--sd-danger);
+  color: var(--sd-danger-text);
 }
 
 .sd-badge {
@@ -210,11 +216,11 @@
 .sd-badge--risk-high,
 .sd-badge--risk-critical {
   border-color: var(--sd-danger);
-  color: var(--sd-danger);
+  color: var(--sd-danger-text);
 }
 .sd-badge--audience-user {
   border-color: var(--sd-user);
-  color: var(--sd-user);
+  color: var(--sd-user-text);
 }
 .sd-badge--audience-admin,
 .sd-badge--audience-operator {
@@ -223,7 +229,7 @@
 }
 .sd-badge--audience-emergency {
   border-color: var(--sd-emergency);
-  color: var(--sd-emergency);
+  color: var(--sd-emergency-text);
 }
 
 .sd-evidence {
@@ -347,7 +353,7 @@
 }
 .sd-badge--write {
   border-color: var(--sd-user);
-  color: var(--sd-user);
+  color: var(--sd-user-text);
 }
 .sd-badge--payable {
   border-color: var(--sd-admin);
@@ -367,7 +373,7 @@
   font-size: 12px;
 }
 .sd-runner__error {
-  color: var(--sd-danger);
+  color: var(--sd-danger-text);
   font-size: 13px;
 }
 
@@ -519,7 +525,7 @@
   border: 1px solid var(--sd-border);
 }
 .sd-pause__status--paused {
-  color: var(--sd-emergency);
+  color: var(--sd-emergency-text);
   border-color: var(--sd-emergency);
 }
 .sd-pause__status--active {
@@ -584,7 +590,7 @@
 }
 .sd-overview__warn {
   margin-top: 10px;
-  color: var(--sd-emergency);
+  color: var(--sd-emergency-text);
   font-size: 12px;
 }
 
@@ -623,7 +629,7 @@
   border-color: var(--sd-emergency);
 }
 .sd-warning--danger .sd-warning__title {
-  color: var(--sd-emergency);
+  color: var(--sd-emergency-text);
 }
 .sd-warning--warn {
   border-color: var(--sd-admin);
@@ -660,6 +666,6 @@
   border-color: var(--sd-ok);
 }
 .sd-audit__status--error {
-  color: var(--sd-emergency);
+  color: var(--sd-emergency-text);
   border-color: var(--sd-emergency);
 }

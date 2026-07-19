@@ -1,6 +1,6 @@
 {
   "name": "semantic-dapp",
-  "version": "0.0.1",
+  "version": "0.1.0-beta",
   "private": true,
   "type": "module",
   "description": "Generate usable user dApps and admin consoles from EVM contract ABI, NatSpec and source code.",
@@ -21,6 +21,8 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "test:integration": "turbo run test:integration",
+    "gen:abi": "node scripts/gen-abi.mjs",
+    "gen:demos": "node scripts/gen-demos.mjs",
     "clean": "turbo run clean && rm -rf node_modules",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\"",
@@ -28,6 +30,9 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
+    "@semantic-dapp/classifier": "workspace:*",
+    "@semantic-dapp/export": "workspace:*",
+    "@semantic-dapp/spec": "workspace:*",
     "@types/node": "^22.10.2",
     "@typescript-eslint/eslint-plugin": "^8.18.2",
     "@typescript-eslint/parser": "^8.18.2",

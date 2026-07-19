@@ -1,6 +1,6 @@
 {
   "name": "@semantic-dapp/export",
-  "version": "0.0.1",
+  "version": "0.1.0-beta",
   "description": "Portable SemanticBundle: identity + ABI + reviewed manifest for standalone export.",
   "license": "AGPL-3.0-only",
   "type": "module",

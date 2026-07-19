@@ -38,7 +38,9 @@ Pick these up between phases or when they naturally fold into a larger workstrea
       locally-stored project.
 - [ ] **Tx notifications** — lightweight toast on success/error in addition to
       the inline `TxStatusView`.
-- [ ] **A11y pass** — labels/aria on generated forms and the tab bar.
+- [x] **A11y pass** — `@axe-core/playwright` gate on the standalone app (User +
+      Raw tabs, no serious/critical violations); raised badge/button text contrast
+      to WCAG AA (Phase 9).
 
 ## Phase 2 — Address resolver (`resolver`)
 
@@ -130,8 +132,16 @@ Pick these up between phases or when they naturally fold into a larger workstrea
 - [ ] `export` that emits a prebuilt static `dist` (not just source) for
       zero-toolchain hosting
 
-## Phase 9 — Public beta
+## Phase 9 — Fixtures, docs & public beta — done (slice)
 
-- ERC-20, ERC-4626 vault, RWA-style (roles + pause) demos
-- Accessibility audit; dependency/security review
-- `v0.1.0-beta` release
+- [x] `MockVault` (ERC-4626) + `MockRWA` (roles + pause) Foundry fixtures + tests
+- [x] Real compiled ABIs (`contracts/fixtures/abi`) drive analyzer/classifier tests
+- [x] Three demo bundles (ERC-20, vault, RWA) + `docs/demos.md`
+- [x] Accessibility gate (`@axe-core/playwright`) + contrast fixes
+- [x] CI: forge fixtures job (+ ABI drift check) and generated-app e2e
+- [x] `v0.1.0-beta` version bump + `CHANGELOG.md` + README beta status
+- [ ] Emergency/write **button** white-on-color contrast (pause/emergency panels
+      only reach ~4:1; the a11y gate scans User + Raw tabs, not the Emergency tab)
+- [ ] Dependency/security review + Dependabot before tagging `v0.1.0`
+- [ ] Fund the demos against a public testnet so writes work without local Anvil
+- [ ] Screenshots/GIFs of the vault and RWA demos in `docs/demos.md`

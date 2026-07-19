@@ -1,6 +1,6 @@
 {
   "name": "@semantic-dapp/generated-app",
-  "version": "0.0.1",
+  "version": "0.1.0-beta",
   "description": "Standalone template that renders a SemanticBundle without the studio.",
   "license": "AGPL-3.0-only",
   "type": "module",
@@ -29,6 +29,7 @@
     "wagmi": "^2.14.6"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.1",
     "@playwright/test": "^1.49.1",
     "@semantic-dapp/classifier": "workspace:*",
     "@types/react": "^18.3.18",

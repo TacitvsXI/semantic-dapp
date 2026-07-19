@@ -1,0 +1,1550 @@
+{
+  "bundleVersion": 1,
+  "generator": {
+    "name": "semantic-dapp",
+    "version": "0.1.0-beta"
+  },
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "name": "Demo Vault",
+  "chainId": 31337,
+  "rpcUrl": "http://127.0.0.1:8545",
+  "contractName": "MockVault",
+  "abi": [
+    {
+      "type": "constructor",
+      "inputs": [
+        {
+          "name": "asset_",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "name_",
+          "type": "string",
+          "internalType": "string"
+        },
+        {
+          "name": "symbol_",
+          "type": "string",
+          "internalType": "string"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "allowance",
+      "inputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "approve",
+      "inputs": [
+        {
+          "name": "spender",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "value",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool",
+          "internalType": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "asset",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "balanceOf",
+      "inputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "convertToAssets",
+      "inputs": [
+        {
+          "name": "shares",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "convertToShares",
+      "inputs": [
+        {
+          "name": "assets",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "decimals",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint8",
+          "internalType": "uint8"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "deposit",
+      "inputs": [
+        {
+          "name": "assets",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "receiver",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "shares",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "maxDeposit",
+      "inputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "pure"
+    },
+    {
+      "type": "function",
+      "name": "maxMint",
+      "inputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "pure"
+    },
+    {
+      "type": "function",
+      "name": "maxRedeem",
+      "inputs": [
+        {
+          "name": "owner",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "maxWithdraw",
+      "inputs": [
+        {
+          "name": "owner",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "mint",
+      "inputs": [
+        {
+          "name": "shares",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "receiver",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "assets",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "name",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "string",
+          "internalType": "string"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "previewDeposit",
+      "inputs": [
+        {
+          "name": "assets",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "previewMint",
+      "inputs": [
+        {
+          "name": "shares",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "previewRedeem",
+      "inputs": [
+        {
+          "name": "shares",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "previewWithdraw",
+      "inputs": [
+        {
+          "name": "assets",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "redeem",
+      "inputs": [
+        {
+          "name": "shares",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "receiver",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "owner",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "assets",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "symbol",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "string",
+          "internalType": "string"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "totalAssets",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "totalSupply",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "transfer",
+      "inputs": [
+        {
+          "name": "to",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "value",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool",
+          "internalType": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "transferFrom",
+      "inputs": [
+        {
+          "name": "from",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "to",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "value",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool",
+          "internalType": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "withdraw",
+      "inputs": [
+        {
+          "name": "assets",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "receiver",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "owner",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "shares",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "event",
+      "name": "Approval",
+      "inputs": [
+        {
+          "name": "owner",
+          "type": "address",
+          "internalType": "address",
+          "indexed": true
+        },
+        {
+          "name": "spender",
+          "type": "address",
+          "internalType": "address",
+          "indexed": true
+        },
+        {
+          "name": "value",
+          "type": "uint256",
+          "internalType": "uint256",
+          "indexed": false
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "Deposit",
+      "inputs": [
+        {
+          "name": "sender",
+          "type": "address",
+          "internalType": "address",
+          "indexed": true
+        },
+        {
+          "name": "owner",
+          "type": "address",
+          "internalType": "address",
+          "indexed": true
+        },
+        {
+          "name": "assets",
+          "type": "uint256",
+          "internalType": "uint256",
+          "indexed": false
+        },
+        {
+          "name": "shares",
+          "type": "uint256",
+          "internalType": "uint256",
+          "indexed": false
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "Transfer",
+      "inputs": [
+        {
+          "name": "from",
+          "type": "address",
+          "internalType": "address",
+          "indexed": true
+        },
+        {
+          "name": "to",
+          "type": "address",
+          "internalType": "address",
+          "indexed": true
+        },
+        {
+          "name": "value",
+          "type": "uint256",
+          "internalType": "uint256",
+          "indexed": false
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "Withdraw",
+      "inputs": [
+        {
+          "name": "sender",
+          "type": "address",
+          "internalType": "address",
+          "indexed": true
+        },
+        {
+          "name": "receiver",
+          "type": "address",
+          "internalType": "address",
+          "indexed": true
+        },
+        {
+          "name": "owner",
+          "type": "address",
+          "internalType": "address",
+          "indexed": true
+        },
+        {
+          "name": "assets",
+          "type": "uint256",
+          "internalType": "uint256",
+          "indexed": false
+        },
+        {
+          "name": "shares",
+          "type": "uint256",
+          "internalType": "uint256",
+          "indexed": false
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "error",
+      "name": "InsufficientAllowance",
+      "inputs": []
+    },
+    {
+      "type": "error",
+      "name": "InsufficientBalance",
+      "inputs": []
+    }
+  ],
+  "manifest": {
+    "version": 1,
+    "project": {
+      "name": "Demo Vault"
+    },
+    "contracts": [
+      {
+        "id": "contract",
+        "chainId": 31337,
+        "name": "MockVault",
+        "abiSource": "manual",
+        "standards": ["erc-20", "erc-4626"]
+      }
+    ],
+    "operations": [
+      {
+        "id": "contract.allowance.a3e16738",
+        "contract": "contract",
+        "function": "allowance(address,address)",
+        "selector": "0xdd62ed3e",
+        "title": "Allowance",
+        "audience": "user",
+        "operationType": "read",
+        "isRead": true,
+        "confidence": 1,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "Matches erc-20 rule for allowance(address,address)",
+            "weight": 1
+          },
+          {
+            "source": "signature",
+            "detail": "allowance is a view/pure read"
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "inputs": [
+          {
+            "name": "arg0",
+            "type": "address",
+            "widget": "address"
+          },
+          {
+            "name": "arg1",
+            "type": "address",
+            "widget": "address"
+          }
+        ],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.approve.5d1a23e6",
+        "contract": "contract",
+        "function": "approve(address,uint256)",
+        "selector": "0x095ea7b3",
+        "title": "Approve spender",
+        "description": "Allow a spender to move tokens on your behalf.",
+        "audience": "user",
+        "operationType": "token-approve",
+        "isRead": false,
+        "confidence": 1,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "Matches erc-20 rule for approve(address,uint256)",
+            "weight": 1
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "risk": {
+          "level": "medium"
+        },
+        "inputs": [
+          {
+            "name": "spender",
+            "type": "address",
+            "widget": "address"
+          },
+          {
+            "name": "value",
+            "type": "uint256",
+            "widget": "token-amount",
+            "token": "self"
+          }
+        ],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.asset.3cf5d7d4",
+        "contract": "contract",
+        "function": "asset()",
+        "selector": "0x38d52e0f",
+        "title": "Underlying asset",
+        "audience": "user",
+        "operationType": "read",
+        "isRead": true,
+        "confidence": 1,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "Matches erc-4626 rule for asset()",
+            "weight": 1
+          },
+          {
+            "source": "signature",
+            "detail": "asset is a view/pure read"
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "inputs": [],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.balanceOf.af5cd17d",
+        "contract": "contract",
+        "function": "balanceOf(address)",
+        "selector": "0x70a08231",
+        "title": "Balance of",
+        "audience": "user",
+        "operationType": "read",
+        "isRead": true,
+        "confidence": 1,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "Matches erc-20 rule for balanceOf(address)",
+            "weight": 1
+          },
+          {
+            "source": "signature",
+            "detail": "balanceOf is a view/pure read"
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "inputs": [
+          {
+            "name": "arg0",
+            "type": "address",
+            "widget": "address"
+          }
+        ],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.convertToAssets.2d3301fc",
+        "contract": "contract",
+        "function": "convertToAssets(uint256)",
+        "selector": "0x07a2d13a",
+        "title": "Convert to assets",
+        "audience": "user",
+        "operationType": "read",
+        "isRead": true,
+        "confidence": 1,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "Matches erc-4626 rule for convertToAssets(uint256)",
+            "weight": 1
+          },
+          {
+            "source": "signature",
+            "detail": "convertToAssets is a view/pure read"
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "inputs": [
+          {
+            "name": "shares",
+            "type": "uint256",
+            "widget": "integer"
+          }
+        ],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.convertToShares.3e9edb21",
+        "contract": "contract",
+        "function": "convertToShares(uint256)",
+        "selector": "0xc6e6f592",
+        "title": "Convert to shares",
+        "audience": "user",
+        "operationType": "read",
+        "isRead": true,
+        "confidence": 1,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "Matches erc-4626 rule for convertToShares(uint256)",
+            "weight": 1
+          },
+          {
+            "source": "signature",
+            "detail": "convertToShares is a view/pure read"
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "inputs": [
+          {
+            "name": "assets",
+            "type": "uint256",
+            "widget": "integer"
+          }
+        ],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.decimals.2e267c1c",
+        "contract": "contract",
+        "function": "decimals()",
+        "selector": "0x313ce567",
+        "title": "Decimals",
+        "audience": "user",
+        "operationType": "read",
+        "isRead": true,
+        "confidence": 1,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "Matches erc-20 rule for decimals()",
+            "weight": 1
+          },
+          {
+            "source": "signature",
+            "detail": "decimals is a view/pure read"
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "inputs": [],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.deposit.95442d39",
+        "contract": "contract",
+        "function": "deposit(uint256,address)",
+        "selector": "0x6e553f65",
+        "title": "Deposit assets",
+        "description": "Deposit assets and receive vault shares.",
+        "audience": "user",
+        "operationType": "vault-deposit",
+        "isRead": false,
+        "confidence": 1,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "Matches erc-4626 rule for deposit(uint256,address)",
+            "weight": 1
+          },
+          {
+            "source": "name",
+            "detail": "Function name \"deposit\" suggests fund-deposit",
+            "weight": 0.5
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "risk": {
+          "level": "low"
+        },
+        "inputs": [
+          {
+            "name": "assets",
+            "type": "uint256",
+            "widget": "token-amount",
+            "token": "self"
+          },
+          {
+            "name": "receiver",
+            "type": "address",
+            "widget": "address"
+          }
+        ],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.maxDeposit.194bdf56",
+        "contract": "contract",
+        "function": "maxDeposit(address)",
+        "selector": "0x402d267d",
+        "title": "Max deposit",
+        "audience": "user",
+        "operationType": "read",
+        "isRead": true,
+        "confidence": 0.35,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "maxDeposit is a view/pure read"
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "inputs": [
+          {
+            "name": "arg0",
+            "type": "address",
+            "widget": "address"
+          }
+        ],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.maxMint.0c593f98",
+        "contract": "contract",
+        "function": "maxMint(address)",
+        "selector": "0xc63d75b6",
+        "title": "Max mint",
+        "audience": "user",
+        "operationType": "read",
+        "isRead": true,
+        "confidence": 0.35,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "maxMint is a view/pure read"
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "inputs": [
+          {
+            "name": "arg0",
+            "type": "address",
+            "widget": "address"
+          }
+        ],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.maxRedeem.2de36298",
+        "contract": "contract",
+        "function": "maxRedeem(address)",
+        "selector": "0xd905777e",
+        "title": "Max redeem",
+        "audience": "user",
+        "operationType": "read",
+        "isRead": true,
+        "confidence": 0.35,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "maxRedeem is a view/pure read"
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "inputs": [
+          {
+            "name": "owner",
+            "type": "address",
+            "widget": "address"
+          }
+        ],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.maxWithdraw.8a0110e4",
+        "contract": "contract",
+        "function": "maxWithdraw(address)",
+        "selector": "0xce96cb77",
+        "title": "Max withdraw",
+        "audience": "user",
+        "operationType": "read",
+        "isRead": true,
+        "confidence": 0.35,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "maxWithdraw is a view/pure read"
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "inputs": [
+          {
+            "name": "owner",
+            "type": "address",
+            "widget": "address"
+          }
+        ],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.mint.9a7eabf7",
+        "contract": "contract",
+        "function": "mint(uint256,address)",
+        "selector": "0x94bf804d",
+        "title": "Mint shares",
+        "description": "Mint an exact number of shares by depositing assets.",
+        "audience": "user",
+        "operationType": "vault-deposit",
+        "isRead": false,
+        "confidence": 1,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "Matches erc-4626 rule for mint(uint256,address)",
+            "weight": 1
+          },
+          {
+            "source": "name",
+            "detail": "Function name \"mint\" suggests token-mint",
+            "weight": 0.5
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "risk": {
+          "level": "low"
+        },
+        "inputs": [
+          {
+            "name": "shares",
+            "type": "uint256",
+            "widget": "token-amount",
+            "token": "self"
+          },
+          {
+            "name": "receiver",
+            "type": "address",
+            "widget": "address"
+          }
+        ],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.name.62e66323",
+        "contract": "contract",
+        "function": "name()",
+        "selector": "0x06fdde03",
+        "title": "Name",
+        "audience": "user",
+        "operationType": "read",
+        "isRead": true,
+        "confidence": 1,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "Matches erc-20 rule for name()",
+            "weight": 1
+          },
+          {
+            "source": "signature",
+            "detail": "name is a view/pure read"
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "inputs": [],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.previewDeposit.ff265409",
+        "contract": "contract",
+        "function": "previewDeposit(uint256)",
+        "selector": "0xef8b30f7",
+        "title": "Preview deposit",
+        "audience": "user",
+        "operationType": "read",
+        "isRead": true,
+        "confidence": 0.35,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "previewDeposit is a view/pure read"
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "inputs": [
+          {
+            "name": "assets",
+            "type": "uint256",
+            "widget": "integer"
+          }
+        ],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.previewMint.4f4e5087",
+        "contract": "contract",
+        "function": "previewMint(uint256)",
+        "selector": "0xb3d7f6b9",
+        "title": "Preview mint",
+        "audience": "user",
+        "operationType": "read",
+        "isRead": true,
+        "confidence": 0.35,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "previewMint is a view/pure read"
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "inputs": [
+          {
+            "name": "shares",
+            "type": "uint256",
+            "widget": "integer"
+          }
+        ],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.previewRedeem.92c1f287",
+        "contract": "contract",
+        "function": "previewRedeem(uint256)",
+        "selector": "0x4cdad506",
+        "title": "Preview redeem",
+        "audience": "user",
+        "operationType": "read",
+        "isRead": true,
+        "confidence": 0.35,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "previewRedeem is a view/pure read"
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "inputs": [
+          {
+            "name": "shares",
+            "type": "uint256",
+            "widget": "integer"
+          }
+        ],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.previewWithdraw.50883ffb",
+        "contract": "contract",
+        "function": "previewWithdraw(uint256)",
+        "selector": "0x0a28a477",
+        "title": "Preview withdraw",
+        "audience": "user",
+        "operationType": "read",
+        "isRead": true,
+        "confidence": 0.35,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "previewWithdraw is a view/pure read"
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "inputs": [
+          {
+            "name": "assets",
+            "type": "uint256",
+            "widget": "integer"
+          }
+        ],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.redeem.2a654d0d",
+        "contract": "contract",
+        "function": "redeem(uint256,address,address)",
+        "selector": "0xba087652",
+        "title": "Redeem shares",
+        "description": "Redeem shares for the underlying assets.",
+        "audience": "user",
+        "operationType": "vault-withdraw",
+        "isRead": false,
+        "confidence": 1,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "Matches erc-4626 rule for redeem(uint256,address,address)",
+            "weight": 1
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "risk": {
+          "level": "medium"
+        },
+        "inputs": [
+          {
+            "name": "shares",
+            "type": "uint256",
+            "widget": "token-amount",
+            "token": "self"
+          },
+          {
+            "name": "receiver",
+            "type": "address",
+            "widget": "address"
+          },
+          {
+            "name": "owner",
+            "type": "address",
+            "widget": "address"
+          }
+        ],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.symbol.07a2caa2",
+        "contract": "contract",
+        "function": "symbol()",
+        "selector": "0x95d89b41",
+        "title": "Symbol",
+        "audience": "user",
+        "operationType": "read",
+        "isRead": true,
+        "confidence": 1,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "Matches erc-20 rule for symbol()",
+            "weight": 1
+          },
+          {
+            "source": "signature",
+            "detail": "symbol is a view/pure read"
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "inputs": [],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.totalAssets.f15de365",
+        "contract": "contract",
+        "function": "totalAssets()",
+        "selector": "0x01e1d114",
+        "title": "Total assets",
+        "audience": "user",
+        "operationType": "read",
+        "isRead": true,
+        "confidence": 1,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "Matches erc-4626 rule for totalAssets()",
+            "weight": 1
+          },
+          {
+            "source": "signature",
+            "detail": "totalAssets is a view/pure read"
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "inputs": [],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.totalSupply.38fbfdd5",
+        "contract": "contract",
+        "function": "totalSupply()",
+        "selector": "0x18160ddd",
+        "title": "Total supply",
+        "audience": "user",
+        "operationType": "read",
+        "isRead": true,
+        "confidence": 1,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "Matches erc-20 rule for totalSupply()",
+            "weight": 1
+          },
+          {
+            "source": "signature",
+            "detail": "totalSupply is a view/pure read"
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "inputs": [],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.transfer.43dcf742",
+        "contract": "contract",
+        "function": "transfer(address,uint256)",
+        "selector": "0xa9059cbb",
+        "title": "Transfer tokens",
+        "description": "Send tokens to another address.",
+        "audience": "user",
+        "operationType": "token-transfer",
+        "isRead": false,
+        "confidence": 1,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "Matches erc-20 rule for transfer(address,uint256)",
+            "weight": 1
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "risk": {
+          "level": "low"
+        },
+        "inputs": [
+          {
+            "name": "to",
+            "type": "address",
+            "widget": "address"
+          },
+          {
+            "name": "value",
+            "type": "uint256",
+            "widget": "token-amount",
+            "token": "self"
+          }
+        ],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.transferFrom.cd55216e",
+        "contract": "contract",
+        "function": "transferFrom(address,address,uint256)",
+        "selector": "0x23b872dd",
+        "title": "Transfer from",
+        "description": "Move tokens from one address to another using an allowance.",
+        "audience": "user",
+        "operationType": "token-transfer",
+        "isRead": false,
+        "confidence": 1,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "Matches erc-20 rule for transferFrom(address,address,uint256)",
+            "weight": 1
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "risk": {
+          "level": "medium"
+        },
+        "inputs": [
+          {
+            "name": "from",
+            "type": "address",
+            "widget": "address"
+          },
+          {
+            "name": "to",
+            "type": "address",
+            "widget": "address"
+          },
+          {
+            "name": "value",
+            "type": "uint256",
+            "widget": "token-amount",
+            "token": "self"
+          }
+        ],
+        "visibility": "visible",
+        "reviewed": false
+      },
+      {
+        "id": "contract.withdraw.49cf8bf1",
+        "contract": "contract",
+        "function": "withdraw(uint256,address,address)",
+        "selector": "0xb460af94",
+        "title": "Withdraw assets",
+        "description": "Withdraw assets by burning shares.",
+        "audience": "user",
+        "operationType": "vault-withdraw",
+        "isRead": false,
+        "confidence": 1,
+        "evidence": [
+          {
+            "source": "signature",
+            "detail": "Matches erc-4626 rule for withdraw(uint256,address,address)",
+            "weight": 1
+          },
+          {
+            "source": "name",
+            "detail": "Function name \"withdraw\" suggests fund-withdraw",
+            "weight": 0.5
+          },
+          {
+            "source": "name",
+            "detail": "No deterministic rule matched; available in the Raw tab."
+          }
+        ],
+        "risk": {
+          "level": "medium"
+        },
+        "inputs": [
+          {
+            "name": "assets",
+            "type": "uint256",
+            "widget": "token-amount",
+            "token": "self"
+          },
+          {
+            "name": "receiver",
+            "type": "address",
+            "widget": "address"
+          },
+          {
+            "name": "owner",
+            "type": "address",
+            "widget": "address"
+          }
+        ],
+        "visibility": "visible",
+        "reviewed": false
+      }
+    ]
+  }
+}

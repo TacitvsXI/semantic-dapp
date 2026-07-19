@@ -7,7 +7,9 @@ import { buildWagmiConfig } from './config.js';
 const queryClient = new QueryClient();
 
 const rkTheme = darkTheme({
-  accentColor: '#3b82f6',
+  // Darker blue than RainbowKit's default so white text on the connect button
+  // clears the WCAG AA 4.5:1 contrast threshold (see ADR-010 a11y gate).
+  accentColor: '#1d4ed8',
   accentColorForeground: '#ffffff',
   borderRadius: 'medium',
   overlayBlur: 'small',

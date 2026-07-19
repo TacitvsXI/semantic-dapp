@@ -1,6 +1,6 @@
 {
   "name": "@semantic-dapp/resolver",
-  "version": "0.0.1",
+  "version": "0.1.0-beta",
   "description": "Resolve a contract ABI/source from an address (Sourcify, block explorers) with proxy detection and provenance.",
   "license": "AGPL-3.0-only",
   "type": "module",

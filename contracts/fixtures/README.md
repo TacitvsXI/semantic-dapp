@@ -6,6 +6,16 @@ end-to-end read/write integration tests.
 - [`src/Counter.sol`](src/Counter.sol) — view/write functions + a custom error.
 - [`src/MockERC20.sol`](src/MockERC20.sol) — self-contained ERC-20 with `mint`,
   events and custom errors.
+- [`src/MockVault.sol`](src/MockVault.sol) — self-contained ERC-4626 vault over an
+  ERC-20 asset (deposit/mint/withdraw/redeem + previews). Shares are an ERC-20.
+- [`src/MockRWA.sol`](src/MockRWA.sol) — role-gated ERC-20 modeling an RWA /
+  stablecoin admin surface: AccessControl-style roles + Pausable + mint/burn.
+
+These are simplified models for analyzer detection and demos — not audited and
+not for production.
+
+Compiled ABIs are committed under [`abi/`](abi) and drive the analyzer/classifier
+unit tests (regenerate with `pnpm gen:abi` from the repo root).
 
 ## Prerequisites
 
@@ -33,8 +43,9 @@ forge script script/Deploy.s.sol \
   --rpc-url http://127.0.0.1:8545 --broadcast   # terminal 2
 ```
 
-The script deploys `Counter` and `MockERC20` (minting 1,000,000 FIX to the
-default Anvil account #0) and prints their addresses.
+The script deploys `Counter`, `MockERC20` (minting 1,000,000 FIX to the default
+Anvil account #0), `MockVault` (over FIX) and `MockRWA` and prints their
+addresses.
 
 The JS integration tests (in `packages/execution`) build these contracts and
 deploy them to an ephemeral Anvil instance automatically.

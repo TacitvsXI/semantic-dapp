@@ -5,6 +5,8 @@ import {Script} from "forge-std/Script.sol";
 import {console} from "forge-std/console.sol";
 import {Counter} from "../src/Counter.sol";
 import {MockERC20} from "../src/MockERC20.sol";
+import {MockVault} from "../src/MockVault.sol";
+import {MockRWA} from "../src/MockRWA.sol";
 
 /// @notice Deploys the fixture contracts to a local chain (Anvil) for demo/dev.
 ///         Usage: forge script script/Deploy.s.sol --rpc-url http://127.0.0.1:8545 --broadcast
@@ -20,13 +22,21 @@ contract Deploy is Script {
         vm.startBroadcast(pk);
 
         Counter counter = new Counter();
+
         MockERC20 token = new MockERC20("Fixture Token", "FIX", 18);
         token.mint(deployer, 1_000_000 ether);
+
+        MockVault vault = new MockVault(address(token), "Vault FIX", "vFIX");
+
+        MockRWA rwa = new MockRWA("RWA Token", "RWA");
+        rwa.mint(deployer, 1_000_000 ether);
 
         vm.stopBroadcast();
 
         console.log("Counter:", address(counter));
         console.log("MockERC20:", address(token));
+        console.log("MockVault:", address(vault));
+        console.log("MockRWA:", address(rwa));
         console.log("Deployer:", deployer);
     }
 }
