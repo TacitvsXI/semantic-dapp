@@ -1,12 +1,15 @@
 import type {
+  Audience,
   ContractFunction,
-  Evidence,
   InputDefinition,
   OperationDefinition,
+  OperationType,
   Permission,
 } from '@semantic-dapp/spec';
 import { inputWidgetForType, operationId } from '@semantic-dapp/spec';
-import type { AccessModel, FunctionSemantic, ResolvedSemantic } from '@semantic-dapp/analyzer';
+import type { AccessModel } from '@semantic-dapp/analyzer';
+import { runRules, type RuleContext } from './engine.js';
+import { DEFAULT_RULES } from './heuristics.js';
 
 /** Confidence assigned to an unmatched function (raw fallback). */
 export const RAW_FALLBACK_CONFIDENCE = 0.2;
@@ -36,7 +39,8 @@ function refineInput(
     return base;
   }
 
-  // Fungible value inputs render as token amounts (decimals-aware).
+  // Fungible value inputs render as token amounts (decimals-aware). Restricted to
+  // standard-backed fungible ops so heuristic matches don't mislabel arbitrary ints.
   const valueOp =
     operationType === 'token-transfer' ||
     operationType === 'token-approve' ||
@@ -44,7 +48,7 @@ function refineInput(
     operationType === 'token-burn' ||
     operationType === 'vault-deposit' ||
     operationType === 'vault-withdraw';
-  if (valueOp && (standard === undefined || FUNGIBLE_STANDARDS.has(standard))) {
+  if (valueOp && standard !== undefined && FUNGIBLE_STANDARDS.has(standard)) {
     return { ...base, widget: 'token-amount', token: 'self' };
   }
   return base;
@@ -60,15 +64,16 @@ function buildInputs(
 
 /** Derive the on-chain permission gating a privileged operation, if any. */
 function permissionFor(
-  semantic: FunctionSemantic,
+  audience: Audience,
+  operationType: OperationType,
+  isRead: boolean,
   access: AccessModel | undefined,
 ): Permission | undefined {
-  const privileged =
-    !semantic.isRead && semantic.audience !== 'user' && semantic.audience !== 'developer';
+  const privileged = !isRead && audience !== 'user' && audience !== 'developer';
   if (!privileged) return undefined;
 
   // Role-based operations are always AccessControl-gated by definition.
-  if (semantic.operationType.startsWith('role-')) return { kind: 'access-control' };
+  if (operationType.startsWith('role-')) return { kind: 'access-control' };
 
   if (access?.kind === 'ownable') return { kind: 'ownable' };
   if (access?.kind === 'access-control') return { kind: 'access-control' };
@@ -76,72 +81,38 @@ function permissionFor(
 }
 
 /**
- * Classify a single function into a semantic operation. If a known rule matches
- * (from any detected standard), it is routed by audience/type with the standard's
- * confidence and a permission from the access model. Otherwise it falls back to
- * the Raw/Developer view (ADR-001) — it is never dropped.
+ * Classify a single function into a semantic operation using the priority rule
+ * engine (ADR-006). Standards win routing; heuristics fill gaps; unknown writers
+ * fall back to the Raw view — nothing is ever dropped (ADR-001).
  */
-export function classifyFunction(
-  func: ContractFunction,
-  contractId: string,
-  resolved?: ResolvedSemantic,
-  access?: AccessModel,
-): OperationDefinition {
+export function classifyFunction(ctx: RuleContext, contractId: string): OperationDefinition {
+  const { func } = ctx;
+  const resolved = runRules(ctx, DEFAULT_RULES);
   const id = operationId(contractId, func.signature);
 
-  if (resolved) {
-    const { semantic, standard, confidence: standardConfidence } = resolved;
-    const confidence = Math.min(1, standardConfidence || 0.9);
-    const evidence: Evidence[] = [
-      {
-        source: 'signature',
-        detail: `Matches ${standard} rule for ${func.signature}`,
-        weight: confidence,
-      },
-    ];
-    const operation: OperationDefinition = {
-      id,
-      contract: contractId,
-      function: func.signature,
-      selector: func.selector,
-      title: semantic.title,
-      audience: semantic.audience,
-      operationType: semantic.operationType,
-      isRead: func.isRead,
-      confidence,
-      evidence,
-      inputs: buildInputs(func, semantic.operationType, standard),
-      visibility: 'visible',
-      reviewed: false,
-    };
-    if (semantic.description) operation.description = semantic.description;
-    if (semantic.risk) operation.risk = { level: semantic.risk };
-    const permission = permissionFor(semantic, access);
-    if (permission) operation.permission = permission;
-    return operation;
-  }
-
-  // Raw fallback: unknown function. Kept out of semantic tabs but always
-  // reachable in the Raw tab (nothing is lost — ADR-001).
-  const confidence = func.isRead ? 0.3 : RAW_FALLBACK_CONFIDENCE;
-  return {
+  const operation: OperationDefinition = {
     id,
     contract: contractId,
     function: func.signature,
     selector: func.selector,
-    title: func.name,
-    audience: 'developer',
-    operationType: func.isRead ? 'read' : 'unknown',
+    title: resolved.title,
+    audience: resolved.audience,
+    operationType: resolved.operationType,
     isRead: func.isRead,
-    confidence,
-    evidence: [
-      {
-        source: 'name',
-        detail: 'No deterministic rule matched; available in the Raw tab.',
-      },
-    ],
-    inputs: buildInputs(func, 'unknown'),
-    visibility: 'raw-only',
+    confidence: resolved.confidence,
+    evidence: resolved.evidence,
+    inputs: buildInputs(func, resolved.operationType, resolved.standard),
+    visibility: resolved.visibility,
     reviewed: false,
   };
+  if (resolved.description) operation.description = resolved.description;
+  if (resolved.risk) operation.risk = { level: resolved.risk };
+  const permission = permissionFor(
+    resolved.audience,
+    resolved.operationType,
+    func.isRead,
+    ctx.access,
+  );
+  if (permission) operation.permission = permission;
+  return operation;
 }

@@ -19,6 +19,12 @@ export const operationTypeSchema = z.enum([
   'unpause',
   'upgrade',
   'ownership-transfer',
+  // Generic buckets for non-standard functions (ADR-006). Additive: older
+  // manifests never used these, so no schema migration is required.
+  'admin-config',
+  'fund-withdraw',
+  'fund-deposit',
+  'claim',
   'read',
   'unknown',
 ]);

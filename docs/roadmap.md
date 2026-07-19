@@ -44,7 +44,12 @@ analyzer) is implemented ([checklist](progress/phase-4-standards-analyzer.md),
 [ADR-005](adr/ADR-005-standards-detection.md)): a generic member-based detection
 engine with ERC-721/1155/4626 detectors, Ownable/AccessControl/Pausable/
 Upgradeable capabilities, an access model, and a semantics registry the
-classifier uses to route and permission every function.
+classifier uses to route and permission every function. Phase 5 (classification &
+routing) is implemented ([checklist](progress/phase-5-classification-routing.md),
+[ADR-006](adr/ADR-006-classification-rule-engine.md)): a priority-based rule
+engine with name/risk heuristics that routes non-standard functions (admin
+setters, fund withdrawals, pausers, claims) and surfaces reads, while standards
+stay authoritative and evidence accumulates for transparency.
 
 ## In scope for the open-source MVP
 

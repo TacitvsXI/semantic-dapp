@@ -70,11 +70,18 @@ Pick these up between phases or when they naturally fold into a larger workstrea
       recorded as evidence only, detection is ABI-shape based)
 - [ ] More extensions: ERC-2612 permit, ERC-777, ERC-20 votes/snapshot
 
-## Phase 5 — Classification (`classifier`)
+## Phase 5 — Classification (`classifier`) — done (slice)
 
-- Full `OperationType` coverage; deposit/withdraw/redeem, grant/revoke/renounce
-- pause/unpause; upgrade/ownership as critical
-- Rule engine with priorities
+- [x] Priority-based rule engine (`engine.ts`) with field-level resolution +
+      evidence accumulation
+- [x] Name heuristics (mint/burn/pause/withdraw/rescue/set·update/claim/deposit)
+- [x] Risk heuristics (destructive/dangerous names, payable)
+- [x] Read promotion (view/pure → Read tab)
+- [x] Permissions attached from the access model post-resolution
+- [ ] Confidence calibration from corroborating evidence (currently primary-rule
+      confidence only)
+- [ ] Per-project custom rule overrides / user-tunable priorities
+- [ ] NatSpec- and source-AST-based evidence (still name/signature only)
 
 ## Phase 6 — Generated UI (`renderer` + `components`)
 

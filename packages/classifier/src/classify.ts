@@ -14,17 +14,18 @@ export interface ClassificationResult {
 
 /**
  * Run all detectors and classify every function in a contract model into
- * semantic operations. Deterministic and network-free.
+ * semantic operations via the priority rule engine (ADR-006). Deterministic and
+ * network-free.
  */
 export function classifyContract(model: ContractModel, contractId: string): ClassificationResult {
-  const { detections, detected, semantics } = resolveSemantics(model);
+  const standards = resolveSemantics(model);
   const access = detectAccessModel(model);
 
   const operations = model.functions.map((func) =>
-    classifyFunction(func, contractId, semantics.get(func.signature), access),
+    classifyFunction({ func, model, standards, access }, contractId),
   );
 
-  return { operations, standards: detected, detections };
+  return { operations, standards: standards.detected, detections: standards.detections };
 }
 
 export interface BuildManifestOptions {

@@ -12,13 +12,26 @@ for the full plan.
 | 2     | Address resolver         | ✅ Done (slice)    |
 | 3     | Semantic manifest        | ✅ Done (slice)    |
 | 4     | Standards analyzer       | ✅ Done (slice)    |
-| 5     | Classification & routing | ⬜ Not started     |
+| 5     | Classification & routing | ✅ Done (slice)    |
 | 6     | Trusted UI components    | ⬜ Not started     |
 | 7     | Safety & diagnostics     | ⬜ Not started     |
 | 8     | Export & CLI             | ⬜ Not started     |
 | 9     | Fixtures, docs, beta     | ⬜ Not started     |
 
-## Current phase: Phase 4 — Standards Analyzer
+## Current phase: Phase 5 — Classification & Routing
+
+Detailed checklist: [`docs/progress/phase-5-classification-routing.md`](docs/progress/phase-5-classification-routing.md).
+
+Classification is now a **priority-based rule engine** (ADR-006). Standards stay
+authoritative (priority 100); **name/risk heuristics** route the many functions
+no standard describes — custom setters → Admin (`admin-config`), `rescue`/`sweep`
+→ high-risk `fund-withdraw`, `pause*` → Emergency, `claim`/`harvest` → User — and
+**view functions surface in the Read tab**. Each field is resolved by priority,
+**evidence accumulates from every matching rule**, permissions are attached from
+the access model, and unknown writers still fall back to Raw (ADR-001). See
+[ADR-006](docs/adr/ADR-006-classification-rule-engine.md).
+
+## Previous phase: Phase 4 — Standards Analyzer
 
 Detailed checklist: [`docs/progress/phase-4-standards-analyzer.md`](docs/progress/phase-4-standards-analyzer.md).
 
