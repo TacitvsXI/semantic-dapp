@@ -75,6 +75,28 @@ export function ProjectView({ project: initialProject, onBack, onUpdated }: Proj
                 : 'no address (read/write disabled)'}
               {standards.length > 0 ? ` · ${standards.join(', ')}` : ''}
             </span>
+            {project.provenance ? (
+              <span className="studio-provenance">
+                <span
+                  className={`studio-provenance__tag ${
+                    project.provenance.verified
+                      ? 'studio-provenance__tag--ok'
+                      : 'studio-provenance__tag--warn'
+                  }`}
+                >
+                  {project.provenance.verified ? 'verified' : 'unverified'}
+                </span>
+                via {project.provenance.sourceName}
+                {project.provenance.matchType ? ` (${project.provenance.matchType})` : ''}
+                {project.proxy?.isProxy
+                  ? ` · ${project.proxy.kind}${
+                      project.proxy.implementation
+                        ? ` → ${project.proxy.implementation.slice(0, 10)}…`
+                        : ''
+                    }`
+                  : ''}
+              </span>
+            ) : null}
           </div>
         </div>
 

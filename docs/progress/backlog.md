@@ -14,10 +14,29 @@ roadmap. Each becomes a GitHub issue with the matching label.
       the full wallet list + WalletConnect QR. `ConnectButton` also handles
       account display and wrong-network switching.
 
-## Post-v0.0.1 polish (still open)
+## Deferred minor improvements (keep in mind)
 
-- [ ] Route-level lazy loading for the studio
-- [ ] Import manifest JSON (round-trip with export) — folds into Phase 3
+Small, non-blocking enhancements intentionally deferred so we can start Phase 2.
+Pick these up between phases or when they naturally fold into a larger workstream.
+
+- [ ] **Import manifest JSON** — round-trip with the existing Export button; load
+      a previously exported/edited manifest into a project. Folds into the
+      Phase 3 manifest editor.
+- [ ] **Route-level lazy loading** — `React.lazy` the `ProjectView` (wallet +
+      renderer stack) so the initial load ships mostly app code; the heavy
+      web3/rainbowkit chunks load when a project is opened.
+- [ ] **Empty `react` vendor chunk** — the manualChunks split emits a 0 KB
+      `react` chunk; refine the split (function form) so React lands in its own
+      cacheable chunk.
+- [ ] **RainbowKit `initialChain`** — default the connect modal to the project's
+      configured chain to reduce wrong-network prompts.
+- [ ] **Unit tests for studio utilities** — cover `lib/download.ts` and the
+      `SettingsPanel` validation logic (currently only e2e-smoke touches them).
+- [ ] **Project delete confirmation** — guard against accidental loss of a
+      locally-stored project.
+- [ ] **Tx notifications** — lightweight toast on success/error in addition to
+      the inline `TxStatusView`.
+- [ ] **A11y pass** — labels/aria on generated forms and the tab bar.
 
 ## Phase 2 — Address resolver (`resolver`)
 

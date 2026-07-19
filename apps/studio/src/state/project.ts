@@ -1,5 +1,6 @@
 import type { Abi } from 'viem';
 import type { SemanticManifest } from '@semantic-dapp/spec';
+import type { Provenance, ProxyInfo } from '@semantic-dapp/resolver';
 
 /** A locally-persisted studio project (no backend; self-hostable). */
 export interface Project {
@@ -7,7 +8,7 @@ export interface Project {
   name: string;
   createdAt: number;
   updatedAt: number;
-  /** Raw ABI as provided by the user. */
+  /** Raw ABI as provided by the user or resolved from an address. */
   abi: Abi;
   contract: {
     address?: string;
@@ -15,6 +16,10 @@ export interface Project {
     name?: string;
   };
   rpcUrl: string;
+  /** Where the ABI came from (set when resolved from an address). */
+  provenance?: Provenance;
+  /** Proxy details, when the resolved address is a proxy. */
+  proxy?: ProxyInfo;
   /** Computed semantic manifest (operations filled in by analyzer/classifier). */
   manifest?: SemanticManifest;
 }

@@ -30,9 +30,12 @@ Source of truth: `Semantic Dapp — Open-source Execution Plan`. MVP horizon:
 
 ## Current status
 
-See [`../PROGRESS.md`](../PROGRESS.md) for the live dashboard and
-[`progress/phase-1-vertical-slice.md`](progress/phase-1-vertical-slice.md) for the
-active phase checklist.
+See [`../PROGRESS.md`](../PROGRESS.md) for the live dashboard. Phase 1 shipped as
+`v0.0.1` ([checklist](progress/phase-1-vertical-slice.md)). Phase 2 (address
+resolver) is implemented ([checklist](progress/phase-2-address-resolver.md),
+[ADR-003](adr/ADR-003-resolver-adapters.md)): `packages/resolver` with Sourcify +
+block-explorer adapters and EIP-1967 proxy detection, wired into the studio's
+**By address** import.
 
 ## In scope for the open-source MVP
 

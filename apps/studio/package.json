@@ -21,6 +21,7 @@
     "@semantic-dapp/components": "workspace:*",
     "@semantic-dapp/execution": "workspace:*",
     "@semantic-dapp/renderer": "workspace:*",
+    "@semantic-dapp/resolver": "workspace:*",
     "@semantic-dapp/spec": "workspace:*",
     "@tanstack/react-query": "^5.62.7",
     "react": "^18.3.1",

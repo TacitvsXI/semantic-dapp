@@ -8,6 +8,11 @@ test('import an ERC-20 ABI and generate User/Raw tabs', async ({ page }) => {
 
   await page.getByRole('button', { name: '+ New import' }).click();
 
+  // Both import modes are available; the address resolver has its own tab.
+  await page.getByRole('tab', { name: 'By address' }).click();
+  await expect(page.getByRole('button', { name: 'Resolve ABI' })).toBeVisible();
+  await page.getByRole('tab', { name: 'Paste ABI' }).click();
+
   await page.getByPlaceholder('My Token').fill('Smoke Token');
   await page.locator('textarea').fill(erc20AbiJson);
   await page.getByPlaceholder('http://127.0.0.1:8545').fill('http://127.0.0.1:8545');

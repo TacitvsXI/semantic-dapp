@@ -48,6 +48,7 @@ semantic-dapp/
 │   └── studio/            # import, review, preview (Vite + React)
 ├── packages/
 │   ├── spec/              # schema, types, validation (Zod + JSON Schema)
+│   ├── resolver/          # address -> ABI/source (Sourcify, explorer, proxies)
 │   ├── analyzer/          # standards detection (ERC-20, ...)
 │   ├── classifier/        # operation type & audience routing
 │   ├── components/        # trusted UI components

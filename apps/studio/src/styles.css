@@ -171,6 +171,49 @@ body {
   color: var(--sd-accent);
 }
 
+.studio-provenance {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--sd-muted);
+}
+.studio-provenance__tag {
+  padding: 1px 6px;
+  border-radius: 6px;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.03em;
+}
+.studio-provenance__tag--ok {
+  color: #16a34a;
+  background: rgba(22, 163, 74, 0.12);
+}
+.studio-provenance__tag--warn {
+  color: #e6a23c;
+  background: rgba(230, 162, 60, 0.12);
+}
+
+.studio-resolved {
+  border: 1px solid var(--sd-border);
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin: 8px 0;
+  background: var(--sd-surface);
+}
+.studio-resolved h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+.studio-resolved ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
 .studio-settings {
   background: var(--sd-surface);
   border: 1px solid var(--sd-border);
