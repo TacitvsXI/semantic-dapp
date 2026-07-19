@@ -13,12 +13,25 @@ for the full plan.
 | 3     | Semantic manifest        | ✅ Done (slice)    |
 | 4     | Standards analyzer       | ✅ Done (slice)    |
 | 5     | Classification & routing | ✅ Done (slice)    |
-| 6     | Trusted UI components    | ⬜ Not started     |
+| 6     | Trusted UI components    | ✅ Done (slice)    |
 | 7     | Safety & diagnostics     | ⬜ Not started     |
 | 8     | Export & CLI             | ⬜ Not started     |
 | 9     | Fixtures, docs, beta     | ⬜ Not started     |
 
-## Current phase: Phase 5 — Classification & Routing
+## Current phase: Phase 6 — Trusted UI Components
+
+Detailed checklist: [`docs/progress/phase-6-trusted-ui.md`](docs/progress/phase-6-trusted-ui.md).
+
+The generated app now renders **purpose-built consoles** instead of one form per
+function (ADR-007): an **Overview** summary, a grouped **Pause** console and
+**Role manager**, and a reusable **ConfirmDialog** that gates every high/critical
+or privileged write (critical actions require typing `CONFIRM`). Dispatch is by
+`operationType` grouping; presentational components stay runtime-free in
+`components`, wiring lives in `renderer`, and ERC-20 transfer/approve are no
+longer duplicated on the User tab. See
+[ADR-007](docs/adr/ADR-007-trusted-ui-dispatch.md).
+
+## Previous phase: Phase 5 — Classification & Routing
 
 Detailed checklist: [`docs/progress/phase-5-classification-routing.md`](docs/progress/phase-5-classification-routing.md).
 

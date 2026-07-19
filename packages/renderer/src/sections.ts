@@ -26,6 +26,34 @@ export interface GeneratedLayout {
   rawFunctions: ContractFunction[];
 }
 
+/** Operations grouped for specialized console panels (ADR-007). */
+export interface GroupedOperations {
+  /** `pause` / `unpause` operations → one PausePanel. */
+  pause: OperationView[];
+  /** `role-*` operations → one RoleManager. */
+  roles: OperationView[];
+  /** Everything else → individual OperationCards. */
+  rest: OperationView[];
+}
+
+/**
+ * Partition a section's operations into console groups (pause, roles) and the
+ * remaining individual operations, so the renderer can show one grouped panel
+ * instead of many identical forms.
+ */
+export function groupOperations(operations: OperationView[]): GroupedOperations {
+  const pause: OperationView[] = [];
+  const roles: OperationView[] = [];
+  const rest: OperationView[] = [];
+  for (const view of operations) {
+    const type = view.operation.operationType;
+    if (type === 'pause' || type === 'unpause') pause.push(view);
+    else if (type.startsWith('role-')) roles.push(view);
+    else rest.push(view);
+  }
+  return { pause, roles, rest };
+}
+
 const SECTION_TITLES: Record<SectionId, string> = {
   user: 'User',
   admin: 'Admin',

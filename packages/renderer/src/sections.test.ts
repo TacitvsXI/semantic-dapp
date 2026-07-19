@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import type { Abi } from 'abitype';
-import { normalizeAbi, type SemanticManifest } from '@semantic-dapp/spec';
-import { buildSections } from './sections.js';
+import { normalizeAbi, type SemanticManifest, type OperationDefinition } from '@semantic-dapp/spec';
+import { buildSections, groupOperations, type OperationView } from './sections.js';
 
 const abi = [
   {
@@ -135,5 +135,38 @@ describe('buildSections', () => {
   it('matches operations to their ABI function by signature', () => {
     const user = layout.sections.find((s) => s.id === 'user');
     expect(user?.operations[0]?.func?.selector).toBe('0xa9059cbb');
+  });
+});
+
+describe('groupOperations', () => {
+  const op = (id: string, operationType: OperationDefinition['operationType']): OperationView => ({
+    operation: {
+      id,
+      contract: 'c',
+      function: `${id}()`,
+      title: id,
+      audience: 'admin',
+      operationType,
+      isRead: false,
+      confidence: 0.9,
+      evidence: [],
+      inputs: [],
+      visibility: 'visible',
+      reviewed: false,
+    },
+  });
+
+  it('groups pause/unpause and role-* into panels, leaving the rest', () => {
+    const grouped = groupOperations([
+      op('pause', 'pause'),
+      op('unpause', 'unpause'),
+      op('grantRole', 'role-grant'),
+      op('revokeRole', 'role-revoke'),
+      op('renounceRole', 'role-renounce'),
+      op('setFee', 'admin-config'),
+    ]);
+    expect(grouped.pause).toHaveLength(2);
+    expect(grouped.roles).toHaveLength(3);
+    expect(grouped.rest.map((v) => v.operation.id)).toEqual(['setFee']);
   });
 });

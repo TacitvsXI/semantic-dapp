@@ -83,11 +83,17 @@ Pick these up between phases or when they naturally fold into a larger workstrea
 - [ ] Per-project custom rule overrides / user-tunable priorities
 - [ ] NatSpec- and source-AST-based evidence (still name/signature only)
 
-## Phase 6 — Generated UI (`renderer` + `components`)
+## Phase 6 — Generated UI (`renderer` + `components`) — done (slice)
 
-- Overview dashboard, Read Data section, Emergency section
-- Mint/Burn, Vault, RoleManager, PausePanel components
-- Critical action confirmation flows
+- [x] Overview panel (identity, standards chips, section counts, confidence)
+- [x] PausePanel + RoleManager consoles (grouped by operationType)
+- [x] ConfirmDialog critical-action flow (typed CONFIRM for critical)
+- [x] De-duplicated ERC-20 transfer/approve on the User tab
+- [ ] Mint/Burn panel (generic form + confirm covers it functionally)
+- [ ] Vault (ERC-4626) deposit/withdraw/redeem panel with previews
+- [ ] Dedicated Read Data grid with auto-called no-arg getters
+- [ ] Wire manifest `InputDefinition` widgets (token-amount/token-id) into the
+      generic form (currently ABI-type based, specialized panels handle amounts)
 
 ## Phase 7 — Safety & diagnostics
 

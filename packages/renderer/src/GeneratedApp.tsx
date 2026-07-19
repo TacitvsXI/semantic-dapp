@@ -1,9 +1,18 @@
 import { useMemo, useState } from 'react';
 import type { ContractModel, SemanticManifest } from '@semantic-dapp/spec';
 import type { ContractRuntime } from './runtime.js';
-import { buildSections, type SectionId } from './sections.js';
+import { buildSections, groupOperations, type SectionId } from './sections.js';
 import { OperationCard, RawFunctionCard, type ReviewControls } from './OperationCard.js';
 import { TokenActions } from './TokenActions.js';
+import { OverviewSummary } from './OverviewSummary.js';
+import { PausePanelHost } from './panels/PausePanelHost.js';
+import { RoleManagerHost } from './panels/RoleManagerHost.js';
+
+/** ERC-20 transfer/approve are shown by TokenActions; hide the duplicate cards. */
+const ERC20_USER_PANEL_SIGNATURES = new Set([
+  'transfer(address,uint256)',
+  'approve(address,uint256)',
+]);
 
 export interface GeneratedAppProps {
   manifest: SemanticManifest;
@@ -41,6 +50,13 @@ export function GeneratedApp({ manifest, model, runtime, contractId, review }: G
 
   return (
     <div className="sd-app">
+      <OverviewSummary
+        manifest={manifest}
+        layout={layout}
+        runtime={runtime}
+        contractId={contractId}
+      />
+
       <nav className="sd-tabs" role="tablist">
         {tabs.map((tab) => (
           <button
@@ -73,21 +89,28 @@ export function GeneratedApp({ manifest, model, runtime, contractId, review }: G
         ) : (
           layout.sections
             .filter((section) => section.id === active)
-            .map((section) => (
-              <div key={section.id} className="sd-section">
-                {section.id === 'user' && isErc20 ? (
-                  <TokenActions model={model} runtime={runtime} />
-                ) : null}
-                {section.operations.map((view) => (
-                  <OperationCard
-                    key={view.operation.id}
-                    view={view}
-                    runtime={runtime}
-                    review={review}
-                  />
-                ))}
-              </div>
-            ))
+            .map((section) => {
+              const showTokenActions = section.id === 'user' && isErc20;
+              const { pause, roles, rest } = groupOperations(section.operations);
+              const cards = showTokenActions
+                ? rest.filter((v) => !ERC20_USER_PANEL_SIGNATURES.has(v.operation.function))
+                : rest;
+              return (
+                <div key={section.id} className="sd-section">
+                  {showTokenActions ? <TokenActions model={model} runtime={runtime} /> : null}
+                  {pause.length > 0 ? <PausePanelHost model={model} runtime={runtime} /> : null}
+                  {roles.length > 0 ? <RoleManagerHost model={model} runtime={runtime} /> : null}
+                  {cards.map((view) => (
+                    <OperationCard
+                      key={view.operation.id}
+                      view={view}
+                      runtime={runtime}
+                      review={review}
+                    />
+                  ))}
+                </div>
+              );
+            })
         )}
       </div>
     </div>

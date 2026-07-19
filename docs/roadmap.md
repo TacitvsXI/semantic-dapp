@@ -49,7 +49,11 @@ routing) is implemented ([checklist](progress/phase-5-classification-routing.md)
 [ADR-006](adr/ADR-006-classification-rule-engine.md)): a priority-based rule
 engine with name/risk heuristics that routes non-standard functions (admin
 setters, fund withdrawals, pausers, claims) and surfaces reads, while standards
-stay authoritative and evidence accumulates for transparency.
+stay authoritative and evidence accumulates for transparency. Phase 6 (trusted UI
+components) is implemented ([checklist](progress/phase-6-trusted-ui.md),
+[ADR-007](adr/ADR-007-trusted-ui-dispatch.md)): an Overview summary, grouped Pause
+and Role consoles dispatched by `operationType`, and a reusable ConfirmDialog that
+gates high/critical/privileged writes (critical actions require typing `CONFIRM`).
 
 ## In scope for the open-source MVP
 

@@ -19,7 +19,11 @@ export interface OperationCardProps {
 export function OperationCard({ view, runtime, review }: OperationCardProps) {
   const { operation, func } = view;
   const risk = operation.risk?.level;
-  const requireConfirmation = risk === 'high' || risk === 'critical';
+  const privileged = operation.permission !== undefined && operation.permission.kind !== 'none';
+  const needsConfirm = risk === 'high' || risk === 'critical' || privileged;
+  const confirm = needsConfirm
+    ? { risk, permission: operation.permission, title: operation.title }
+    : undefined;
 
   return (
     <section className="sd-card sd-op-card">
@@ -58,7 +62,7 @@ export function OperationCard({ view, runtime, review }: OperationCardProps) {
       ) : null}
 
       {func ? (
-        <FunctionRunner func={func} runtime={runtime} requireConfirmation={requireConfirmation} />
+        <FunctionRunner func={func} runtime={runtime} confirm={confirm} />
       ) : (
         <MissingFunctionNotice signature={operation.function} />
       )}

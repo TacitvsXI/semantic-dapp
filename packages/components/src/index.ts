@@ -6,4 +6,8 @@ export * from './components/FunctionForm.js';
 export * from './components/ReadResultView.js';
 export * from './components/TxStatusView.js';
 export * from './components/Badges.js';
+export * from './components/ConfirmDialog.js';
+export * from './pause/PausePanel.js';
+export * from './roles/RoleManager.js';
+export * from './overview/OverviewPanel.js';
 export * from './erc20/index.js';
