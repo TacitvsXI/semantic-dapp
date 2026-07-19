@@ -46,6 +46,12 @@ form, so they need no further work — listed here so the baseline is clear:
   `hasRole` for every discovered role and shows which ones it holds (✓/·), then
   **disables no-op actions** (Grant for a role already held, Revoke for one it
   doesn't). Wired in `RoleManagerHost` via `checkMembership`.
+- **Inline parameter confirmation (roles)** — the Role manager now validates as
+  you type: the Account field shows “✓ Address accepted” with the **checksummed**
+  value (accepting any casing) or an inline error; a custom role shows “✓ Valid
+  bytes32” or a live **keccak256 preview** when hashing a name; and when a
+  contract exposes no role constants, a hint explains manual entry instead of a
+  bare hash box.
 - **Accessibility gate** — `@axe-core/playwright` fails the build on
   serious/critical violations on the standalone app (User + Raw tabs).
 - **WCAG AA contrast** — audience/risk badge text, the connect button
@@ -73,6 +79,10 @@ form, so they need no further work — listed here so the baseline is clear:
 - [ ] **Empty/loading/error polish** — skeletons for reads in flight, a clear
       "RPC unreachable" banner (vs. silent empty reads), and a first-run empty
       state that points at "New import".
+- [ ] **Inline validation in the generic form** — bring the Role manager's
+      live "✓ accepted / checksummed / preview" feedback to the generic
+      `FunctionForm` (per-field, as-you-type) so every parameter is confirmed
+      before submit, not only on click. (`components`)
 
 ### P1 — high impact, medium effort
 

@@ -49,6 +49,28 @@
   font-size: 12px;
   margin: 2px 0 0;
 }
+.sd-field__ok {
+  color: var(--sd-ok);
+  font-size: 12px;
+  margin: 2px 0 0;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.sd-field__ok .sd-roles__value {
+  margin-top: 0;
+}
+.sd-field__warn {
+  color: var(--sd-danger-text);
+  font-size: 12px;
+  margin: 2px 0 0;
+}
+.sd-field__hint {
+  color: var(--sd-muted);
+  font-size: 12px;
+  margin: 2px 0 6px;
+}
 
 .sd-input {
   background: var(--sd-surface-2);

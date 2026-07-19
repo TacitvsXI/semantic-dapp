@@ -38,6 +38,11 @@ function isBytes32(value: string): value is `0x${string}` {
   return isHex(value) && value.length === 66;
 }
 
+/** Accept an address in any casing; the canonical checksum is shown separately. */
+function isAddr(value: string): boolean {
+  return isAddress(value, { strict: false });
+}
+
 /**
  * AccessControl role console: grant / revoke / renounce a role for an account.
  * When the host supplies the contract's `roles`, the role is chosen by name from
@@ -76,7 +81,7 @@ export function RoleManager({
   // current membership and no-op grants/revokes are disabled.
   useEffect(() => {
     const raw = account.trim();
-    if (!checkMembership || !hasKnownRoles || !isAddress(raw)) {
+    if (!checkMembership || !hasKnownRoles || !isAddr(raw)) {
       setMembership(null);
       return;
     }
@@ -99,6 +104,28 @@ export function RoleManager({
   const selectedHeld =
     knownRole && membership ? (membership[knownRole.name] ?? undefined) : undefined;
 
+  // Live feedback so the user sees a parameter was accepted (and normalized)
+  // before submitting, instead of only learning about problems on click.
+  const rolesProvided = roles !== undefined;
+  const accountRaw = account.trim();
+  const accountValid = accountRaw.length > 0 && isAddr(accountRaw);
+  const accountChecksum = accountValid ? getAddress(accountRaw) : null;
+  const accountReformatted = accountChecksum !== null && accountChecksum !== accountRaw;
+
+  const roleRaw = role.trim();
+  const rolePreview =
+    isCustom && roleRaw
+      ? hashName
+        ? { ok: true as const, label: 'keccak256', value: keccak256(toBytes(roleRaw)) }
+        : isBytes32(roleRaw)
+          ? { ok: true as const, label: 'Valid bytes32', value: undefined }
+          : {
+              ok: false as const,
+              label: 'Expected 0x + 64 hex, or enable “Hash name”.',
+              value: undefined,
+            }
+      : null;
+
   const resolveRole = (): `0x${string}` | undefined => {
     if (hasKnownRoles && !isCustom) {
       if (knownRole) return knownRole.value;
@@ -120,7 +147,7 @@ export function RoleManager({
 
   const resolveAccount = (fallback?: string): `0x${string}` | undefined => {
     const raw = (account.trim() || fallback || '').trim();
-    if (!isAddress(raw)) {
+    if (!isAddr(raw)) {
       setError('Enter a valid account address.');
       return undefined;
     }
@@ -172,6 +199,13 @@ export function RoleManager({
         </label>
       ) : null}
 
+      {rolesProvided && !hasKnownRoles ? (
+        <p className="sd-field__hint">
+          No on-chain role constants were found on this contract — enter a role id (bytes32)
+          directly, or type a role name and enable “Hash name”.
+        </p>
+      ) : null}
+
       {isCustom ? (
         <>
           <label className="sd-field">
@@ -183,6 +217,18 @@ export function RoleManager({
               placeholder={hashName ? 'MINTER_ROLE' : `${DEFAULT_ADMIN_ROLE.slice(0, 10)}…`}
             />
           </label>
+          {rolePreview ? (
+            rolePreview.ok ? (
+              <p className="sd-field__ok">
+                <span aria-hidden="true">✓</span> {rolePreview.label}
+                {rolePreview.value ? (
+                  <code className="sd-roles__value">{rolePreview.value}</code>
+                ) : null}
+              </p>
+            ) : (
+              <p className="sd-field__warn">{rolePreview.label}</p>
+            )
+          ) : null}
           <label className="sd-bool sd-roles__hash">
             <input
               type="checkbox"
@@ -213,8 +259,21 @@ export function RoleManager({
           value={account}
           onChange={(e) => setAccount(e.target.value)}
           placeholder="0x…"
+          aria-invalid={accountRaw.length > 0 && !accountValid}
         />
       </label>
+
+      {accountRaw.length > 0 ? (
+        accountValid ? (
+          <p className="sd-field__ok">
+            <span aria-hidden="true">✓</span> Address accepted
+            {accountReformatted ? ' (checksummed)' : ''}
+            <code className="sd-roles__value">{accountChecksum}</code>
+          </p>
+        ) : (
+          <p className="sd-field__warn">Not a valid address — expected 0x followed by 40 hex.</p>
+        )
+      ) : null}
 
       {membership && hasKnownRoles ? (
         <div className="sd-roles__membership" aria-label="Roles held by this account">

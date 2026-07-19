@@ -20,6 +20,35 @@ describe('RoleManager', () => {
     expect(call?.account.toLowerCase()).toBe(ADDR);
   });
 
+  it('confirms an accepted account and checksums mixed-case input', () => {
+    render(<RoleManager canGrant onGrant={() => {}} />);
+    const account = screen.getAllByRole('textbox')[1]!;
+    fireEvent.change(account, { target: { value: ADDR } });
+    expect(screen.getByText(/Address accepted/)).toBeTruthy();
+    // The canonical checksum is shown as confirmation of what will be sent.
+    expect(screen.getByText('0x52908400098527886E0F7030069857D2E4169EE7')).toBeTruthy();
+  });
+
+  it('flags an invalid account inline', () => {
+    render(<RoleManager canGrant onGrant={() => {}} />);
+    const account = screen.getAllByRole('textbox')[1]!;
+    fireEvent.change(account, { target: { value: '0x123' } });
+    expect(screen.getByText(/Not a valid address/)).toBeTruthy();
+  });
+
+  it('previews the keccak256 hash of a role name', () => {
+    render(<RoleManager canGrant onGrant={() => {}} />);
+    fireEvent.change(screen.getAllByRole('textbox')[0]!, { target: { value: 'MINTER_ROLE' } });
+    fireEvent.click(screen.getByLabelText(/Hash name with keccak256/));
+    const expected = keccak256(toBytes('MINTER_ROLE'));
+    expect(screen.getByText(expected)).toBeTruthy();
+  });
+
+  it('explains when no on-chain role constants were discovered', () => {
+    render(<RoleManager canGrant roles={[]} onGrant={() => {}} />);
+    expect(screen.getByText(/No on-chain role constants were found/)).toBeTruthy();
+  });
+
   it('rejects an invalid role', () => {
     let called = false;
     render(<RoleManager canGrant onGrant={() => (called = true)} />);
