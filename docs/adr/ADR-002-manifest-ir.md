@@ -28,4 +28,4 @@ understood about a contract. It sits between analysis and UI.
 
 - Every stage has a clear contract; packages stay decoupled.
 - The manifest can be exported/imported and drives the standalone app export.
-- The renderer never depends on analyzer internals — only on the manifest schema.
+- The renderer never depends on analyzer internals - only on the manifest schema.

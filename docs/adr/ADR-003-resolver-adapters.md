@@ -9,9 +9,9 @@ Phase 2 turns a contract **address** into an ABI (and, ideally, verified source
 and metadata) so the pipeline can generate a UI without manual ABI paste. Sources
 of ABI/metadata differ in trust, availability, coverage and cost:
 
-- **Sourcify** — decentralized, no API key, verified metadata (`full_match` vs
+- **Sourcify** - decentralized, no API key, verified metadata (`full_match` vs
   `partial_match`), broad but not universal coverage.
-- **Block explorers** (Etherscan-family) — wide coverage; Etherscan v2 exposes a
+- **Block explorers** (Etherscan-family) - wide coverage; Etherscan v2 exposes a
   single multichain endpoint, but rate-limited and better with an API key.
 - Many contracts are **proxies**: the address holds little logic; the real ABI
   belongs to the implementation contract (EIP-1967 / UUPS / beacon).
@@ -44,4 +44,4 @@ development, while allowing keys/config for production coverage.
 - Zero-config local use works via Sourcify; production coverage is opt-in via an
   explorer API key.
 - Provenance/confidence flow into the manifest and the UI, so users can see and
-  trust where an interface came from — and proxies are made explicit.
+  trust where an interface came from - and proxies are made explicit.

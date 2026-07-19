@@ -10,13 +10,13 @@ strings (token `name`/`symbol`, NatSpec), imported manifests, and on-chain state
 It also sends irreversible transactions. Three concrete risks were unaddressed
 after Phase 6:
 
-1. **Text spoofing** — bidi overrides, zero-width characters and mixed-script
+1. **Text spoofing** - bidi overrides, zero-width characters and mixed-script
    homoglyphs can make a malicious `name()` look like a trusted one, or hide
    content in a title/description.
-2. **Preflight blind spots** — a user can confirm a write while on the wrong
+2. **Preflight blind spots** - a user can confirm a write while on the wrong
    network, against an unverified ABI, or against a manifest that no longer
    matches the deployed (upgraded) implementation.
-3. **No audit trail** — there was no record of what was executed, which matters
+3. **No audit trail** - there was no record of what was executed, which matters
    for a tool that self-hosts and touches funds.
 
 ## Decision
@@ -25,7 +25,7 @@ after Phase 6:
   cleaned text plus a list of `TextIssue`s (control / bidi / zero-width /
   mixed-script / too-long); `writeWarnings` turns a `WriteSafetyContext` (wallet
   vs contract chain, verified, stale, risk) into severity-ranked
-  `SafetyWarning`s. Both are deterministic and unit-tested — no React, no chain.
+  `SafetyWarning`s. Both are deterministic and unit-tested - no React, no chain.
 - **Sanitize at the render boundary.** A `SafeText` component wraps every place an
   untrusted string is shown; it displays the cleaned text and a ⚠ marker
   explaining detected issues, rather than trusting or dropping the value.

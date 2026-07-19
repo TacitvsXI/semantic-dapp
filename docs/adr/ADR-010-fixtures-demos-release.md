@@ -5,9 +5,9 @@
 
 ## Context
 
-The pipeline (Phases 1–8) was validated mostly against hand-written or single
+The pipeline (Phases 1-8) was validated mostly against hand-written or single
 ERC-20 fixtures. Before a public beta it needs evidence that it works on
-**production-like shapes** — a yield vault and a role-gated/pausable token — and a
+**production-like shapes** - a yield vault and a role-gated/pausable token - and a
 low-friction way for newcomers to see results. It also needs a defensible release
 posture: versioned packages, a changelog, and CI that guards both the Solidity
 fixtures and the standalone app.
@@ -27,7 +27,7 @@ fixtures and the standalone app.
 
 - **Demos are `SemanticBundle`s** (Phase 8), one per fixture, committed under
   `docs/demo/bundles`. The standalone template renders any of them by dropping the
-  file in as `bundle.json`, so a demo is just data — no bespoke demo app.
+  file in as `bundle.json`, so a demo is just data - no bespoke demo app.
 
 - **Accessibility is enforced, not asserted.** A `@axe-core/playwright` smoke runs
   against the rendered app and fails on serious/critical violations, turning a11y

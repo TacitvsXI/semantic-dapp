@@ -18,13 +18,13 @@ for the full plan.
 | 8     | Export & CLI             | ✅ Done (slice)         |
 | 9     | Fixtures, docs, beta     | ✅ Done (`v0.1.0-beta`) |
 
-## Current phase: Phase 9 — Fixtures, Docs & Public Beta
+## Current phase: Phase 9 - Fixtures, Docs & Public Beta
 
 Detailed checklist: [`docs/progress/phase-9-fixtures-docs-beta.md`](docs/progress/phase-9-fixtures-docs-beta.md).
 
 The pipeline is now proven on **production-like fixtures** and cut as a public
-beta (ADR-010). Two new Foundry fixtures — **`MockVault`** (ERC-4626) and
-**`MockRWA`** (AccessControl roles + Pausable + mint/burn) — join `MockERC20`,
+beta (ADR-010). Two new Foundry fixtures - **`MockVault`** (ERC-4626) and
+**`MockRWA`** (AccessControl roles + Pausable + mint/burn) - join `MockERC20`,
 each with `forge` tests. Their **real compiled ABIs** (committed under
 `contracts/fixtures/abi`) drive analyzer/classifier detection tests, so coverage
 reflects what the compiler emits. Three committed **demo bundles** (ERC-20, vault,
@@ -34,12 +34,12 @@ the Solidity fixtures and the standalone e2e. Packages are versioned
 **`0.1.0-beta`** with a [`CHANGELOG.md`](CHANGELOG.md). See
 [ADR-010](docs/adr/ADR-010-fixtures-demos-release.md).
 
-## Previous phase: Phase 8 — Export & CLI
+## Previous phase: Phase 8 - Export & CLI
 
 Detailed checklist: [`docs/progress/phase-8-export-cli.md`](docs/progress/phase-8-export-cli.md).
 
 A reviewed contract can now be **shipped as a standalone dApp** (ADR-009). The
-portable artifact is a **`SemanticBundle`** (`packages/export`) — identity + ABI +
+portable artifact is a **`SemanticBundle`** (`packages/export`) - identity + ABI +
 reviewed manifest in one validated JSON. The studio exports it with one click; the
 **`semantic-dapp` CLI** (`packages/cli`) produces it headlessly (`bundle`),
 scaffolds a standalone app (`export`) and previews it (`serve`); and the
@@ -48,7 +48,7 @@ analyzer-free, hostable on any static host. See
 [ADR-009](docs/adr/ADR-009-export-bundle-template.md) and
 [`docs/export.md`](docs/export.md).
 
-## Previous phase: Phase 7 — Safety & Diagnostics
+## Previous phase: Phase 7 - Safety & Diagnostics
 
 Detailed checklist: [`docs/progress/phase-7-safety-diagnostics.md`](docs/progress/phase-7-safety-diagnostics.md).
 
@@ -62,7 +62,7 @@ preflight warnings** before sending, and the studio keeps a local, exportable
 **execution history** (audit trail) of every transaction. See
 [ADR-008](docs/adr/ADR-008-safety-diagnostics.md).
 
-## Previous phase: Phase 6 — Trusted UI Components
+## Previous phase: Phase 6 - Trusted UI Components
 
 Detailed checklist: [`docs/progress/phase-6-trusted-ui.md`](docs/progress/phase-6-trusted-ui.md).
 
@@ -75,20 +75,20 @@ or privileged write (critical actions require typing `CONFIRM`). Dispatch is by
 longer duplicated on the User tab. See
 [ADR-007](docs/adr/ADR-007-trusted-ui-dispatch.md).
 
-## Previous phase: Phase 5 — Classification & Routing
+## Previous phase: Phase 5 - Classification & Routing
 
 Detailed checklist: [`docs/progress/phase-5-classification-routing.md`](docs/progress/phase-5-classification-routing.md).
 
 Classification is now a **priority-based rule engine** (ADR-006). Standards stay
 authoritative (priority 100); **name/risk heuristics** route the many functions
-no standard describes — custom setters → Admin (`admin-config`), `rescue`/`sweep`
-→ high-risk `fund-withdraw`, `pause*` → Emergency, `claim`/`harvest` → User — and
+no standard describes - custom setters → Admin (`admin-config`), `rescue`/`sweep`
+→ high-risk `fund-withdraw`, `pause*` → Emergency, `claim`/`harvest` → User - and
 **view functions surface in the Read tab**. Each field is resolved by priority,
 **evidence accumulates from every matching rule**, permissions are attached from
 the access model, and unknown writers still fall back to Raw (ADR-001). See
 [ADR-006](docs/adr/ADR-006-classification-rule-engine.md).
 
-## Previous phase: Phase 4 — Standards Analyzer
+## Previous phase: Phase 4 - Standards Analyzer
 
 Detailed checklist: [`docs/progress/phase-4-standards-analyzer.md`](docs/progress/phase-4-standards-analyzer.md).
 
@@ -101,7 +101,7 @@ Emergency, upgrade → critical) and attaches an **access-model permission**
 (`ownable` / `access-control`). See
 [ADR-005](docs/adr/ADR-005-standards-detection.md).
 
-## Previous phase: Phase 3 — Semantic Manifest
+## Previous phase: Phase 3 - Semantic Manifest
 
 Detailed checklist: [`docs/progress/phase-3-semantic-manifest.md`](docs/progress/phase-3-semantic-manifest.md).
 
@@ -111,7 +111,7 @@ a **form + raw-JSON editor**, **reviewed edits survive re-analyze**
 **versioned schema with a migration framework**. See
 [ADR-004](docs/adr/ADR-004-manifest-versioning.md).
 
-## Previous phase: Phase 2 — Address Resolver
+## Previous phase: Phase 2 - Address Resolver
 
 Detailed checklist: [`docs/progress/phase-2-address-resolver.md`](docs/progress/phase-2-address-resolver.md).
 
@@ -121,22 +121,22 @@ detection → ABI + provenance → normalize → classify → generated app`. Pa
 badge. See [ADR-003](docs/adr/ADR-003-resolver-adapters.md). Deferred small
 enhancements: [`docs/progress/backlog.md`](docs/progress/backlog.md).
 
-## Phase 1 — Vertical Slice to v0.0.1
+## Phase 1 - Vertical Slice to v0.0.1
 
 Detailed checklist: [`docs/progress/phase-1-vertical-slice.md`](docs/progress/phase-1-vertical-slice.md).
 
 | Workstream                       | Status                |
 | -------------------------------- | --------------------- |
 | Foundation (Day 1)               | ✅ Done               |
-| `spec` — contract model & schema | ✅ Done               |
+| `spec` - contract model & schema | ✅ Done               |
 | `contracts/fixtures` (Foundry)   | ✅ Done               |
-| `execution` — viem/wagmi         | ✅ Done               |
-| `components` — generic widgets   | ✅ Done               |
-| `renderer` — sections/tabs       | ✅ Done               |
-| `studio` — import & raw UI       | ✅ Done               |
-| `analyzer` — ERC-20 detector     | ✅ Done               |
-| `components` — ERC-20 semantic   | ✅ Done               |
-| `classifier` — routing rules     | ✅ Done               |
+| `execution` - viem/wagmi         | ✅ Done               |
+| `components` - generic widgets   | ✅ Done               |
+| `renderer` - sections/tabs       | ✅ Done               |
+| `studio` - import & raw UI       | ✅ Done               |
+| `analyzer` - ERC-20 detector     | ✅ Done               |
+| `components` - ERC-20 semantic   | ✅ Done               |
+| `classifier` - routing rules     | ✅ Done               |
 | Tests & CI                       | ✅ Done               |
 | Demo & v0.0.1 release            | ✅ Done (tag pending) |
 

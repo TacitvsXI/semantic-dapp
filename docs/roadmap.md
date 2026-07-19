@@ -1,32 +1,32 @@
 # Roadmap
 
-Source of truth: `Semantic Dapp — Open-source Execution Plan`. MVP horizon:
-10–12 weeks for a solo developer. Version 0.1 target.
+Source of truth: `Semantic Dapp - Open-source Execution Plan`. MVP horizon:
+10-12 weeks for a solo developer. Version 0.1 target.
 
 ## Phases
 
 | Phase | Timeframe   | Focus                    | Output                                            |
 | ----- | ----------- | ------------------------ | ------------------------------------------------- |
-| 0     | 2–3 days    | Decisions & repo setup   | Monorepo, license, spec draft, CI skeleton        |
+| 0     | 2-3 days    | Decisions & repo setup   | Monorepo, license, spec draft, CI skeleton        |
 | 1     | Week 1      | Raw contract runtime     | Import ABI, render read/write, wallet execution   |
 | 2     | Week 2      | Address resolver         | Chain/address import, ABI/source/proxy adapters   |
 | 3     | Week 3      | Semantic manifest        | Schema, editor, save/load, migrations             |
-| 4     | Weeks 4–5   | Standards analyzer       | ERC-20/721/1155/4626 + Ownable/AccessControl      |
+| 4     | Weeks 4-5   | Standards analyzer       | ERC-20/721/1155/4626 + Ownable/AccessControl      |
 | 5     | Week 6      | Classification & routing | User/Admin/Emergency/Raw sections                 |
 | 6     | Week 7      | Trusted UI components    | Token, vault, role, pause and raw components      |
 | 7     | Week 8      | Safety & diagnostics     | Simulation, errors, risk, fingerprints            |
 | 8     | Week 9      | Export & CLI             | Standalone app and npx workflow                   |
-| 9     | Weeks 10–12 | Fixtures, docs, beta     | Foundry contracts, Playwright, docs, v0.1 release |
+| 9     | Weeks 10-12 | Fixtures, docs, beta     | Foundry contracts, Playwright, docs, v0.1 release |
 
 ## Release milestones
 
 | Milestone         | Demo                            | Gate                                       |
 | ----------------- | ------------------------------- | ------------------------------------------ |
-| M1 — Raw Runtime  | ABI → working interface         | All ABI types, read/write, wallet          |
-| M2 — Semantic ERC | ERC-20/4626 → understandable UI | Standards recognized without manual config |
-| M3 — Admin Split  | AccessControl → admin console   | Roles and risk evidence visible            |
-| M4 — Export       | One-click standalone build      | Works without Studio backend               |
-| M5 — Public Beta  | 3 production-like demos         | Docs, CI, security policy, issue templates |
+| M1 - Raw Runtime  | ABI → working interface         | All ABI types, read/write, wallet          |
+| M2 - Semantic ERC | ERC-20/4626 → understandable UI | Standards recognized without manual config |
+| M3 - Admin Split  | AccessControl → admin console   | Roles and risk evidence visible            |
+| M4 - Export       | One-click standalone build      | Works without Studio backend               |
+| M5 - Public Beta  | 3 production-like demos         | Docs, CI, security policy, issue templates |
 
 ## Current status
 
@@ -125,7 +125,7 @@ type-safe end to end.
   Vite `manualChunks` (react / web3 / rainbowkit) and RainbowKit lazy-loads its
   per-wallet and per-locale chunks. Revisit with route-level lazy loading.
 - **Untrusted metadata**: when rendering NatSpec/metadata (Phases 4+), sanitize
-  input (e.g. DOMPurify or strict text-only rendering) — see `SECURITY.md`.
+  input (e.g. DOMPurify or strict text-only rendering) - see `SECURITY.md`.
 - **State management**: React state + react-query suffice now; consider Zustand
   or Jotai for the manifest editor (Phase 3) only if needed.
 - **Zod**: pinned to v3 (abitype peer); migrate to v4 as a dedicated task.

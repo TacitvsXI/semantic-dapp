@@ -1,4 +1,4 @@
-# Phase 9 — Fixtures, Docs & Public Beta
+# Phase 9 - Fixtures, Docs & Public Beta
 
 Goal (Execution Plan §17.9): prove the pipeline on **production-like contracts**,
 make it easy for others to try, and cut the first public beta. Three fixtures
@@ -13,8 +13,8 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 
 ## Fixtures (`contracts/fixtures`)
 
-- [x] `MockVault.sol` — self-contained ERC-4626 vault over an ERC-20 asset
-- [x] `MockRWA.sol` — role-gated token: AccessControl-style roles + Pausable +
+- [x] `MockVault.sol` - self-contained ERC-4626 vault over an ERC-20 asset
+- [x] `MockRWA.sol` - role-gated token: AccessControl-style roles + Pausable +
       mint/burn (models an RWA/stablecoin admin surface)
 - [x] Forge tests for both; `Deploy.s.sol` deploys all fixtures
 - [x] Update `contracts/fixtures/README.md`
@@ -28,7 +28,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 ## Demos (`docs/demo`)
 
 - [x] Three committed demo bundles (ERC-20, ERC-4626 vault, RWA)
-- [x] `docs/demos.md` — what each demonstrates + how to run locally
+- [x] `docs/demos.md` - what each demonstrates + how to run locally
 
 ## Accessibility
 
@@ -49,7 +49,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 
 ## Docs & ADR
 
-- [x] ADR-010 — fixtures, demos & release readiness
+- [x] ADR-010 - fixtures, demos & release readiness
 - [x] Update `PROGRESS.md`, `docs/roadmap.md`, backlog
 - [x] lint / typecheck / test / build / forge / e2e green
 

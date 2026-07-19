@@ -1,8 +1,8 @@
 # Demo: ABI → generated app → transfer
 
 This is the Phase 1 vertical slice end to end: take a contract ABI, get a
-generated User/Admin/Raw interface, connect a wallet, and send a token transfer
-— all locally, against Anvil.
+generated User/Admin/Raw interface, connect a wallet, and send a token transfer -
+all locally, against Anvil.
 
 ## 1. Start a local chain and deploy the fixtures
 
@@ -64,6 +64,6 @@ against an ephemeral Anvil in CI.
 | --------------------------------- | ------------------------------ | ------------------------ |
 | ![Import](demo/import-wizard.png) | ![App](demo/generated-app.png) | ![Raw](demo/raw-tab.png) |
 
-> A short screen recording (GIF) can be captured from step 3–4; the static
+> A short screen recording (GIF) can be captured from step 3-4; the static
 > screenshots above are regenerated with `CAPTURE=1 pnpm --filter
 @semantic-dapp/studio test:e2e capture`.

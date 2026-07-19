@@ -1,13 +1,13 @@
-# Phase 1 — Vertical Slice to v0.0.1
+# Phase 1 - Vertical Slice to v0.0.1
 
-Goal (Execution Plan §17.1): a single end-to-end slice —
+Goal (Execution Plan §17.1): a single end-to-end slice -
 **manual ABI → normalized ContractModel → one ERC-20 semantic rule → generated
 User/Admin/Raw app → wallet transaction**. Combines Phase 0 (foundation),
 Phase 1 (Raw ABI runtime) and the first ERC-20 detector.
 
 Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 
-## Phase 0 — Foundation (Day 1)
+## Phase 0 - Foundation (Day 1)
 
 - [x] GitHub repository `semantic-dapp`
 - [x] pnpm workspace + Turborepo
@@ -19,9 +19,9 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 - [x] Issue labels: core, resolver, analyzer, ui, security, docs, good-first-issue
 - [x] ADR-001 deterministic-first
 - [x] ADR-002 manifest as intermediate representation
-- [x] Public roadmap and milestones M1–M5 (`docs/roadmap.md`)
+- [x] Public roadmap and milestones M1-M5 (`docs/roadmap.md`)
 
-## Phase 1 — Raw ABI runtime
+## Phase 1 - Raw ABI runtime
 
 ### `packages/spec` (Day 2)
 
@@ -48,7 +48,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 - [x] Decode custom errors and revert reasons
 - [x] Anvil integration test (deploy/read/write/revert-decode)
 
-### `packages/components` (Days 3–5)
+### `packages/components` (Days 3-5)
 
 - [x] Input widgets: address, uint/bounded, bool, bytes, tuple, array
 - [x] Read result display
@@ -81,7 +81,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 - [x] Canonical ERC-20 function semantics map (for the classifier)
 - [x] Unit tests against canonical fixtures (7 passing)
 
-### `packages/components` — ERC-20 semantic (Day 8)
+### `packages/components` - ERC-20 semantic (Day 8)
 
 - [x] `TokenTransfer` component (human amount → base units, balance guard)
 - [x] `TokenApproval` component (with unlimited-approval risk toggle)
@@ -113,9 +113,9 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 - [x] User/Admin/Raw tabs with confidence/evidence
 - [x] Wallet transaction against Anvil (covered by execution integration test; UI path documented in `docs/demo.md`)
 - [x] Unit tests + Foundry fixtures
-- [x] Demo screenshots (`docs/demo/`); short GIF is an optional manual capture — see `docs/demo.md`
-- [x] Clear backlog for the next 8–10 weeks (`docs/progress/backlog.md`)
-- [ ] `v0.0.1` tag — release action, run when ready: `git tag v0.0.1` (not created automatically)
+- [x] Demo screenshots (`docs/demo/`); short GIF is an optional manual capture - see `docs/demo.md`
+- [x] Clear backlog for the next 8-10 weeks (`docs/progress/backlog.md`)
+- [ ] `v0.0.1` tag - release action, run when ready: `git tag v0.0.1` (not created automatically)
 
 ## Test summary
 

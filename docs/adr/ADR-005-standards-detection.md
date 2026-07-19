@@ -8,7 +8,7 @@
 Phase 1 shipped a single hand-written ERC-20 detector. Phase 4 must recognize
 many more standards (ERC-721/1155/4626) and access models (Ownable,
 AccessControl, Pausable, upgradeable/UUPS). Doing this deterministically from the
-ABI — without executing the contract — keeps the pipeline safe and reproducible
+ABI - without executing the contract - keeps the pipeline safe and reproducible
 (ADR-001), but detectors must not become copy-pasted one-offs, and multiple
 standards can apply to one contract (e.g. an ERC-4626 vault is also an ERC-20,
 and may be Ownable + Pausable).
@@ -31,7 +31,7 @@ and may be Ownable + Pausable).
   `ownable` | `access-control` | `none`) and attached as a `permission` to
   privileged operations, so the UI can explain how an action is gated.
 - The classifier consumes the merged semantics; it no longer hard-codes ERC-20.
-  Unmatched functions still fall back to the Raw view — nothing is dropped.
+  Unmatched functions still fall back to the Raw view - nothing is dropped.
 
 ## Consequences
 

@@ -21,30 +21,30 @@ prioritized in [`docs/ux-improvements.md`](../ux-improvements.md).
 Small, non-blocking enhancements intentionally deferred so we can start Phase 2.
 Pick these up between phases or when they naturally fold into a larger workstream.
 
-- [x] **Import manifest JSON** — round-trip with Export; loads a previously
+- [x] **Import manifest JSON** - round-trip with Export; loads a previously
       exported/edited manifest via `migrateManifest` (delivered in Phase 3).
-- [ ] **Full re-resolution after upgrade** — when a manifest is stale, re-fetch a
+- [ ] **Full re-resolution after upgrade** - when a manifest is stale, re-fetch a
       fresh ABI via the Phase 2 resolver (today Re-analyze refreshes
       classification + code hash on the current ABI only).
-- [ ] **Route-level lazy loading** — `React.lazy` the `ProjectView` (wallet +
+- [ ] **Route-level lazy loading** - `React.lazy` the `ProjectView` (wallet +
       renderer stack) so the initial load ships mostly app code; the heavy
       web3/rainbowkit chunks load when a project is opened.
-- [ ] **Empty `react` vendor chunk** — the manualChunks split emits a 0 KB
+- [ ] **Empty `react` vendor chunk** - the manualChunks split emits a 0 KB
       `react` chunk; refine the split (function form) so React lands in its own
       cacheable chunk.
-- [x] **RainbowKit `initialChain`** — connect/switch flow now defaults to the
+- [x] **RainbowKit `initialChain`** - connect/switch flow now defaults to the
       project's / bundle's chain in both apps to reduce wrong-network prompts.
-- [ ] **Unit tests for studio utilities** — cover `lib/download.ts` and the
+- [ ] **Unit tests for studio utilities** - cover `lib/download.ts` and the
       `SettingsPanel` validation logic (currently only e2e-smoke touches them).
-- [x] **Project delete confirmation** — deleting a project opens a high-risk
+- [x] **Project delete confirmation** - deleting a project opens a high-risk
       `ConfirmDialog` and clears its local execution history (no one-click loss).
-- [ ] **Tx notifications** — lightweight toast on success/error in addition to
+- [ ] **Tx notifications** - lightweight toast on success/error in addition to
       the inline `TxStatusView`. Tracked in [UX improvements](../ux-improvements.md) (P0).
-- [x] **A11y pass** — `@axe-core/playwright` gate on the standalone app (User +
+- [x] **A11y pass** - `@axe-core/playwright` gate on the standalone app (User +
       Raw tabs, no serious/critical violations); raised badge/button text contrast
       to WCAG AA (Phase 9).
 
-## Phase 2 — Address resolver (`resolver`)
+## Phase 2 - Address resolver (`resolver`)
 
 - Adapter interface for ABI/source providers
 - Generic block-explorer API adapter
@@ -54,7 +54,7 @@ Pick these up between phases or when they naturally fold into a larger workstrea
 - Show ABI/source provenance and confidence
 - Fallback when ABI is not found
 
-## Phase 3 — Semantic manifest (`spec` + `studio`) — done (slice)
+## Phase 3 - Semantic manifest (`spec` + `studio`) - done (slice)
 
 - [x] Manifest editor with form and raw JSON tabs
 - [x] Import/export manifest round-trip
@@ -62,7 +62,7 @@ Pick these up between phases or when they naturally fold into a larger workstrea
 - [x] Stale detection by implementation code hash
 - [ ] YAML tab (JSON only for now)
 
-## Phase 4 — Standards analyzer (`analyzer`) — done (slice)
+## Phase 4 - Standards analyzer (`analyzer`) - done (slice)
 
 - [x] Generic member-based detection engine (`detectByMembers`) + registry
 - [x] ERC-721, ERC-1155, ERC-4626 detectors + semantics
@@ -74,7 +74,7 @@ Pick these up between phases or when they naturally fold into a larger workstrea
       recorded as evidence only, detection is ABI-shape based)
 - [ ] More extensions: ERC-2612 permit, ERC-777, ERC-20 votes/snapshot
 
-## Phase 5 — Classification (`classifier`) — done (slice)
+## Phase 5 - Classification (`classifier`) - done (slice)
 
 - [x] Priority-based rule engine (`engine.ts`) with field-level resolution +
       evidence accumulation
@@ -87,7 +87,7 @@ Pick these up between phases or when they naturally fold into a larger workstrea
 - [ ] Per-project custom rule overrides / user-tunable priorities
 - [ ] NatSpec- and source-AST-based evidence (still name/signature only)
 
-## Phase 6 — Generated UI (`renderer` + `components`) — done (slice)
+## Phase 6 - Generated UI (`renderer` + `components`) - done (slice)
 
 - [x] Overview panel (identity, standards chips, section counts, confidence)
 - [x] PausePanel + RoleManager consoles (grouped by operationType)
@@ -99,7 +99,7 @@ Pick these up between phases or when they naturally fold into a larger workstrea
 - [ ] Wire manifest `InputDefinition` widgets (token-amount/token-id) into the
       generic form (currently ABI-type based, specialized panels handle amounts)
 
-## Phase 7 — Safety & diagnostics — done (slice)
+## Phase 7 - Safety & diagnostics - done (slice)
 
 - [x] Untrusted-text sanitization (`sanitizeText` + `SafeText`): strips
       bidi/zero-width/control chars, flags mixed-script homoglyphs and length
@@ -107,7 +107,7 @@ Pick these up between phases or when they naturally fold into a larger workstrea
       manifest, critical risk) surfaced in the ConfirmDialog
 - [x] Applied `SafeText` to token name/symbol and contract name
 - [x] Local execution history (audit trail) with export/clear in the studio
-- [ ] History store unit test — studio lacks a vitest runner; add jsdom+vitest to
+- [ ] History store unit test - studio lacks a vitest runner; add jsdom+vitest to
       the studio and cover `state/history.ts` and `lib/download.ts`
 - [ ] NatSpec/metadata sanitization at **import** time (sanitize titles/
       descriptions into the manifest, not just at render)
@@ -118,14 +118,14 @@ Pick these up between phases or when they naturally fold into a larger workstrea
 - [ ] Explorer links in the audit log (needs an `explorerUrl` in the studio
       runtime)
 
-## Phase 8 — Export & CLI (`export`, `cli`) — done (slice)
+## Phase 8 - Export & CLI (`export`, `cli`) - done (slice)
 
 - [x] Portable `SemanticBundle` (identity + ABI + manifest) with zod validation
 - [x] `generated-app` template renders a bundle at runtime (analyzer-free)
 - [x] Studio "Export app" button
 - [x] `semantic-dapp bundle | export | serve` CLI (+ `import` alias)
 - [x] Static-hosting friendly (SPA fallback serve; any static host works)
-- [ ] CLI address-based `import` (resolver-backed) — today `bundle` takes an ABI
+- [ ] CLI address-based `import` (resolver-backed) - today `bundle` takes an ABI
       file; the studio already resolves by address
 - [ ] Publish `@semantic-dapp/*` to npm for a true `npx semantic-dapp` and a
       standalone `pnpm install` outside the monorepo
@@ -134,7 +134,7 @@ Pick these up between phases or when they naturally fold into a larger workstrea
 - [ ] `export` that emits a prebuilt static `dist` (not just source) for
       zero-toolchain hosting
 
-## Phase 9 — Fixtures, docs & public beta — done (slice)
+## Phase 9 - Fixtures, docs & public beta - done (slice)
 
 - [x] `MockVault` (ERC-4626) + `MockRWA` (roles + pause) Foundry fixtures + tests
 - [x] Real compiled ABIs (`contracts/fixtures/abi`) drive analyzer/classifier tests
@@ -142,7 +142,7 @@ Pick these up between phases or when they naturally fold into a larger workstrea
 - [x] Accessibility gate (`@axe-core/playwright`) + contrast fixes
 - [x] CI: forge fixtures job (+ ABI drift check) and generated-app e2e
 - [x] `v0.1.0-beta` version bump + `CHANGELOG.md` + README beta status
-- [x] Emergency/write **button** white-on-color contrast — filled emergency
+- [x] Emergency/write **button** white-on-color contrast - filled emergency
       buttons use a darker `--sd-emergency-fill` (#b3261e) so white text clears AA
 - [ ] Dependency/security review + Dependabot before tagging `v0.1.0`
 - [ ] Fund the demos against a public testnet so writes work without local Anvil

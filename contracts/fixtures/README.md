@@ -3,15 +3,15 @@
 Foundry project with the contracts used for analyzer detection, the demo, and
 end-to-end read/write integration tests.
 
-- [`src/Counter.sol`](src/Counter.sol) — view/write functions + a custom error.
-- [`src/MockERC20.sol`](src/MockERC20.sol) — self-contained ERC-20 with `mint`,
+- [`src/Counter.sol`](src/Counter.sol) - view/write functions + a custom error.
+- [`src/MockERC20.sol`](src/MockERC20.sol) - self-contained ERC-20 with `mint`,
   events and custom errors.
-- [`src/MockVault.sol`](src/MockVault.sol) — self-contained ERC-4626 vault over an
+- [`src/MockVault.sol`](src/MockVault.sol) - self-contained ERC-4626 vault over an
   ERC-20 asset (deposit/mint/withdraw/redeem + previews). Shares are an ERC-20.
-- [`src/MockRWA.sol`](src/MockRWA.sol) — role-gated ERC-20 modeling an RWA /
+- [`src/MockRWA.sol`](src/MockRWA.sol) - role-gated ERC-20 modeling an RWA /
   stablecoin admin surface: AccessControl-style roles + Pausable + mint/burn.
 
-These are simplified models for analyzer detection and demos — not audited and
+These are simplified models for analyzer detection and demos - not audited and
 not for production.
 
 Compiled ABIs are committed under [`abi/`](abi) and drive the analyzer/classifier

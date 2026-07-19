@@ -30,5 +30,5 @@ modifiers, NatSpec and (when available) verified source.
   evidence objects and confidence scores.
 - The first release ships without any required AI dependency.
 - Confidence thresholds (documented in the analyzer) drive routing:
-  `0.90+` auto-confirmed, `0.70–0.89` suggested, `0.40–0.69` developer review,
+  `0.90+` auto-confirmed, `0.70-0.89` suggested, `0.40-0.69` developer review,
   `< 0.40` raw-only.

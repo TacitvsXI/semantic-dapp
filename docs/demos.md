@@ -3,7 +3,7 @@
 Three ready-to-render [`SemanticBundle`](export.md)s live in
 [`docs/demo/bundles`](demo/bundles). Each is generated from a real Foundry
 fixture (`contracts/fixtures`), so what you see is exactly what the analyzer
-produces from compiled ABIs — no hand-tuning.
+produces from compiled ABIs - no hand-tuning.
 
 | Demo                                                  | Fixture     | Standards detected              | Shows off                                                                 |
 | ----------------------------------------------------- | ----------- | ------------------------------- | ------------------------------------------------------------------------- |
@@ -21,7 +21,7 @@ pnpm build && pnpm gen:demos            # rebuild the bundles
 
 ## Render a demo in the standalone app
 
-The standalone template renders whatever bundle it finds — so a demo is just data.
+The standalone template renders whatever bundle it finds - so a demo is just data.
 
 ```bash
 pnpm build

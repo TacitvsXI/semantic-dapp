@@ -1,8 +1,8 @@
-# Phase 6 — Trusted UI Components
+# Phase 6 - Trusted UI Components
 
-Goal (Execution Plan §17.6): render the semantics from Phases 4–5 as **trusted,
-purpose-built UI** — an overview, grouped admin/emergency consoles, and an
-explicit **confirmation flow for critical actions** — instead of one generic form
+Goal (Execution Plan §17.6): render the semantics from Phases 4-5 as **trusted,
+purpose-built UI** - an overview, grouped admin/emergency consoles, and an
+explicit **confirmation flow for critical actions** - instead of one generic form
 per function. Standards and heuristics decide _what_ an action is; Phase 6 decides
 _how it is presented safely_.
 
@@ -11,21 +11,21 @@ ConfirmDialog gating high/critical/privileged writes + an Overview summary`.
 
 Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 
-## `packages/components` — presentational
+## `packages/components` - presentational
 
-- [x] `ConfirmDialog` — accessible modal (role=dialog, Esc/backdrop cancel) that
+- [x] `ConfirmDialog` - accessible modal (role=dialog, Esc/backdrop cancel) that
       shows risk, permission, signature and an argument summary; critical actions
       require typing `CONFIRM`
-- [x] `PausePanel` — status pill (paused/active/unknown) + Pause/Unpause actions
-- [x] `RoleManager` — grant/revoke/renounce with role (known-role presets +
+- [x] `PausePanel` - status pill (paused/active/unknown) + Pause/Unpause actions
+- [x] `RoleManager` - grant/revoke/renounce with role (known-role presets +
       bytes32) and account validation
-- [x] `OverviewPanel` — contract identity, detected standards chips, network/
+- [x] `OverviewPanel` - contract identity, detected standards chips, network/
       wallet status, confidence summary
 - [x] Styles for modal + panels (`sd-modal`, `sd-pause`, `sd-roles`, `sd-overview`)
 
-## `packages/renderer` — wiring & dispatch
+## `packages/renderer` - wiring & dispatch
 
-- [x] `useConfirm()` hook — promise-based confirmation backed by `ConfirmDialog`
+- [x] `useConfirm()` hook - promise-based confirmation backed by `ConfirmDialog`
 - [x] `OperationRenderer` / grouping: pause+unpause → one `PausePanel`,
       role-\* → one `RoleManager`; everything else → `OperationCard`
 - [x] Integrate `ConfirmDialog` into `FunctionRunner` (replace the checkbox);
@@ -45,7 +45,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 
 ## Docs & CI
 
-- [x] ADR-007 — operationType→component dispatch & confirmation flow
+- [x] ADR-007 - operationType→component dispatch & confirmation flow
 - [x] Update `PROGRESS.md`, `docs/roadmap.md`, backlog
 - [x] lint / typecheck / test / build / e2e green
 

@@ -8,7 +8,7 @@
 The semantic manifest (ADR-002) is exported, imported, hand-edited and persisted
 in the browser. As the schema evolves across phases (new operation types, input
 widgets, contract fields), previously saved or exported manifests must remain
-loadable — otherwise users lose work and shared manifests rot.
+loadable - otherwise users lose work and shared manifests rot.
 
 We also need to detect when a manifest no longer matches the on-chain contract.
 For proxies the address is stable but the **implementation** (hence the ABI and

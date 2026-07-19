@@ -7,8 +7,8 @@
 
 Through Phase 4 the classifier was a single lookup: a function was either a known
 standard member (routed by its semantic) or an unknown that fell back to the Raw
-view. Real contracts carry many meaningful functions that no standard describes —
-`setFeeRecipient`, `rescueTokens`, `pause`, `claimRewards`, custom `withdraw` —
+view. Real contracts carry many meaningful functions that no standard describes -
+`setFeeRecipient`, `rescueTokens`, `pause`, `claimRewards`, custom `withdraw` -
 and dumping them all into Raw produces empty Admin/Emergency views for exactly
 the contracts where governance clarity matters most. We need to classify those
 functions too, without weakening the deterministic, standard-first guarantees or
@@ -34,7 +34,7 @@ Introduce a small **priority-based rule engine** in `packages/classifier`.
   only fill gaps and add corroborating evidence.
 - `OperationType` gains additive generic buckets (`admin-config`,
   `fund-withdraw`, `fund-deposit`, `claim`) so non-standard writers have honest
-  types. This is backward compatible — old manifests never used them, so no
+  types. This is backward compatible - old manifests never used them, so no
   schema migration is required.
 - **Permissions are computed after resolution** from the final audience/type and
   the access model (`ownable` / `access-control`), with role operations always

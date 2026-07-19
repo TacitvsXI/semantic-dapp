@@ -5,16 +5,16 @@
 
 ## Context
 
-Phases 1–7 produce a reviewed semantic manifest inside the studio, but the value
+Phases 1-7 produce a reviewed semantic manifest inside the studio, but the value
 only lands when a team can **ship** a usable dApp from it. The Execution Plan
 (§17.8) calls for a `generated-app` template, manifest injection on export, and a
-`semantic-dapp` CLI (`import` / `serve` / `export`) — all without a backend and
+`semantic-dapp` CLI (`import` / `serve` / `export`) - all without a backend and
 hostable on any static host.
 
 Two questions drove the design:
 
 1. **What crosses the boundary between analysis and a shipped app?** The manifest
-   alone is not enough — the app also needs the ABI (to encode calls) and the
+   alone is not enough - the app also needs the ABI (to encode calls) and the
    contract's identity (chain, address, RPC, explorer).
 2. **How does a standalone app render without re-running analysis?** It should
    consume a finished artifact, not the analyzer, so exported apps stay small and
@@ -35,7 +35,7 @@ address?, contractName?, explorerUrl?, abi, manifest }`. It reuses the existing
   `@semantic-dapp/renderer` `GeneratedApp` the studio uses. Because it consumes a
   finished manifest, the exported app never imports the analyzer/classifier
   (answers Q2). Injecting the bundle as a static `public/bundle.json` means
-  **export needs no rebuild of source** — the same built template serves any
+  **export needs no rebuild of source** - the same built template serves any
   contract.
 
 - **The CLI is dependency-light and library-first** (`packages/cli`). `bundle`
@@ -50,7 +50,7 @@ address?, contractName?, explorerUrl?, abi, manifest }`. It reuses the existing
 
 ## Consequences
 
-- One artifact (`SemanticBundle`) is shared by studio, CLI and template — no
+- One artifact (`SemanticBundle`) is shared by studio, CLI and template - no
   divergent formats.
 - Exported apps are small and analyzer-free; a single built template can render
   any contract by swapping `bundle.json`.

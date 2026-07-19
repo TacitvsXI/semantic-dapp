@@ -6,7 +6,7 @@ Semantic Dapp generates interfaces for **arbitrary, untrusted** smart contracts.
 Contract metadata (names, NatSpec, symbols) is attacker-controlled and must be
 treated as untrusted input. Key protections we care about:
 
-- No arbitrary generated code execution — the generated UI is built only from
+- No arbitrary generated code execution - the generated UI is built only from
   trusted, reviewed components.
 - Contract metadata and NatSpec must be sanitized before rendering.
 - The tool never stores private keys and never signs transactions itself; all

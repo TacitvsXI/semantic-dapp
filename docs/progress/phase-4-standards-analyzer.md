@@ -1,4 +1,4 @@
-# Phase 4 — Standards Analyzer
+# Phase 4 - Standards Analyzer
 
 Goal (Execution Plan §17.4): recognize the common EVM standards and access models
 beyond ERC-20, so real contracts (NFTs, vaults, role-gated admin, pausable,
@@ -60,7 +60,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 
 ## Docs & CI
 
-- [x] ADR-005 — standards detection engine & access model
+- [x] ADR-005 - standards detection engine & access model
 - [x] Update `PROGRESS.md`, `docs/roadmap.md`, backlog
 - [x] Keep lint/typecheck/test/build/e2e green
 

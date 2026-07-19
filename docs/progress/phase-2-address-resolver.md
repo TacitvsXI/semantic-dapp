@@ -1,6 +1,6 @@
-# Phase 2 — Address Resolver
+# Phase 2 - Address Resolver
 
-Goal (Execution Plan §17.2): deliver the project's core promise — **a dApp from
+Goal (Execution Plan §17.2): deliver the project's core promise - **a dApp from
 any contract address**. Instead of pasting an ABI by hand, the user enters an
 address + chain and the studio resolves the ABI/source, detects proxies, and
 records provenance + confidence before generating the UI.
@@ -26,9 +26,9 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 
 ### Adapters
 
-- [x] **Sourcify** adapter — no API key; check `full_match` then `partial_match`,
+- [x] **Sourcify** adapter - no API key; check `full_match` then `partial_match`,
       read `metadata.json` → ABI + compiler + contract name; set verified flag
-- [x] **Block-explorer** adapter — Etherscan v2 unified endpoint
+- [x] **Block-explorer** adapter - Etherscan v2 unified endpoint
       (`api.etherscan.io/v2/api?chainid=…&module=contract&action=getsourcecode`);
       API key optional (rate-limited without); parse ABI + proxy hints
 - [x] Graceful per-adapter failure (network/404/not-verified) → typed result
@@ -57,11 +57,11 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 - [x] Unit: Sourcify adapter (mocked `fetch`, full/partial/miss)
 - [x] Unit: explorer adapter (mocked `fetch`, verified/unverified/proxy)
 - [x] Unit: proxy slot decoding (mocked `getStorageAt` + beacon `call`)
-- [x] Unit: orchestrator (adapter ordering, proxy follow, fallback) — 18 passing
+- [x] Unit: orchestrator (adapter ordering, proxy follow, fallback) - 18 passing
 
 ## `apps/studio` integration
 
-- [x] `ImportWizard`: tabs — **Paste ABI** (existing) and **By address** (new)
+- [x] `ImportWizard`: tabs - **Paste ABI** (existing) and **By address** (new)
 - [x] By-address form: address, chainId, RPC, optional explorer API key → Resolve
 - [x] On resolve: preview provenance/proxy/confidence; prefill on create
 - [x] Persist `provenance`/`proxy` on `Project`; provenance badge in the
@@ -70,7 +70,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 
 ## Docs & CI
 
-- [x] ADR-003 — resolver adapter strategy & trust model
+- [x] ADR-003 - resolver adapter strategy & trust model
 - [x] Update `PROGRESS.md`, `docs/roadmap.md`
 - [x] Keep lint/typecheck/test/build/e2e green (15 lint/type, 14 test tasks)
 

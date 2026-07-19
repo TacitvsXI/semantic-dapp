@@ -1,7 +1,7 @@
-# Phase 5 — Classification & Routing
+# Phase 5 - Classification & Routing
 
 Goal (Execution Plan §17.5): turn detection into a **priority-based rule engine**
-so every function — not just standard members — gets a meaningful audience, type,
+so every function - not just standard members - gets a meaningful audience, type,
 risk and permission. Custom admin setters, fund movements, pausers and claims are
 routed instead of dumped to Raw, while standards stay authoritative.
 
@@ -16,17 +16,17 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 - [x] Extend `OperationType` with generic buckets: `admin-config`,
       `fund-withdraw`, `fund-deposit`, `claim` (additive, no migration needed)
 
-## `packages/classifier` — rule engine
+## `packages/classifier` - rule engine
 
 - [x] `ClassificationRule` / `RuleMatch` / `RuleContext` types
-- [x] `runRules(ctx, rules)` — collect matches, resolve each field by
+- [x] `runRules(ctx, rules)` - collect matches, resolve each field by
       (priority, confidence), accumulate evidence, never drop a function
-- [x] `standardRule` (priority 100) — authoritative Phase-4 semantics
-- [x] `nameHeuristicRule` (priority 50) — mint/burn/pause/withdraw/rescue/
+- [x] `standardRule` (priority 100) - authoritative Phase-4 semantics
+- [x] `nameHeuristicRule` (priority 50) - mint/burn/pause/withdraw/rescue/
       set·update·config/claim/deposit·stake by function name
-- [x] `riskHeuristicRule` (priority 40) — payable / destructive names raise risk
-- [x] `readRule` (priority 30) — view·pure functions surface in the Read tab
-- [x] `fallbackRule` (priority 0) — unknown writer → Raw/Developer (ADR-001)
+- [x] `riskHeuristicRule` (priority 40) - payable / destructive names raise risk
+- [x] `readRule` (priority 30) - view·pure functions surface in the Read tab
+- [x] `fallbackRule` (priority 0) - unknown writer → Raw/Developer (ADR-001)
 - [x] Central `permissionFor(audience, type, isRead, access)` post-resolution
 
 ## Routing & rendering
@@ -48,7 +48,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 
 ## Docs & CI
 
-- [x] ADR-006 — priority rule engine & heuristics
+- [x] ADR-006 - priority rule engine & heuristics
 - [x] Update `PROGRESS.md`, `docs/roadmap.md`, backlog
 - [x] lint / typecheck / test / build / e2e green
 

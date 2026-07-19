@@ -19,7 +19,7 @@ Use **Export manifest** if you only need the manifest (no ABI/identity).
 Within the monorepo, build first (`pnpm -w build`) then run
 `node packages/cli/dist/cli.js <command>` (or link the `semantic-dapp` bin).
 
-### `bundle` (alias `import`) — ABI → bundle
+### `bundle` (alias `import`) - ABI → bundle
 
 ```bash
 semantic-dapp bundle \
@@ -34,7 +34,7 @@ semantic-dapp bundle \
 - `--abi` accepts a bare ABI array or a Foundry/Hardhat artifact (`{ "abi": [...] }`).
 - Analysis (standards detection + classification) runs locally; no network calls.
 
-### `export` — bundle → standalone app
+### `export` - bundle → standalone app
 
 ```bash
 semantic-dapp export --bundle mytoken.bundle.json --out ./my-dapp
@@ -49,7 +49,7 @@ cd ./my-dapp && pnpm install && pnpm build
 
 Pass `--template <dir>` to use a customized template.
 
-### `serve` — preview a built site
+### `serve` - preview a built site
 
 ```bash
 semantic-dapp serve --dir ./my-dapp/dist --port 4174

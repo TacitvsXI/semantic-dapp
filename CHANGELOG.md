@@ -5,7 +5,7 @@ All notable changes to this project are documented here. The format is based on
 follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) once it reaches
 `1.0.0`. While in `0.x`, minor versions may include breaking changes.
 
-## [0.1.0-beta] — 2026-07-19
+## [0.1.0-beta] - 2026-07-19
 
 First public beta: the full pipeline from a contract to a shippable dApp, proven
 on production-like fixtures.
@@ -22,7 +22,7 @@ on production-like fixtures.
   and access models (Ownable, AccessControl, Pausable, Upgradeable) with
   confidence scoring and evidence.
 - **Classification & routing** (Phase 5): a priority rule engine that routes every
-  function to a semantic operation, audience and risk — never dropping a function.
+  function to a semantic operation, audience and risk - never dropping a function.
 - **Trusted UI components** (Phase 6): purpose-built Overview, Pause and Role
   Manager consoles and a `ConfirmDialog` gating high/critical writes (critical
   actions require typing `CONFIRM`).
@@ -50,7 +50,7 @@ on production-like fixtures.
 - ADR-002 … ADR-010 covering resolver, manifest, standards, classification,
   trusted UI, safety, export, and fixtures/release decisions.
 
-## [0.0.1] — 2026-07-19
+## [0.0.1] - 2026-07-19
 
 ### Added
 
