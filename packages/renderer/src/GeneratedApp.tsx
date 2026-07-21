@@ -9,6 +9,7 @@ import {
   type SafetyContext,
 } from './OperationCard.js';
 import { TokenActions } from './TokenActions.js';
+import { VaultActions } from './VaultActions.js';
 import { OverviewSummary } from './OverviewSummary.js';
 import { ReadDataGrid } from './ReadDataGrid.js';
 import { RpcHealthBanner } from './RpcHealthBanner.js';
@@ -17,6 +18,16 @@ import { RoleManagerHost } from './panels/RoleManagerHost.js';
 
 /** ERC-20 transfer/approve are shown by TokenActions; hide the duplicate cards. */
 const ERC20_USER_PANEL_SIGNATURES = new Set([
+  'transfer(address,uint256)',
+  'approve(address,uint256)',
+]);
+
+/** Deposit/mint/withdraw/redeem (plus share transfer/approve) are shown by VaultActions. */
+const ERC4626_USER_PANEL_SIGNATURES = new Set([
+  'deposit(uint256,address)',
+  'mint(uint256,address)',
+  'withdraw(uint256,address,address)',
+  'redeem(uint256,address,address)',
   'transfer(address,uint256)',
   'approve(address,uint256)',
 ]);
@@ -52,7 +63,8 @@ export function GeneratedApp({
   const activeContract = contractId
     ? manifest.contracts.find((c) => c.id === contractId)
     : manifest.contracts[0];
-  const isErc20 = activeContract?.standards.includes('erc-20') ?? false;
+  const isVault = activeContract?.standards.includes('erc-4626') ?? false;
+  const isErc20 = (activeContract?.standards.includes('erc-20') ?? false) && !isVault;
 
   const safetyContext: SafetyContext = {
     ...(activeContract?.chainId !== undefined ? { contractChainId: activeContract.chainId } : {}),
@@ -119,11 +131,17 @@ export function GeneratedApp({
             .filter((section) => section.id === active)
             .map((section) => {
               const showTokenActions = section.id === 'user' && isErc20;
+              const showVaultActions = section.id === 'user' && isVault;
               const isReadSection = section.id === 'read';
               const { pause, roles, rest } = groupOperations(section.operations);
-              let cards = showTokenActions
-                ? rest.filter((v) => !ERC20_USER_PANEL_SIGNATURES.has(v.operation.function))
-                : rest;
+              let cards = rest;
+              if (showVaultActions) {
+                cards = rest.filter(
+                  (v) => !ERC4626_USER_PANEL_SIGNATURES.has(v.operation.function),
+                );
+              } else if (showTokenActions) {
+                cards = rest.filter((v) => !ERC20_USER_PANEL_SIGNATURES.has(v.operation.function));
+              }
               // No-arg getters are shown together in the live data grid; keep
               // only parametrized reads (e.g. balanceOf) as individual forms.
               if (isReadSection) {
@@ -134,6 +152,7 @@ export function GeneratedApp({
               return (
                 <div key={section.id} className="sd-section">
                   {showTokenActions ? <TokenActions model={model} runtime={runtime} /> : null}
+                  {showVaultActions ? <VaultActions model={model} runtime={runtime} /> : null}
                   {isReadSection ? <ReadDataGrid model={model} runtime={runtime} /> : null}
                   {pause.length > 0 ? <PausePanelHost model={model} runtime={runtime} /> : null}
                   {roles.length > 0 ? <RoleManagerHost model={model} runtime={runtime} /> : null}

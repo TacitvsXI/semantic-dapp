@@ -37,6 +37,15 @@ form, so they need no further work - listed here so the baseline is clear:
 
 ## Recently shipped
 
+- **ERC-4626 vault panel** - vaults now render a dedicated deposit / mint /
+  withdraw / redeem panel (segmented tabs) instead of four bare generic forms.
+  Amounts are entered in **human units** (`decimals`-aware), each action shows a
+  **live conversion preview** wired to `previewDeposit/Mint/Withdraw/Redeem`
+  ("You receive ≈ N vFIX"), the connected account is used as receiver/owner, and
+  MAX is offered for redeem (share balance) and withdraw (`maxWithdraw`). Assets
+  and shares are assumed to share `decimals()`. The panel is fully ABI-driven:
+  it appears whenever the standards analyzer tags a contract `erc-4626`.
+  (`components` `VaultPanel` + `renderer` `VaultActions`)
 - **Inline validation in every form** - the generic `FunctionForm` now confirms
   each scalar field as you type (not just on submit): an address shows "✓ Address
   accepted" with the **checksummed** value (accepting any casing), integers echo
@@ -128,12 +137,14 @@ form, so they need no further work - listed here so the baseline is clear:
       (name/symbol/decimals/totalSupply/paused/owner…) and shows them as a live
       dashboard, instead of one form per getter. Shipped as `ReadDataGrid` at the
       top of the Read tab. (backlog: Phase 6)
-- [ ] **ERC-4626 vault panel** - deposit/mint/withdraw/redeem with live previews
+- [x] **ERC-4626 vault panel** - deposit/mint/withdraw/redeem with live previews
       (`previewDeposit`/`previewRedeem`) and share/asset balances, replacing the
-      generic forms for vaults. Directly improves the vault demo. (backlog: Phase 6)
-- [ ] **Amount widgets with decimals** - render `token-amount` inputs with human
-      units (respecting `decimals`), a MAX button, and balance hints; wire the
-      manifest `InputDefinition` widgets into the generic form. (backlog: Phase 6)
+      generic forms for vaults. Shipped as `VaultPanel` + `VaultActions`.
+      (backlog: Phase 6)
+- [ ] **Amount widgets with decimals** - the vault panel already uses human-unit
+      amounts with MAX; extend the same widget to the **generic** form by wiring
+      the manifest `InputDefinition` `token-amount` hints into `InputField`.
+      (backlog: Phase 6)
 - [ ] **Diagnostics panel** - a green/warn/fail checklist (verified source,
       proxy, staleness, standards confidence, network) beyond the Overview
       summary, so a reviewer can judge trust at a glance. (backlog: Phase 7)

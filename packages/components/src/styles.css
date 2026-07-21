@@ -447,6 +447,55 @@
   flex-direction: column;
   gap: 14px;
 }
+
+/* ERC-4626 vault panel */
+.sd-vault__stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 0 0 14px;
+}
+.sd-vault__stats dt {
+  font-size: 12px;
+  color: var(--sd-muted);
+}
+.sd-vault__stats dd {
+  margin: 2px 0 0;
+  font-family: ui-monospace, monospace;
+  font-size: 15px;
+  color: var(--sd-text);
+  word-break: break-all;
+}
+.sd-vault__tabs {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 12px;
+  background: var(--sd-surface-2, rgba(127, 127, 127, 0.12));
+  border-radius: 10px;
+}
+.sd-vault__tab {
+  border: 0;
+  background: transparent;
+  color: var(--sd-muted);
+  padding: 6px 14px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.sd-vault__tab--active {
+  background: var(--sd-surface, #fff);
+  color: var(--sd-text);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+.sd-vault__preview {
+  font-size: 13px;
+  color: var(--sd-text);
+}
+.sd-vault__preview strong {
+  font-family: ui-monospace, monospace;
+}
 .sd-card__reviewed {
   margin-left: 8px;
   font-size: 11px;

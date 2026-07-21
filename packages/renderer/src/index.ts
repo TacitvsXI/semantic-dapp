@@ -4,6 +4,7 @@ export * from './useConfirm.js';
 export * from './FunctionRunner.js';
 export * from './OperationCard.js';
 export * from './TokenActions.js';
+export * from './VaultActions.js';
 export * from './OverviewSummary.js';
 export * from './ReadDataGrid.js';
 export * from './RpcHealthBanner.js';
