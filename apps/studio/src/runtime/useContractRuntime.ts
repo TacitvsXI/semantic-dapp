@@ -6,6 +6,7 @@ import {
   createReadClientFor,
   decodeExecutionError,
   estimateWriteGas,
+  explorerUrlForChain,
   idleTxState,
   readAndFormat,
   simulateWrite,
@@ -14,6 +15,7 @@ import {
   type TxState,
 } from '@semantic-dapp/execution';
 import type { ContractRuntime } from '@semantic-dapp/renderer';
+import { pushToast } from '@semantic-dapp/components';
 import type { Project } from '../state/project.js';
 
 /** A terminal write result reported for the audit trail. */
@@ -80,6 +82,7 @@ export function useContractRuntime(project: Project, hooks?: RuntimeHooks): Cont
 
   const abi = project.abi as Abi;
   const target = project.contract.address as Address | undefined;
+  const explorerUrl = explorerUrlForChain(project.contract.chainId);
 
   const callRead = useCallback(
     async (func: ContractFunction, args: unknown[]): Promise<FormattedOutput[]> => {
@@ -147,6 +150,14 @@ export function useContractRuntime(project: Project, hooks?: RuntimeHooks): Cont
         setTx(sig, { phase: 'awaiting-signature', gasEstimate });
         const hash = await walletClient.writeContract(sim.request);
         setTx(sig, { phase: 'pending', hash, gasEstimate });
+        const txHref = explorerUrl ? `${explorerUrl}/tx/${hash}` : undefined;
+        pushToast({
+          id: `tx-${sig}`,
+          kind: 'info',
+          title: 'Transaction submitted',
+          message: func.name,
+          ...(txHref ? { href: txHref, hrefLabel: 'View on explorer' } : {}),
+        });
 
         const receipt = await waitForTx(publicClient, hash);
         const ok = receipt.status === 'success';
@@ -164,6 +175,13 @@ export function useContractRuntime(project: Project, hooks?: RuntimeHooks): Cont
                 },
               }),
         });
+        pushToast({
+          id: `tx-${sig}`,
+          kind: ok ? 'success' : 'error',
+          title: ok ? 'Transaction confirmed' : 'Transaction failed',
+          message: ok ? func.name : `${func.name} reverted on-chain`,
+          ...(txHref ? { href: txHref, hrefLabel: 'View on explorer' } : {}),
+        });
         record({
           function: sig,
           status: ok ? 'success' : 'error',
@@ -173,10 +191,16 @@ export function useContractRuntime(project: Project, hooks?: RuntimeHooks): Cont
       } catch (error) {
         const decoded = decodeExecutionError(error);
         setTx(sig, { phase: 'error', error: decoded });
+        pushToast({
+          id: `tx-${sig}`,
+          kind: 'error',
+          title: 'Transaction failed',
+          message: `${func.name}: ${decoded.title}`,
+        });
         record({ function: sig, status: 'error', detail: `${decoded.title}: ${decoded.detail}` });
       }
     },
-    [publicClient, abi, target, walletClient, address, setTx, record],
+    [publicClient, abi, target, walletClient, address, setTx, record, explorerUrl],
   );
 
   const getTxState = useCallback(
@@ -201,5 +225,6 @@ export function useContractRuntime(project: Project, hooks?: RuntimeHooks): Cont
     callRead,
     submitWrite,
     getTxState,
+    ...(explorerUrl ? { explorerUrl } : {}),
   };
 }

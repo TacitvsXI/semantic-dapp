@@ -8,7 +8,8 @@ import {
 } from '@semantic-dapp/spec';
 import { applyReview } from '@semantic-dapp/classifier';
 import { GeneratedApp } from '@semantic-dapp/renderer';
-import { AuditLog, type AuditEntry } from '@semantic-dapp/components';
+import { AddressView, AuditLog, type AuditEntry } from '@semantic-dapp/components';
+import { explorerUrlForChain } from '@semantic-dapp/execution';
 import { buildBundle, bundleFilename } from '@semantic-dapp/export';
 import { useContractRuntime, type WriteRecord } from '../runtime/useContractRuntime.js';
 import { computeManifest, CONTRACT_ID } from '../state/manifest.js';
@@ -173,7 +174,7 @@ export function ProjectView({ project: initialProject, onBack, onUpdated }: Proj
 
   const standards = manifest.contracts[0]?.standards ?? [];
   const address = project.contract.address;
-  const shortAddress = address ? `${address.slice(0, 6)}…${address.slice(-4)}` : null;
+  const explorerUrl = explorerUrlForChain(project.contract.chainId);
 
   return (
     <div className="studio-project">
@@ -187,10 +188,10 @@ export function ProjectView({ project: initialProject, onBack, onUpdated }: Proj
               <h2>{project.name}</h2>
               <span className="studio-project__meta">
                 <span>chain {project.contract.chainId}</span>
-                {shortAddress ? (
+                {address ? (
                   <>
                     <span className="studio-project__dot">·</span>
-                    <code title={address}>{shortAddress}</code>
+                    <AddressView address={address} {...(explorerUrl ? { explorerUrl } : {})} />
                   </>
                 ) : (
                   <>
@@ -304,6 +305,7 @@ export function ProjectView({ project: initialProject, onBack, onUpdated }: Proj
       {showHistory ? (
         <AuditLog
           entries={history}
+          {...(explorerUrl ? { explorerUrl } : {})}
           onExport={() => downloadJson(`${project.name || 'project'}.history.json`, history)}
           onClear={() => {
             clearHistory(initialProject.id);

@@ -75,6 +75,14 @@ demo bundles render in the standalone app; an `@axe-core/playwright` gate enforc
 accessibility; CI runs the Solidity fixtures and standalone e2e; and the packages
 are cut as **`v0.1.0-beta`** with a [`CHANGELOG.md`](../CHANGELOG.md).
 
+Post-beta, **Track B** ("it just works" UX) shipped
+([checklist](progress/track-b-ux.md)): a known-chain registry powers
+block-explorer links for transactions and addresses; a reusable copy affordance;
+dismissible transaction toasts (submitted → confirmed/failed) from both runtimes;
+and a live **Read data grid** that auto-calls every no-argument getter into a
+dashboard. Remaining UX work is prioritized in
+[`docs/ux-improvements.md`](ux-improvements.md).
+
 ## In scope for the open-source MVP
 
 - Import any EVM contract by chain ID + address

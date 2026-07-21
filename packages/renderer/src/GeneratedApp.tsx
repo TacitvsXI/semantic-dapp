@@ -10,6 +10,7 @@ import {
 } from './OperationCard.js';
 import { TokenActions } from './TokenActions.js';
 import { OverviewSummary } from './OverviewSummary.js';
+import { ReadDataGrid } from './ReadDataGrid.js';
 import { PausePanelHost } from './panels/PausePanelHost.js';
 import { RoleManagerHost } from './panels/RoleManagerHost.js';
 
@@ -111,13 +112,22 @@ export function GeneratedApp({
             .filter((section) => section.id === active)
             .map((section) => {
               const showTokenActions = section.id === 'user' && isErc20;
+              const isReadSection = section.id === 'read';
               const { pause, roles, rest } = groupOperations(section.operations);
-              const cards = showTokenActions
+              let cards = showTokenActions
                 ? rest.filter((v) => !ERC20_USER_PANEL_SIGNATURES.has(v.operation.function))
                 : rest;
+              // No-arg getters are shown together in the live data grid; keep
+              // only parametrized reads (e.g. balanceOf) as individual forms.
+              if (isReadSection) {
+                cards = cards.filter(
+                  (v) => !(v.func && v.func.isRead && v.func.inputs.length === 0),
+                );
+              }
               return (
                 <div key={section.id} className="sd-section">
                   {showTokenActions ? <TokenActions model={model} runtime={runtime} /> : null}
+                  {isReadSection ? <ReadDataGrid model={model} runtime={runtime} /> : null}
                   {pause.length > 0 ? <PausePanelHost model={model} runtime={runtime} /> : null}
                   {roles.length > 0 ? <RoleManagerHost model={model} runtime={runtime} /> : null}
                   {cards.map((view) => (

@@ -37,6 +37,25 @@ form, so they need no further work - listed here so the baseline is clear:
 
 ## Recently shipped
 
+- **Live data grid** - the Read tab opens with a dashboard that auto-calls every
+  no-argument getter (name/symbol/decimals/totalSupply/paused/owner…) in
+  parallel and shows the values in a grid, with per-cell loading skeletons,
+  independent error + retry, and a "Refresh all". Parametrized reads (e.g.
+  `balanceOf`) stay as individual forms. The biggest "it just works" moment on
+  the User/Read tabs. (`renderer` `ReadDataGrid`)
+- **Explorer links everywhere** - a small known-chain registry
+  (`explorerUrlForChain`) threads a block-explorer base URL into both runtimes,
+  so transaction hashes (tx status + audit log) and the contract address
+  (overview + studio header) link out to Etherscan/Basescan/Arbiscan/…, on all
+  the common chains. (`execution` + `components`)
+- **Copy-to-clipboard** - a reusable `CopyButton` (with a transient ✓ and a
+  legacy fallback) and an `AddressView` that pairs a shortened, linkable address
+  with one-click copy. Used in the overview, the studio header, and read values.
+- **Transaction toasts** - submitted / confirmed / failed now also surface as a
+  dismissible toast (bottom-right), so a user who scrolled away still sees the
+  outcome; the "submitted" toast is upgraded in place to "confirmed"/"failed" and
+  carries an explorer link. Shared `pushToast` store + `ToastViewport`, emitted
+  from both runtimes.
 - **Role picker by name** - the Role manager discovers the contract's role
   constants (`MINTER_ROLE`, `PAUSER_ROLE`, `DEFAULT_ADMIN_ROLE`, …) **from the
   ABI** and offers them in a **dropdown mapped to their bytes32 id**, so you
@@ -74,19 +93,18 @@ form, so they need no further work - listed here so the baseline is clear:
 
 ### P0 - high impact, low effort
 
-- [ ] **Transaction toasts** - a lightweight, dismissible toast on submitted /
-      confirmed / failed, in addition to the inline `TxStatusView`. Today status
-      only lives next to the button, so a user who scrolled away misses the
-      result. (`components` + `renderer`)
-- [ ] **Explorer links everywhere** - link tx hashes and addresses (audit log,
-      tx status, overview) to the chain's block explorer. Needs an `explorerUrl`
-      threaded into the studio runtime (the resolver already knows it).
-- [ ] **Copy-to-clipboard affordances** - one-click copy for addresses, tx
-      hashes, and the generated app URL, with a "copied" tick.
-- [ ] **Empty/loading/error polish** - skeletons for reads in flight, a clear
-      "RPC unreachable" banner (vs. silent empty reads), and a first-run empty
-      state that points at "New import". Now that reads fall back to the wallet,
-      the banner should distinguish "no RPC and no wallet" from a genuine revert.
+- [x] **Transaction toasts** - a lightweight, dismissible toast on submitted /
+      confirmed / failed, in addition to the inline `TxStatusView`, so a user who
+      scrolled away still sees the result. (`components` + both runtimes)
+- [x] **Explorer links everywhere** - tx hashes (audit log, tx status) and the
+      contract address (overview, studio header) link to the chain's block
+      explorer via a known-chain registry (`explorerUrlForChain`).
+- [x] **Copy-to-clipboard affordances** - one-click `CopyButton` for addresses
+      and read values, with a "copied" tick (`AddressView`, read grid).
+- [ ] **Empty/loading/error polish** - the read grid now shows per-cell
+      skeletons + retry; still to do: a clear "RPC unreachable" banner (vs.
+      silent empty reads) that distinguishes "no RPC and no wallet" from a
+      genuine revert, and a first-run empty state pointing at "New import".
 - [ ] **Inline validation in the generic form** - bring the Role manager's
       live "✓ accepted / checksummed / preview" feedback to the generic
       `FunctionForm` (per-field, as-you-type) so every parameter is confirmed
@@ -94,10 +112,10 @@ form, so they need no further work - listed here so the baseline is clear:
 
 ### P1 - high impact, medium effort
 
-- [ ] **Read Data grid** - a dedicated panel that auto-calls no-arg getters
+- [x] **Read Data grid** - a dedicated panel that auto-calls no-arg getters
       (name/symbol/decimals/totalSupply/paused/owner…) and shows them as a live
-      dashboard, instead of one form per getter. Biggest "it just works" moment
-      for the User tab. (backlog: Phase 6)
+      dashboard, instead of one form per getter. Shipped as `ReadDataGrid` at the
+      top of the Read tab. (backlog: Phase 6)
 - [ ] **ERC-4626 vault panel** - deposit/mint/withdraw/redeem with live previews
       (`previewDeposit`/`previewRedeem`) and share/asset balances, replacing the
       generic forms for vaults. Directly improves the vault demo. (backlog: Phase 6)

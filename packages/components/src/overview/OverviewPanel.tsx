@@ -1,4 +1,5 @@
 import { SafeText } from '../components/SafeText.js';
+import { AddressView } from '../components/AddressView.js';
 
 export interface OverviewPanelProps {
   contractName?: string;
@@ -9,6 +10,8 @@ export interface OverviewPanelProps {
   sectionCounts?: { label: string; count: number }[];
   /** Average classification confidence across semantic operations, 0..1. */
   averageConfidence?: number;
+  /** Block-explorer base URL, so the address links out and can be copied. */
+  explorerUrl?: string;
   wallet?: { connected: boolean; address?: string; chainId?: number };
 }
 
@@ -23,11 +26,6 @@ const STANDARD_LABELS: Record<string, string> = {
   upgradeable: 'Upgradeable',
 };
 
-function shorten(address?: string): string | undefined {
-  if (!address) return undefined;
-  return address.length > 12 ? `${address.slice(0, 6)}…${address.slice(-4)}` : address;
-}
-
 /** A summary header for a generated app: identity, standards and network. */
 export function OverviewPanel({
   contractName,
@@ -36,6 +34,7 @@ export function OverviewPanel({
   standards,
   sectionCounts,
   averageConfidence,
+  explorerUrl,
   wallet,
 }: OverviewPanelProps) {
   const wrongNetwork =
@@ -50,7 +49,13 @@ export function OverviewPanel({
           <h3 className="sd-card__title">
             <SafeText value={contractName} fallback="Contract" maxLength={80} />
           </h3>
-          {address ? <code className="sd-card__sig">{shorten(address)}</code> : null}
+          {address ? (
+            <AddressView
+              className="sd-overview__address"
+              address={address}
+              {...(explorerUrl ? { explorerUrl } : {})}
+            />
+          ) : null}
         </div>
         {chainId !== undefined ? (
           <span className="sd-badge sd-overview__chain">chain {chainId}</span>

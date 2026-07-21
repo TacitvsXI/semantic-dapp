@@ -1,4 +1,5 @@
 export * from './chains.js';
+export * from './known-chains.js';
 export * from './format.js';
 export * from './errors.js';
 export * from './read.js';

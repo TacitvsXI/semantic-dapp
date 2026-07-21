@@ -37,6 +37,7 @@ export function OverviewSummary({ manifest, layout, runtime, contractId }: Overv
       standards={contract?.standards ?? []}
       sectionCounts={sectionCounts}
       averageConfidence={averageConfidence}
+      {...(runtime.explorerUrl ? { explorerUrl: runtime.explorerUrl } : {})}
       wallet={{
         connected: runtime.wallet.isConnected,
         address: runtime.wallet.address,

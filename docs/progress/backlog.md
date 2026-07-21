@@ -38,8 +38,9 @@ Pick these up between phases or when they naturally fold into a larger workstrea
       `SettingsPanel` validation logic (currently only e2e-smoke touches them).
 - [x] **Project delete confirmation** - deleting a project opens a high-risk
       `ConfirmDialog` and clears its local execution history (no one-click loss).
-- [ ] **Tx notifications** - lightweight toast on success/error in addition to
-      the inline `TxStatusView`. Tracked in [UX improvements](../ux-improvements.md) (P0).
+- [x] **Tx notifications** - dismissible toasts on submitted/confirmed/failed
+      (shared `pushToast` store + `ToastViewport`, emitted from both runtimes) in
+      addition to the inline `TxStatusView`, with an explorer link.
 - [x] **A11y pass** - `@axe-core/playwright` gate on the standalone app (User +
       Raw tabs, no serious/critical violations); raised badge/button text contrast
       to WCAG AA (Phase 9).
@@ -95,7 +96,7 @@ Pick these up between phases or when they naturally fold into a larger workstrea
 - [x] De-duplicated ERC-20 transfer/approve on the User tab
 - [ ] Mint/Burn panel (generic form + confirm covers it functionally)
 - [ ] Vault (ERC-4626) deposit/withdraw/redeem panel with previews
-- [ ] Dedicated Read Data grid with auto-called no-arg getters
+- [x] Dedicated Read Data grid with auto-called no-arg getters (`ReadDataGrid`)
 - [ ] Wire manifest `InputDefinition` widgets (token-amount/token-id) into the
       generic form (currently ABI-type based, specialized panels handle amounts)
 
@@ -115,8 +116,8 @@ Pick these up between phases or when they naturally fold into a larger workstrea
       staleness, standards confidence, network) beyond the Overview summary
 - [ ] Simulation-based preflight warnings (revert/gas anomalies, unlimited
       approval, self-transfer) feeding the same `SafetyWarning` type
-- [ ] Explorer links in the audit log (needs an `explorerUrl` in the studio
-      runtime)
+- [x] Explorer links in the audit log + tx status + overview/header (known-chain
+      registry `explorerUrlForChain`, threaded into both runtimes)
 
 ## Phase 8 - Export & CLI (`export`, `cli`) - done (slice)
 

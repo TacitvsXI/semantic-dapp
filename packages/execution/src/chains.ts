@@ -9,6 +9,7 @@ import {
   type PublicClient,
   type Transport,
 } from 'viem';
+import { knownChain } from './known-chains.js';
 
 export interface ChainConfig {
   chainId: number;
@@ -23,22 +24,28 @@ export interface ChainConfig {
  * self-hostable and RPC-agnostic (a custom RPC can always be provided).
  */
 export function defineChainFromConfig(config: ChainConfig): Chain {
-  const nativeCurrency = config.nativeCurrency ?? {
-    name: 'Ether',
-    symbol: 'ETH',
-    decimals: 18,
-  };
+  // Fill in name / native currency / explorer from the known-chain registry when
+  // the caller didn't provide them, so a bare { chainId, rpcUrl } still yields a
+  // well-labelled chain with an explorer link where we recognize the network.
+  const known = knownChain(config.chainId);
+  const nativeCurrency = config.nativeCurrency ??
+    known?.nativeCurrency ?? {
+      name: 'Ether',
+      symbol: 'ETH',
+      decimals: 18,
+    };
+  const explorerUrl = config.blockExplorerUrl ?? known?.explorerUrl;
   return defineChain({
     id: config.chainId,
-    name: config.name ?? `Chain ${config.chainId}`,
+    name: config.name ?? known?.name ?? `Chain ${config.chainId}`,
     nativeCurrency,
     rpcUrls: {
       default: { http: [config.rpcUrl] },
     },
-    ...(config.blockExplorerUrl
+    ...(explorerUrl
       ? {
           blockExplorers: {
-            default: { name: 'Explorer', url: config.blockExplorerUrl },
+            default: { name: 'Explorer', url: explorerUrl },
           },
         }
       : {}),

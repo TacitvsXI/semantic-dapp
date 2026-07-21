@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ConfirmDialog } from '@semantic-dapp/components';
+import { ConfirmDialog, ToastViewport } from '@semantic-dapp/components';
 import { ProjectProviders } from './wallet/Providers.js';
 import { ImportWizard } from './screens/ImportWizard.js';
 import { ProjectList } from './screens/ProjectList.js';
@@ -94,6 +94,8 @@ export function App() {
         onConfirm={confirmDelete}
         onCancel={() => setPendingDelete(null)}
       />
+
+      <ToastViewport />
     </div>
   );
 }

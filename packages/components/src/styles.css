@@ -716,3 +716,220 @@
   color: var(--sd-emergency-text);
   border-color: var(--sd-emergency);
 }
+
+/* Copy button */
+.sd-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--sd-muted);
+  cursor: pointer;
+  padding: 1px 5px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.4;
+  vertical-align: middle;
+}
+.sd-copy:hover {
+  color: var(--sd-text);
+  border-color: var(--sd-border);
+  background: var(--sd-surface-2);
+}
+.sd-copy--done {
+  color: var(--sd-ok);
+}
+.sd-copy__text {
+  font-size: 12px;
+}
+
+/* Address display (link + copy) */
+.sd-address {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+.sd-address__value {
+  font-family: ui-monospace, monospace;
+  color: var(--sd-text);
+  text-decoration: none;
+}
+a.sd-address__value:hover {
+  color: var(--sd-user-text);
+  text-decoration: underline;
+}
+.sd-overview__address {
+  margin-top: 2px;
+}
+
+/* Read data grid (live dashboard of no-arg getters) */
+.sd-readgrid__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+}
+.sd-readgrid__cell {
+  border: 1px solid var(--sd-border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: var(--sd-surface-2);
+  min-width: 0;
+}
+.sd-readgrid__key {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.sd-readgrid__name {
+  font-size: 12px;
+  color: var(--sd-muted);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sd-readgrid__refresh {
+  border: none;
+  background: transparent;
+  color: var(--sd-muted);
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  padding: 2px;
+  border-radius: 4px;
+}
+.sd-readgrid__refresh:hover {
+  color: var(--sd-text);
+  background: var(--sd-surface);
+}
+.sd-readgrid__value {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.sd-readgrid__value code {
+  font-family: ui-monospace, monospace;
+  color: var(--sd-text);
+  word-break: break-all;
+}
+.sd-readgrid__complex {
+  font-size: 13px;
+}
+.sd-readgrid__error {
+  color: var(--sd-emergency-text);
+  font-size: 13px;
+}
+.sd-readgrid__skeleton {
+  display: block;
+  height: 14px;
+  width: 60%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--sd-surface) 25%, var(--sd-border) 37%, var(--sd-surface) 63%);
+  background-size: 400% 100%;
+  animation: sd-shimmer 1.3s ease-in-out infinite;
+}
+@keyframes sd-shimmer {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+}
+
+/* Toasts */
+.sd-toasts {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: min(360px, calc(100vw - 32px));
+}
+.sd-toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--sd-border);
+  background: var(--sd-surface);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  color: var(--sd-text);
+  animation: sd-toast-in 0.16s ease-out;
+}
+@keyframes sd-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.sd-toast__icon {
+  font-size: 15px;
+  line-height: 1.4;
+}
+.sd-toast--info {
+  border-left: 3px solid var(--sd-user);
+}
+.sd-toast--info .sd-toast__icon {
+  color: var(--sd-user-text);
+}
+.sd-toast--success {
+  border-left: 3px solid var(--sd-ok);
+}
+.sd-toast--success .sd-toast__icon {
+  color: var(--sd-ok);
+}
+.sd-toast--error {
+  border-left: 3px solid var(--sd-emergency);
+}
+.sd-toast--error .sd-toast__icon {
+  color: var(--sd-emergency-text);
+}
+.sd-toast__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+.sd-toast__title {
+  font-size: 13px;
+}
+.sd-toast__message {
+  font-size: 12px;
+  color: var(--sd-muted);
+  word-break: break-word;
+}
+.sd-toast__link {
+  font-size: 12px;
+  color: var(--sd-user-text);
+  text-decoration: none;
+  margin-top: 2px;
+}
+.sd-toast__link:hover {
+  text-decoration: underline;
+}
+.sd-toast__close {
+  border: none;
+  background: transparent;
+  color: var(--sd-muted);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0 2px;
+}
+.sd-toast__close:hover {
+  color: var(--sd-text);
+}
