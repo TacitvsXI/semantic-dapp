@@ -61,3 +61,41 @@ forge script script/Deploy.s.sol \
 The script prints the deployed `MockERC20`, `MockVault` and `MockRWA` addresses;
 add the matching `address` to a bundle (or import the contract by address in the
 studio) to read and write against the live deployment.
+
+## Deploy the demos to a public testnet
+
+To let anyone try the write buttons without running Anvil, deploy the same
+fixtures to a public testnet (e.g. **Sepolia** or **Base Sepolia**). This needs a
+funded deployer key, so it is a manual step:
+
+1. **Fund a throwaway key** with testnet ETH from a faucet (never use a key that
+   holds real funds).
+2. **Deploy + verify** (the deploy script already reads `PRIVATE_KEY` and works
+   against any RPC):
+
+   ```bash
+   cd contracts/fixtures
+   export PRIVATE_KEY=0x<funded-testnet-key>
+   export SEPOLIA_RPC_URL="https://sepolia.infura.io/v3/<key>"   # or any RPC
+   export ETHERSCAN_API_KEY="<key>"                              # for --verify
+   forge script script/Deploy.s.sol \
+     --rpc-url "$SEPOLIA_RPC_URL" --broadcast \
+     --verify --etherscan-api-key "$ETHERSCAN_API_KEY"
+   ```
+
+   Verifying the source means the Studio's **By address** import resolves the ABI
+   automatically and shows a `verified` provenance badge.
+
+3. **Point a demo at it** - either import the printed address in the Studio
+   (chain id `11155111` for Sepolia), or bake it into a bundle for the standalone
+   app by editing `chainId` / `rpcUrl` / `address` in a copy of the relevant
+   `docs/demo/bundles/*.json` (or regenerate with `gen:demos` after updating the
+   generator's constants).
+
+Because the address block explorer is known for these chains, transaction hashes
+and addresses will link out automatically (see the known-chain registry in
+`@semantic-dapp/execution`).
+
+> Reads on public RPCs can be rate-limited or CORS-blocked in the browser; a
+> connected wallet on the same chain is used as a fallback transport, and an
+> unreachable RPC now surfaces a recovery banner instead of silently-empty reads.

@@ -1,0 +1,43 @@
+version: 2
+updates:
+  # JavaScript/TypeScript dependencies (pnpm workspace, resolved from the root
+  # lockfile). Grouped so routine minor/patch bumps arrive as one PR per week.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+    groups:
+      dev-dependencies:
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+      production-minor-patch:
+        dependency-type: production
+        update-types:
+          - minor
+          - patch
+    # Security updates for these transitive wallet-stack deps are handled via
+    # pnpm overrides in package.json; let Dependabot still flag majors.
+    ignore:
+      - dependency-name: zod
+        update-types:
+          - version-update:semver-major
+
+  # GitHub Actions used by the CI / Pages / CodeQL workflows.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    labels:
+      - dependencies
+      - github-actions
+    groups:
+      actions:
+        patterns:
+          - '*'

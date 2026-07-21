@@ -145,6 +145,10 @@ Pick these up between phases or when they naturally fold into a larger workstrea
 - [x] `v0.1.0-beta` version bump + `CHANGELOG.md` + README beta status
 - [x] Emergency/write **button** white-on-color contrast - filled emergency
       buttons use a darker `--sd-emergency-fill` (#b3261e) so white text clears AA
-- [ ] Dependency/security review + Dependabot before tagging `v0.1.0`
-- [ ] Fund the demos against a public testnet so writes work without local Anvil
+- [x] Dependency/security review + Dependabot before tagging `v0.1.0` - audit
+      triaged, transitive `axios`/`ws`/`uuid` pinned via pnpm overrides (audit
+      clean), Dependabot + CodeQL + audit/dependency-review CI added (Track A,
+      [checklist](track-a-hardening.md))
+- [~] Fund the demos against a public testnet so writes work without local Anvil - deploy flow + verification documented (`docs/demos.md`); the actual
+  funded deployment is a manual maintainer step
 - [ ] Screenshots/GIFs of the vault and RWA demos in `docs/demos.md`

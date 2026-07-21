@@ -8,8 +8,19 @@ import {MockERC20} from "../src/MockERC20.sol";
 import {MockVault} from "../src/MockVault.sol";
 import {MockRWA} from "../src/MockRWA.sol";
 
-/// @notice Deploys the fixture contracts to a local chain (Anvil) for demo/dev.
-///         Usage: forge script script/Deploy.s.sol --rpc-url http://127.0.0.1:8545 --broadcast
+/// @notice Deploys the fixture contracts for demo/dev.
+///
+/// Local (Anvil, default account #0):
+///   forge script script/Deploy.s.sol --rpc-url http://127.0.0.1:8545 --broadcast
+///
+/// Public testnet (e.g. Sepolia / Base Sepolia) so the demos work without a
+/// local node - fund the deployer first, then:
+///   PRIVATE_KEY=0x<funded-key> forge script script/Deploy.s.sol \
+///     --rpc-url "$SEPOLIA_RPC_URL" --broadcast \
+///     --verify --etherscan-api-key "$ETHERSCAN_API_KEY"
+///
+/// See docs/demos.md ("Deploy the demos to a public testnet") for the full flow,
+/// including how to load the deployed addresses into the Studio or a bundle.
 contract Deploy is Script {
     function run() external {
         uint256 pk = vm.envOr(
