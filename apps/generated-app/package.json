@@ -22,7 +22,7 @@
     "@semantic-dapp/export": "workspace:*",
     "@semantic-dapp/renderer": "workspace:*",
     "@semantic-dapp/spec": "workspace:*",
-    "@tanstack/react-query": "^5.62.7",
+    "@tanstack/react-query": "^5.101.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "viem": "^2.21.55",
