@@ -14,10 +14,14 @@ the box. Tracked separately from hardening (Track A) and "it just works" UX
       duplicate generic forms (and share transfer/approve). Tests:
       `VaultPanel.test.tsx`, `VaultActions.test.tsx`.
 
+- [x] **Generic amount widgets** - `token-amount` manifest hints wired into the
+      generic `FunctionForm` via `TokenAmountInput` (components) + `useAmountMeta`
+      (renderer): human units, MAX from balance, base-unit echo, raw-integer
+      fallback when decimals are unknown. Tests: `TokenAmountInput.test.tsx`,
+      `FunctionForm.hint.test.tsx`.
+
 ## Next candidates
 
-- [ ] **Generic amount widgets** - reuse the vault's human-unit input (decimals +
-      MAX) in the generic `FunctionForm` via manifest `token-amount` hints.
 - [ ] **npm publish** - publish `@semantic-dapp/*` (spec/execution/components/
       renderer + CLI) so the generated app can be embedded downstream.
 - [ ] **More detectors** - e.g. ERC-2612 permit, ERC-1155 batch, Governor.

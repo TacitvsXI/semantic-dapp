@@ -15,6 +15,7 @@ import { ReadDataGrid } from './ReadDataGrid.js';
 import { RpcHealthBanner } from './RpcHealthBanner.js';
 import { PausePanelHost } from './panels/PausePanelHost.js';
 import { RoleManagerHost } from './panels/RoleManagerHost.js';
+import { useAmountMeta } from './useAmountMeta.js';
 
 /** ERC-20 transfer/approve are shown by TokenActions; hide the duplicate cards. */
 const ERC20_USER_PANEL_SIGNATURES = new Set([
@@ -65,6 +66,8 @@ export function GeneratedApp({
     : manifest.contracts[0];
   const isVault = activeContract?.standards.includes('erc-4626') ?? false;
   const isErc20 = (activeContract?.standards.includes('erc-20') ?? false) && !isVault;
+  const isFungible = (activeContract?.standards.includes('erc-20') ?? false) || isVault;
+  const amountMeta = useAmountMeta(model, runtime, isFungible);
 
   const safetyContext: SafetyContext = {
     ...(activeContract?.chainId !== undefined ? { contractChainId: activeContract.chainId } : {}),
@@ -163,6 +166,7 @@ export function GeneratedApp({
                       runtime={runtime}
                       review={review}
                       safety={safetyContext}
+                      amount={amountMeta}
                     />
                   ))}
                 </div>

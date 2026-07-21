@@ -1,6 +1,17 @@
 import { useState } from 'react';
-import type { ContractFunction, Permission, RiskLevel, SafetyWarning } from '@semantic-dapp/spec';
-import { FunctionForm, ReadResultView, TxStatusView } from '@semantic-dapp/components';
+import type {
+  ContractFunction,
+  InputWidget,
+  Permission,
+  RiskLevel,
+  SafetyWarning,
+} from '@semantic-dapp/spec';
+import {
+  FunctionForm,
+  ReadResultView,
+  TxStatusView,
+  type AmountContext,
+} from '@semantic-dapp/components';
 import type { FormattedOutput } from '@semantic-dapp/execution';
 import { decodeExecutionError } from '@semantic-dapp/execution';
 import type { ContractRuntime } from './runtime.js';
@@ -20,6 +31,10 @@ export interface FunctionRunnerProps {
   /** When set, gate the write behind a confirmation modal with these details. */
   confirm?: RunnerConfirm;
   submitLabel?: string;
+  /** Manifest widget hints, index-aligned with `func.inputs`. */
+  hints?: (InputWidget | undefined)[];
+  /** Token metadata for `token-amount` widgets. */
+  amount?: AmountContext;
 }
 
 /**
@@ -27,7 +42,14 @@ export interface FunctionRunnerProps {
  * reads (showing results) or writes (showing tx state), gates sensitive writes
  * behind a confirmation modal, and surfaces decoded errors.
  */
-export function FunctionRunner({ func, runtime, confirm, submitLabel }: FunctionRunnerProps) {
+export function FunctionRunner({
+  func,
+  runtime,
+  confirm,
+  submitLabel,
+  hints,
+  amount,
+}: FunctionRunnerProps) {
   const [readResult, setReadResult] = useState<FormattedOutput[] | null>(null);
   const [readError, setReadError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -88,6 +110,8 @@ export function FunctionRunner({ func, runtime, confirm, submitLabel }: Function
         submitLabel={submitLabel}
         busy={busy}
         disabled={needsWallet}
+        {...(hints !== undefined ? { hints } : {})}
+        {...(amount !== undefined ? { amount } : {})}
       />
 
       {needsWallet ? (

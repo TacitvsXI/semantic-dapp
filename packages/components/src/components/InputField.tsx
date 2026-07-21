@@ -1,5 +1,5 @@
-import type { NormalizedParameter } from '@semantic-dapp/spec';
-import type { FieldValue } from '../inputs/types.js';
+import type { InputWidget, NormalizedParameter } from '@semantic-dapp/spec';
+import type { AmountContext, FieldValue } from '../inputs/types.js';
 import {
   defaultFieldValue,
   elementType,
@@ -8,6 +8,7 @@ import {
   resolveWidget,
 } from '../inputs/widget.js';
 import { scalarFeedback } from '../inputs/validate.js';
+import { TokenAmountInput } from './TokenAmountInput.js';
 
 export interface InputFieldProps {
   param: NormalizedParameter;
@@ -16,11 +17,23 @@ export interface InputFieldProps {
   error?: string;
   /** Hide the field's own label (used by array item rows). */
   hideLabel?: boolean;
+  /** Manifest widget hint for this input (overrides the ABI-derived default). */
+  widgetHint?: InputWidget;
+  /** Token metadata for `token-amount` widgets (decimals / symbol / balance). */
+  amount?: AmountContext;
 }
 
 /** Dispatch an ABI parameter to the right widget (scalar / tuple / array). */
-export function InputField({ param, value, onChange, error, hideLabel }: InputFieldProps) {
-  const widget = resolveWidget(param);
+export function InputField({
+  param,
+  value,
+  onChange,
+  error,
+  hideLabel,
+  widgetHint,
+  amount,
+}: InputFieldProps) {
+  const widget = widgetHint ?? resolveWidget(param);
 
   const label = hideLabel ? null : (
     <label className="sd-field__label">
@@ -29,10 +42,19 @@ export function InputField({ param, value, onChange, error, hideLabel }: InputFi
     </label>
   );
 
+  const isInteger = /^u?int\d*$/.test(param.type);
+  // A `token-amount` hint on an integer renders a human-unit widget, but only
+  // when we know the token decimals; otherwise fall back to the raw integer.
+  const isTokenAmount = widget === 'token-amount' && isInteger && amount?.decimals !== undefined;
+
   // Live, as-you-type feedback for scalar leaves (address/int/bytes). Arrays,
-  // tuples and bools manage their own children / are always valid.
+  // tuples and bools manage their own children / are always valid. The
+  // token-amount widget renders its own inline feedback.
   const isScalar = !isArrayType(param.type) && !isTupleType(param.type) && param.type !== 'bool';
-  const feedback = isScalar && typeof value === 'string' ? scalarFeedback(param.type, value) : null;
+  const feedback =
+    isScalar && !isTokenAmount && typeof value === 'string'
+      ? scalarFeedback(param.type, value)
+      : null;
 
   let control: React.ReactNode;
   if (isArrayType(param.type)) {
@@ -45,6 +67,16 @@ export function InputField({ param, value, onChange, error, hideLabel }: InputFi
     );
   } else if (param.type === 'bool') {
     control = <BoolInput value={typeof value === 'string' ? value : 'false'} onChange={onChange} />;
+  } else if (isTokenAmount) {
+    control = (
+      <TokenAmountInput
+        value={typeof value === 'string' ? value : ''}
+        onChange={onChange}
+        decimals={amount!.decimals!}
+        {...(amount?.symbol !== undefined ? { symbol: amount.symbol } : {})}
+        {...(amount?.balance !== undefined ? { balance: amount.balance } : {})}
+      />
+    );
   } else {
     control = (
       <ScalarInput

@@ -1,5 +1,11 @@
 import { writeWarnings, type ContractFunction } from '@semantic-dapp/spec';
-import { AudienceBadge, ConfidenceBadge, EvidenceList, RiskBadge } from '@semantic-dapp/components';
+import {
+  AudienceBadge,
+  ConfidenceBadge,
+  EvidenceList,
+  RiskBadge,
+  type AmountContext,
+} from '@semantic-dapp/components';
 import type { OperationView } from './sections.js';
 import type { ContractRuntime } from './runtime.js';
 import { FunctionRunner } from './FunctionRunner.js';
@@ -21,11 +27,14 @@ export interface OperationCardProps {
   runtime: ContractRuntime;
   review?: ReviewControls;
   safety?: SafetyContext;
+  /** Token metadata used to render `token-amount` inputs in human units. */
+  amount?: AmountContext;
 }
 
 /** A semantic operation: title, badges (audience/confidence/risk), evidence and form. */
-export function OperationCard({ view, runtime, review, safety }: OperationCardProps) {
+export function OperationCard({ view, runtime, review, safety, amount }: OperationCardProps) {
   const { operation, func } = view;
+  const hints = operation.inputs.map((input) => input.widget);
   const risk = operation.risk?.level;
   const privileged = operation.permission !== undefined && operation.permission.kind !== 'none';
   const warnings = operation.isRead
@@ -79,7 +88,13 @@ export function OperationCard({ view, runtime, review, safety }: OperationCardPr
       ) : null}
 
       {func ? (
-        <FunctionRunner func={func} runtime={runtime} confirm={confirm} />
+        <FunctionRunner
+          func={func}
+          runtime={runtime}
+          confirm={confirm}
+          hints={hints}
+          {...(amount !== undefined ? { amount } : {})}
+        />
       ) : (
         <MissingFunctionNotice signature={operation.function} />
       )}

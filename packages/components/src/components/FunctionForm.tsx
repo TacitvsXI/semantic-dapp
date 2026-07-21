@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
-import type { ContractFunction } from '@semantic-dapp/spec';
-import type { FieldValue } from '../inputs/types.js';
+import type { ContractFunction, InputWidget } from '@semantic-dapp/spec';
+import type { AmountContext, FieldValue } from '../inputs/types.js';
 import { defaultFieldValue } from '../inputs/widget.js';
 import { encodeInputs } from '../inputs/encode.js';
 import { InputField } from './InputField.js';
@@ -14,6 +14,10 @@ export interface FunctionFormProps {
   busy?: boolean;
   /** Submission is blocked (e.g. wallet not connected) but not in flight. */
   disabled?: boolean;
+  /** Manifest widget hints, index-aligned with `func.inputs`. */
+  hints?: (InputWidget | undefined)[];
+  /** Token metadata for `token-amount` widgets. */
+  amount?: AmountContext;
 }
 
 /**
@@ -21,7 +25,15 @@ export interface FunctionFormProps {
  * validates/encodes on submit and surfaces per-field errors — never silently
  * dropping invalid input.
  */
-export function FunctionForm({ func, onSubmit, submitLabel, busy, disabled }: FunctionFormProps) {
+export function FunctionForm({
+  func,
+  onSubmit,
+  submitLabel,
+  busy,
+  disabled,
+  hints,
+  amount,
+}: FunctionFormProps) {
   const [values, setValues] = useState<FieldValue[]>(() =>
     func.inputs.map((input) => defaultFieldValue(input)),
   );
@@ -52,6 +64,8 @@ export function FunctionForm({ func, onSubmit, submitLabel, busy, disabled }: Fu
             param={input}
             value={values[index] ?? defaultFieldValue(input)}
             error={errors[index]}
+            {...(hints?.[index] !== undefined ? { widgetHint: hints[index] } : {})}
+            {...(amount !== undefined ? { amount } : {})}
             onChange={(next) => {
               setValues((prev) => {
                 const updated = [...prev];

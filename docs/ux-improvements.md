@@ -37,6 +37,14 @@ form, so they need no further work - listed here so the baseline is clear:
 
 ## Recently shipped
 
+- **Amount widgets in the generic form** - any input the classifier tags
+  `token-amount` (fungible `transfer`/`mint`/`approve`/… amounts) now renders a
+  **decimals-aware** widget in the generic `FunctionForm`: you type human units
+  (`1.5`) and the field emits base units for encoding, echoes `= N base units`,
+  offers **MAX** from the connected balance, and shows a balance hint. Decimals /
+  symbol / balance are read once per fungible contract; when decimals are unknown
+  it falls back to a raw integer input. (`components` `TokenAmountInput` +
+  `renderer` `useAmountMeta`)
 - **ERC-4626 vault panel** - vaults now render a dedicated deposit / mint /
   withdraw / redeem panel (segmented tabs) instead of four bare generic forms.
   Amounts are entered in **human units** (`decimals`-aware), each action shows a
@@ -141,9 +149,8 @@ form, so they need no further work - listed here so the baseline is clear:
       (`previewDeposit`/`previewRedeem`) and share/asset balances, replacing the
       generic forms for vaults. Shipped as `VaultPanel` + `VaultActions`.
       (backlog: Phase 6)
-- [ ] **Amount widgets with decimals** - the vault panel already uses human-unit
-      amounts with MAX; extend the same widget to the **generic** form by wiring
-      the manifest `InputDefinition` `token-amount` hints into `InputField`.
+- [x] **Amount widgets with decimals** - the manifest `token-amount` hints are
+      now wired into the generic `FunctionForm`/`InputField` via `TokenAmountInput` + `useAmountMeta`: human units, MAX, balance hint, base-unit echo.
       (backlog: Phase 6)
 - [ ] **Diagnostics panel** - a green/warn/fail checklist (verified source,
       proxy, staleness, standards confidence, network) beyond the Overview

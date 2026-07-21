@@ -438,6 +438,17 @@
 .sd-token-form__max {
   margin-left: 8px;
 }
+.sd-amount {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.sd-amount .sd-input {
+  flex: 1;
+}
+.sd-amount__max {
+  flex: 0 0 auto;
+}
 .sd-token-form__unlimited {
   color: var(--sd-admin);
   font-size: 13px;
