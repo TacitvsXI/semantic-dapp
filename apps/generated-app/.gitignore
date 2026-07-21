@@ -1,0 +1,3 @@
+# Local dev convenience: a bundle.json dropped in public/ to preview a real
+# contract during `vite dev`. The deployed demo bundle is generated in CI.
+public/bundle.json

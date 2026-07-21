@@ -37,6 +37,18 @@ form, so they need no further work - listed here so the baseline is clear:
 
 ## Recently shipped
 
+- **Inline validation in every form** - the generic `FunctionForm` now confirms
+  each scalar field as you type (not just on submit): an address shows "✓ Address
+  accepted" with the **checksummed** value (accepting any casing), integers echo
+  the parsed value or flag a bad number, and `bytesN` is hex/length-checked. Bad
+  fields also get `aria-invalid`. Works for nested array/tuple leaves too.
+  (`components` `scalarFeedback` + `InputField`)
+- **"RPC unreachable" banner** - a one-probe connectivity check distinguishes a
+  genuinely unreachable RPC from silently-empty reads or a contract revert, and
+  shows a recovery banner ("connect a wallet on this chain / set a custom RPC")
+  with Connect / Switch / Retry actions. Clears itself once a wallet on the
+  contract's chain provides a fallback transport. (`renderer` `RpcHealthBanner`;
+  `decodeExecutionError` now also recognizes transport-looking plain errors)
 - **Live data grid** - the Read tab opens with a dashboard that auto-calls every
   no-argument getter (name/symbol/decimals/totalSupply/paused/owner…) in
   parallel and shows the values in a grid, with per-cell loading skeletons,
@@ -101,14 +113,14 @@ form, so they need no further work - listed here so the baseline is clear:
       explorer via a known-chain registry (`explorerUrlForChain`).
 - [x] **Copy-to-clipboard affordances** - one-click `CopyButton` for addresses
       and read values, with a "copied" tick (`AddressView`, read grid).
-- [ ] **Empty/loading/error polish** - the read grid now shows per-cell
-      skeletons + retry; still to do: a clear "RPC unreachable" banner (vs.
-      silent empty reads) that distinguishes "no RPC and no wallet" from a
-      genuine revert, and a first-run empty state pointing at "New import".
-- [ ] **Inline validation in the generic form** - bring the Role manager's
-      live "✓ accepted / checksummed / preview" feedback to the generic
-      `FunctionForm` (per-field, as-you-type) so every parameter is confirmed
-      before submit, not only on click. (`components`)
+- [x] **RPC-unreachable banner** - `RpcHealthBanner` probes with one no-arg read
+      and, on a transport failure (not a revert), shows a recovery banner with
+      Connect / Switch / Retry; distinguishes "no RPC and no wallet" from a
+      genuine revert. (still open: a first-run empty state pointing at "New
+      import", and skeletons already ship in the read grid.)
+- [x] **Inline validation in the generic form** - the Role manager's live "✓
+      accepted / checksummed / preview" feedback now runs per-field, as-you-type,
+      in the generic `FunctionForm` (`scalarFeedback` + `InputField`).
 
 ### P1 - high impact, medium effort
 

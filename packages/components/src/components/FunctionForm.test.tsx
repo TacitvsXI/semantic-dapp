@@ -43,6 +43,18 @@ describe('FunctionForm', () => {
     expect(screen.getByText(/Invalid address/)).toBeTruthy();
   });
 
+  it('confirms a valid address inline as you type', () => {
+    render(<FunctionForm func={transferFn} onSubmit={() => {}} />);
+    const [addr, amount] = screen.getAllByRole('textbox');
+    fireEvent.change(addr!, { target: { value: '0x52908400098527886e0f7030069857d2e4169ee7' } });
+    // Green confirmation appears without submitting, with the checksummed value.
+    expect(screen.getByText(/Address accepted/)).toBeTruthy();
+    expect(screen.getByText('0x52908400098527886E0F7030069857D2E4169EE7')).toBeTruthy();
+    // A bad integer flags inline too.
+    fireEvent.change(amount!, { target: { value: 'abc' } });
+    expect(screen.getByText(/Not a valid integer/)).toBeTruthy();
+  });
+
   it('encodes and submits valid input', () => {
     let submitted: unknown[] | undefined;
     render(

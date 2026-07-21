@@ -6,6 +6,7 @@ export * from './OperationCard.js';
 export * from './TokenActions.js';
 export * from './OverviewSummary.js';
 export * from './ReadDataGrid.js';
+export * from './RpcHealthBanner.js';
 export * from './panels/PausePanelHost.js';
 export * from './panels/RoleManagerHost.js';
 export * from './GeneratedApp.js';

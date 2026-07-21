@@ -11,6 +11,7 @@ import {
 import { TokenActions } from './TokenActions.js';
 import { OverviewSummary } from './OverviewSummary.js';
 import { ReadDataGrid } from './ReadDataGrid.js';
+import { RpcHealthBanner } from './RpcHealthBanner.js';
 import { PausePanelHost } from './panels/PausePanelHost.js';
 import { RoleManagerHost } from './panels/RoleManagerHost.js';
 
@@ -76,6 +77,12 @@ export function GeneratedApp({
         layout={layout}
         runtime={runtime}
         contractId={contractId}
+      />
+
+      <RpcHealthBanner
+        model={model}
+        runtime={runtime}
+        {...(activeContract?.chainId !== undefined ? { chainId: activeContract.chainId } : {})}
       />
 
       <nav className="sd-tabs" role="tablist">

@@ -71,6 +71,15 @@
   font-size: 12px;
   margin: 2px 0 6px;
 }
+.sd-field__code {
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--sd-muted);
+  word-break: break-all;
+}
+.sd-input[aria-invalid='true'] {
+  border-color: var(--sd-danger);
+}
 
 .sd-input {
   background: var(--sd-surface-2);
@@ -932,4 +941,29 @@ a.sd-address__value:hover {
 }
 .sd-toast__close:hover {
   color: var(--sd-text);
+}
+
+/* RPC unreachable banner */
+.sd-rpc-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--sd-admin);
+  border-left: 3px solid var(--sd-admin);
+  background: color-mix(in srgb, var(--sd-admin) 12%, var(--sd-surface));
+  color: var(--sd-text);
+  font-size: 13px;
+}
+.sd-rpc-banner__text {
+  min-width: 0;
+}
+.sd-rpc-banner__actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
 }

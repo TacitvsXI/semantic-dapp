@@ -25,6 +25,12 @@ registry, a copy affordance, a toast store):
 - [x] **Read data grid** - `ReadDataGrid` auto-calls every no-argument getter in
       parallel and renders a live dashboard with per-cell skeletons, error+retry
       and "Refresh all"; parametrized reads stay as forms.
+- [x] **Inline form validation** - `scalarFeedback` powers as-you-type "✓
+      accepted / checksummed / parsed / bad" feedback in the generic
+      `FunctionForm`/`InputField` (address, int, bytesN), incl. nested leaves.
+- [x] **RPC-unreachable banner** - `RpcHealthBanner` probes with one no-arg read
+      and shows a recovery banner on a transport failure (distinct from a
+      revert); `decodeExecutionError` recognizes transport-looking plain errors.
 
 ## Tests
 
@@ -36,6 +42,14 @@ registry, a copy affordance, a toast store):
       copy-button presence/absence.
 - [x] `packages/renderer/ReadDataGrid.test.tsx` - `noArgReads` selection,
       auto-call + render, per-cell failure, empty (renders nothing).
+- [x] `packages/components/inputs/validate.test.ts` - address checksum, int echo,
+      bytes hex/length, silent for string/unknown.
+- [x] `packages/components/FunctionForm.test.tsx` - inline "Address accepted" +
+      "Not a valid integer" as-you-type.
+- [x] `packages/renderer/RpcHealthBanner.test.tsx` - banner on transport error,
+      hidden on success, hidden on revert-like error, no probe → nothing.
+- [x] `packages/execution/errors.test.ts` - transport-looking plain errors →
+      `network`.
 
 ## Gates
 
@@ -46,6 +60,6 @@ registry, a copy affordance, a toast store):
 
 ## Follow-ups (not in this track)
 
-- "RPC unreachable" banner distinct from a genuine revert (P0 empty/error).
-- Inline as-you-type validation in the generic `FunctionForm` (P0).
+- First-run empty state pointing at "New import".
 - ERC-4626 vault panel with previews; amount widgets with decimals (P1).
+- Diagnostics panel (green/warn/fail checklist) beyond the Overview summary (P1).

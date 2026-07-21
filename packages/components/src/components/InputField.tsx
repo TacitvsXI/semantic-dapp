@@ -7,6 +7,7 @@ import {
   isTupleType,
   resolveWidget,
 } from '../inputs/widget.js';
+import { scalarFeedback } from '../inputs/validate.js';
 
 export interface InputFieldProps {
   param: NormalizedParameter;
@@ -28,6 +29,11 @@ export function InputField({ param, value, onChange, error, hideLabel }: InputFi
     </label>
   );
 
+  // Live, as-you-type feedback for scalar leaves (address/int/bytes). Arrays,
+  // tuples and bools manage their own children / are always valid.
+  const isScalar = !isArrayType(param.type) && !isTupleType(param.type) && param.type !== 'bool';
+  const feedback = isScalar && typeof value === 'string' ? scalarFeedback(param.type, value) : null;
+
   let control: React.ReactNode;
   if (isArrayType(param.type)) {
     control = (
@@ -46,6 +52,7 @@ export function InputField({ param, value, onChange, error, hideLabel }: InputFi
         widget={widget}
         value={typeof value === 'string' ? value : ''}
         onChange={onChange}
+        invalid={feedback?.tone === 'error'}
       />
     );
   }
@@ -54,7 +61,18 @@ export function InputField({ param, value, onChange, error, hideLabel }: InputFi
     <div className="sd-field" data-widget={widget}>
       {label}
       {control}
-      {error ? <p className="sd-field__error">{error}</p> : null}
+      {error ? (
+        <p className="sd-field__error">{error}</p>
+      ) : feedback ? (
+        feedback.tone === 'ok' ? (
+          <p className="sd-field__ok">
+            <span aria-hidden="true">✓</span> {feedback.text}
+            {feedback.code ? <code className="sd-field__code">{feedback.code}</code> : null}
+          </p>
+        ) : (
+          <p className="sd-field__warn">{feedback.text}</p>
+        )
+      ) : null}
     </div>
   );
 }
@@ -71,9 +89,10 @@ interface ScalarInputProps {
   widget: string;
   value: string;
   onChange: (value: FieldValue) => void;
+  invalid?: boolean;
 }
 
-function ScalarInput({ param, value, onChange }: ScalarInputProps) {
+function ScalarInput({ param, value, onChange, invalid }: ScalarInputProps) {
   return (
     <input
       className="sd-input"
@@ -81,6 +100,7 @@ function ScalarInput({ param, value, onChange }: ScalarInputProps) {
       inputMode={/^u?int\d*$/.test(param.type) ? 'numeric' : 'text'}
       placeholder={placeholderFor(param.type)}
       value={value}
+      aria-invalid={invalid ? true : undefined}
       onChange={(e) => onChange(e.target.value)}
     />
   );

@@ -13,4 +13,11 @@ describe('decodeExecutionError', () => {
     expect(decoded.kind).toBe('unknown');
     expect(decoded.detail).toBe('nope');
   });
+
+  it('classifies transport-looking plain errors as network', () => {
+    expect(decodeExecutionError(new Error('HTTP request failed')).kind).toBe('network');
+    expect(decodeExecutionError(new Error('Failed to fetch')).kind).toBe('network');
+    // A revert-looking message is not a transport failure.
+    expect(decodeExecutionError(new Error('execution reverted')).kind).toBe('unknown');
+  });
 });

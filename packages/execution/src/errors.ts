@@ -78,7 +78,21 @@ export function decodeExecutionError(error: unknown): DecodedExecutionError {
   }
 
   if (error instanceof Error) {
+    // Transport failures can surface as plain Errors (e.g. fetch/HTTP) rather
+    // than viem BaseErrors; recognize them so callers can distinguish an
+    // unreachable RPC from a contract revert.
+    if (isTransportMessage(error.message)) {
+      return { kind: 'network', title: 'Request failed', detail: error.message };
+    }
     return { kind: 'unknown', title: 'Error', detail: error.message };
   }
   return { kind: 'unknown', title: 'Error', detail: String(error) };
+}
+
+const TRANSPORT_MESSAGE =
+  /http request failed|failed to fetch|fetch failed|networkerror|network error|timed out|timeout|connection (refused|reset|closed)|econnrefused|err_network/i;
+
+/** Heuristic: does a plain error message look like a transport/RPC failure? */
+export function isTransportMessage(message: string): boolean {
+  return TRANSPORT_MESSAGE.test(message);
 }

@@ -1,6 +1,7 @@
 export * from './inputs/types.js';
 export * from './inputs/widget.js';
 export * from './inputs/encode.js';
+export * from './inputs/validate.js';
 export * from './components/InputField.js';
 export * from './components/FunctionForm.js';
 export * from './components/ReadResultView.js';
