@@ -27,14 +27,20 @@ jobs:
 
       - uses: pnpm/action-setup@v4
 
-      # No registry-url on purpose: it writes an .npmrc with an (empty)
-      # _authToken, and a static token makes pnpm fall back from OIDC to token
-      # auth. pnpm defaults to the npmjs registry and drives the OIDC exchange
-      # itself from the GitHub Actions id-token.
+      # registry-url makes setup-node write the npmjs registry into .npmrc, which
+      # pnpm needs to target the per-package OIDC token exchange endpoint. No
+      # NPM_TOKEN is set, so there is no static token for pnpm to fall back to —
+      # it performs the OIDC exchange from the GitHub Actions id-token.
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
+          registry-url: 'https://registry.npmjs.org'
           cache: pnpm
+
+      # pnpm delegates the registry upload to npm; npm bundled with Node 22 is
+      # 10.x, which predates OIDC trusted publishing (needs >= 11.5.1).
+      - name: Upgrade npm for OIDC support
+        run: npm install -g npm@latest
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
