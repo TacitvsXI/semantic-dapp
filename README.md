@@ -13,6 +13,7 @@ Semantic Dapp turns any deployed EVM contract into a clean **user dApp**, an **a
 [![CI](https://github.com/TacitvsXI/semantic-dapp/actions/workflows/ci.yml/badge.svg)](https://github.com/TacitvsXI/semantic-dapp/actions/workflows/ci.yml)
 [![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)
 [![Release](https://img.shields.io/badge/release-v0.1.0--beta-14b8a6.svg)](CHANGELOG.md)
+[![npm](https://img.shields.io/npm/v/@semantic-dapp/cli/latest.svg?logo=npm&color=cb3837)](https://www.npmjs.com/package/@semantic-dapp/cli)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Built with viem + wagmi](https://img.shields.io/badge/built%20with-viem%20%2B%20wagmi-635bff.svg)](https://viem.sh/)
@@ -117,6 +118,30 @@ Then open the Studio, paste a contract address (or an ABI), and preview the gene
 pnpm gen:demos                                  # build demo bundles from the fixtures
 pnpm --filter @semantic-dapp/generated-app dev  # render a bundled dApp
 ```
+
+## Use as a library (npm)
+
+All the building blocks are published to npm under the [`@semantic-dapp`](https://www.npmjs.com/org/semantic-dapp) scope, so you can embed the analyzer, classifier and generated UI in your own app:
+
+```bash
+# analyze + classify a contract and render the generated UI
+pnpm add @semantic-dapp/analyzer @semantic-dapp/classifier @semantic-dapp/renderer @semantic-dapp/components viem
+
+# or drive it from the terminal
+pnpm add -g @semantic-dapp/cli
+semantic-dapp --help
+```
+
+| Package                                                                                                                                                                                                                                                                                  | What it does                                             |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| [`@semantic-dapp/spec`](https://www.npmjs.com/package/@semantic-dapp/spec)                                                                                                                                                                                                               | Schema, types and validation (contract model + manifest) |
+| [`@semantic-dapp/analyzer`](https://www.npmjs.com/package/@semantic-dapp/analyzer)                                                                                                                                                                                                       | ABI normalization + standards analysis                   |
+| [`@semantic-dapp/classifier`](https://www.npmjs.com/package/@semantic-dapp/classifier)                                                                                                                                                                                                   | Turns analysis into a semantic manifest                  |
+| [`@semantic-dapp/components`](https://www.npmjs.com/package/@semantic-dapp/components)                                                                                                                                                                                                   | Trusted React UI components                              |
+| [`@semantic-dapp/renderer`](https://www.npmjs.com/package/@semantic-dapp/renderer)                                                                                                                                                                                                       | Renders a full app from a manifest + runtime             |
+| [`@semantic-dapp/execution`](https://www.npmjs.com/package/@semantic-dapp/execution) · [`resolver`](https://www.npmjs.com/package/@semantic-dapp/resolver) · [`export`](https://www.npmjs.com/package/@semantic-dapp/export) · [`cli`](https://www.npmjs.com/package/@semantic-dapp/cli) | Tx execution, contract resolution, portable bundles, CLI |
+
+> Beta: published as `0.1.0-beta`. APIs may shift before `1.0`.
 
 ## Try the demos
 

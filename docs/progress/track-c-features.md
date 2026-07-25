@@ -65,7 +65,10 @@ the box. Tracked separately from hardening (Track A) and "it just works" UX
 
 ## Next candidates
 
-- [ ] **npm publish** - publish `@semantic-dapp/*` (spec/execution/components/
-      renderer + CLI) so the generated app can be embedded downstream.
+- [x] **npm publish** - all 9 `@semantic-dapp/*` packages published at
+      `0.1.0-beta` under the personal scope. Packaging (`publishConfig.access`,
+      repo metadata, `release`/`release:dry` scripts) + OIDC trusted-publishing
+      workflow (`.github/workflows/release.yml`) + `docs/RELEASING.md` for the
+      per-package Trusted Publisher setup and tag-based releases.
 - [ ] **More panels** - e.g. ERC-1155 batch balance viewer, Governor proposal
       discovery via `ProposalCreated` logs (needs event access in the runtime).
