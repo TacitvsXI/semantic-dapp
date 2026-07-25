@@ -20,6 +20,13 @@ the box. Tracked separately from hardening (Track A) and "it just works" UX
       fallback when decimals are unknown. Tests: `TokenAmountInput.test.tsx`,
       `FunctionForm.hint.test.tsx`.
 
+- [x] **ERC-2612 detector (permit)** - member-based detector (`permit` / `nonces`
+      / `DOMAIN_SEPARATOR`, requires the ERC-20 core) tagging contracts
+      `erc-2612`. `permit` is routed as a high-risk user `token-approve` (gasless
+      approve), `nonces` / `DOMAIN_SEPARATOR` as reads, and the permit `value`
+      renders as a decimals-aware amount widget. Tests in `standards.test.ts` +
+      `classify.test.ts`.
+
 ## Next candidates
 
 - [ ] **npm publish** - publish `@semantic-dapp/*` (spec/execution/components/

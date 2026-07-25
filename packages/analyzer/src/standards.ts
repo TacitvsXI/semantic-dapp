@@ -280,3 +280,56 @@ export const erc4626Detector: StandardDetector = {
   detect: detectErc4626,
   semantics: ERC4626_SEMANTICS,
 };
+
+/* ------------------------------- ERC-2612 ------------------------------- */
+
+const ERC2612_MEMBERS: StandardMember[] = [
+  fn('permit(address,address,uint256,uint256,uint8,bytes32,bytes32)'),
+  fn('nonces(address)'),
+  fn('DOMAIN_SEPARATOR()'),
+];
+
+const ERC2612_SEMANTICS: Record<string, FunctionSemantic> = {
+  'permit(address,address,uint256,uint256,uint8,bytes32,bytes32)': {
+    operationType: 'token-approve',
+    audience: 'user',
+    title: 'Permit (gasless approve)',
+    description:
+      'Approve a spender with an off-chain EIP-712 signature - no prior approval transaction needed.',
+    isRead: false,
+    risk: 'high',
+  },
+  'nonces(address)': {
+    operationType: 'read',
+    audience: 'user',
+    title: 'Permit nonce',
+    description: 'Current signature nonce for an owner.',
+    isRead: true,
+  },
+  'DOMAIN_SEPARATOR()': {
+    operationType: 'read',
+    audience: 'developer',
+    title: 'EIP-712 domain separator',
+    isRead: true,
+  },
+};
+
+export function detectErc2612(model: ContractModel): StandardDetection {
+  return detectByMembers(model, {
+    standard: 'erc-2612',
+    members: ERC2612_MEMBERS,
+    coreRequired: [
+      'permit(address,address,uint256,uint256,uint8,bytes32,bytes32)',
+      'nonces(address)',
+      'DOMAIN_SEPARATOR()',
+    ],
+    threshold: 0.6,
+    requiresErc20: true,
+  });
+}
+
+export const erc2612Detector: StandardDetector = {
+  id: 'erc-2612',
+  detect: detectErc2612,
+  semantics: ERC2612_SEMANTICS,
+};

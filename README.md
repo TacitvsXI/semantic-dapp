@@ -136,7 +136,7 @@ See [`docs/demos.md`](docs/demos.md) for rendering them (optionally against a lo
 
 | Category        | Supported                                                         |
 | --------------- | ----------------------------------------------------------------- |
-| Token standards | ERC-20, ERC-721, ERC-1155, ERC-4626                               |
+| Token standards | ERC-20, ERC-2612 (permit), ERC-721, ERC-1155, ERC-4626            |
 | Access models   | Ownable, AccessControl (roles), Pausable, UUPS-upgradeable        |
 | Proxies         | EIP-1967 detection → analyze the implementation                   |
 | Sources         | Sourcify, block explorers (Etherscan v2 API), manual ABI/artifact |

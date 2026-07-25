@@ -14,7 +14,7 @@ import { DEFAULT_RULES } from './heuristics.js';
 /** Confidence assigned to an unmatched function (raw fallback). */
 export const RAW_FALLBACK_CONFIDENCE = 0.2;
 
-const FUNGIBLE_STANDARDS = new Set(['erc-20', 'erc-4626']);
+const FUNGIBLE_STANDARDS = new Set(['erc-20', 'erc-4626', 'erc-2612']);
 const NFT_STANDARDS = new Set(['erc-721', 'erc-1155']);
 
 const AMOUNT_NAME = /amount|value|assets|shares|wad/i;

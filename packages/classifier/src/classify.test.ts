@@ -205,6 +205,35 @@ describe('classifyContract — ERC-721', () => {
   });
 });
 
+describe('classifyContract with ERC-2612 permit', () => {
+  const permitAbi = [
+    ...erc20Abi,
+    fn('permit', ['address', 'address', 'uint256', 'uint256', 'uint8', 'bytes32', 'bytes32'], []),
+    fn('nonces', ['address'], ['uint256'], 'view'),
+    fn('DOMAIN_SEPARATOR', [], ['bytes32'], 'view'),
+  ] as const satisfies Abi;
+  const result = classifyContract(normalizeAbi(permitAbi as unknown as Abi), 'token');
+
+  it('detects erc-2612 alongside erc-20', () => {
+    expect(result.standards).toContain('erc-2612');
+    expect(result.standards).toContain('erc-20');
+  });
+
+  it('routes permit to the user audience as a token-approve', () => {
+    const op = result.operations.find((o) => o.function.startsWith('permit('));
+    expect(op?.audience).toBe('user');
+    expect(op?.operationType).toBe('token-approve');
+    expect(op?.risk?.level).toBe('high');
+  });
+
+  it('renders the permit value as a token-amount widget', () => {
+    const op = result.operations.find((o) => o.function.startsWith('permit('));
+    // permit(owner, spender, value, deadline, v, r, s): value is a2.
+    const value = op?.inputs.find((i) => i.name === 'a2');
+    expect(value?.widget).toBe('token-amount');
+  });
+});
+
 describe('applyReview', () => {
   it('confirms and moves operations, marking them reviewed', () => {
     const manifest = buildManifest(model, { projectName: 'FIX', contractId: 'token' });

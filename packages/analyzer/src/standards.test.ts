@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import type { Abi } from 'abitype';
 import { normalizeAbi } from '@semantic-dapp/spec';
-import { detectErc721, detectErc1155, detectErc4626 } from './standards.js';
+import { detectErc721, detectErc1155, detectErc4626, detectErc2612 } from './standards.js';
 
 function fn(name: string, inputs: string[], outputs: string[], mut = 'nonpayable') {
   return {
@@ -57,6 +57,20 @@ const erc4626Abi = [
   fn('redeem', ['uint256', 'address', 'address'], ['uint256']),
 ] as const satisfies Abi;
 
+const erc2612Abi = [
+  // ERC-20 core
+  fn('totalSupply', [], ['uint256'], 'view'),
+  fn('balanceOf', ['address'], ['uint256'], 'view'),
+  fn('transfer', ['address', 'uint256'], ['bool']),
+  fn('allowance', ['address', 'address'], ['uint256'], 'view'),
+  fn('approve', ['address', 'uint256'], ['bool']),
+  fn('transferFrom', ['address', 'address', 'uint256'], ['bool']),
+  // ERC-2612 permit
+  fn('permit', ['address', 'address', 'uint256', 'uint256', 'uint8', 'bytes32', 'bytes32'], []),
+  fn('nonces', ['address'], ['uint256'], 'view'),
+  fn('DOMAIN_SEPARATOR', [], ['bytes32'], 'view'),
+] as const satisfies Abi;
+
 describe('detectErc721', () => {
   it('detects a canonical ERC-721', () => {
     const result = detectErc721(normalizeAbi(erc721Abi as unknown as Abi));
@@ -98,5 +112,34 @@ describe('detectErc4626', () => {
       fn('convertToAssets', ['uint256'], ['uint256'], 'view'),
     ] as unknown as Abi);
     expect(detectErc4626(noShares).detected).toBe(false);
+  });
+});
+
+describe('detectErc2612', () => {
+  it('detects an ERC-20 with permit', () => {
+    const result = detectErc2612(normalizeAbi(erc2612Abi as unknown as Abi));
+    expect(result.detected).toBe(true);
+    expect(result.confidence).toBeGreaterThanOrEqual(0.6);
+  });
+
+  it('does not detect a plain ERC-20 without permit', () => {
+    const erc20 = normalizeAbi([
+      fn('totalSupply', [], ['uint256'], 'view'),
+      fn('balanceOf', ['address'], ['uint256'], 'view'),
+      fn('transfer', ['address', 'uint256'], ['bool']),
+      fn('allowance', ['address', 'address'], ['uint256'], 'view'),
+      fn('approve', ['address', 'uint256'], ['bool']),
+      fn('transferFrom', ['address', 'address', 'uint256'], ['bool']),
+    ] as unknown as Abi);
+    expect(detectErc2612(erc20).detected).toBe(false);
+  });
+
+  it('rejects permit-shaped members without the ERC-20 core', () => {
+    const noErc20 = normalizeAbi([
+      fn('permit', ['address', 'address', 'uint256', 'uint256', 'uint8', 'bytes32', 'bytes32'], []),
+      fn('nonces', ['address'], ['uint256'], 'view'),
+      fn('DOMAIN_SEPARATOR', [], ['bytes32'], 'view'),
+    ] as unknown as Abi);
+    expect(detectErc2612(noErc20).detected).toBe(false);
   });
 });
