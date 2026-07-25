@@ -11,6 +11,8 @@ import {
 import { TokenActions } from './TokenActions.js';
 import { VaultActions } from './VaultActions.js';
 import { Erc1155Actions } from './Erc1155Actions.js';
+import { Erc721Actions } from './Erc721Actions.js';
+import { GovernorActions } from './GovernorActions.js';
 import { OverviewSummary } from './OverviewSummary.js';
 import { ReadDataGrid } from './ReadDataGrid.js';
 import { RpcHealthBanner } from './RpcHealthBanner.js';
@@ -27,6 +29,14 @@ const ERC20_USER_PANEL_SIGNATURES = new Set([
 /** Batch transfer is shown by Erc1155Actions; hide the duplicate array-based card. */
 const ERC1155_USER_PANEL_SIGNATURES = new Set([
   'safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)',
+]);
+
+/** propose / castVote are shown by GovernorActions; hide the duplicate cards. */
+const GOVERNOR_USER_PANEL_SIGNATURES = new Set([
+  'propose(address[],uint256[],bytes[],string)',
+  'castVote(uint256,uint8)',
+  'castVoteWithReason(uint256,uint8,string)',
+  'castVoteWithReasonAndParams(uint256,uint8,string,bytes)',
 ]);
 
 /** Deposit/mint/withdraw/redeem (plus share transfer/approve) are shown by VaultActions. */
@@ -72,6 +82,8 @@ export function GeneratedApp({
     : manifest.contracts[0];
   const isVault = activeContract?.standards.includes('erc-4626') ?? false;
   const isErc1155 = activeContract?.standards.includes('erc-1155') ?? false;
+  const isErc721 = activeContract?.standards.includes('erc-721') ?? false;
+  const isGovernor = activeContract?.standards.includes('governor') ?? false;
   const isErc20 = (activeContract?.standards.includes('erc-20') ?? false) && !isVault;
   const isFungible = (activeContract?.standards.includes('erc-20') ?? false) || isVault;
   const amountMeta = useAmountMeta(model, runtime, isFungible);
@@ -143,6 +155,8 @@ export function GeneratedApp({
               const showTokenActions = section.id === 'user' && isErc20;
               const showVaultActions = section.id === 'user' && isVault;
               const showBatchActions = section.id === 'user' && isErc1155;
+              const showGovernorActions = section.id === 'user' && isGovernor;
+              const showNftGallery = section.id === 'user' && isErc721;
               const isReadSection = section.id === 'read';
               const { pause, roles, rest } = groupOperations(section.operations);
               let cards = rest;
@@ -158,6 +172,11 @@ export function GeneratedApp({
                   (v) => !ERC1155_USER_PANEL_SIGNATURES.has(v.operation.function),
                 );
               }
+              if (showGovernorActions) {
+                cards = cards.filter(
+                  (v) => !GOVERNOR_USER_PANEL_SIGNATURES.has(v.operation.function),
+                );
+              }
               // No-arg getters are shown together in the live data grid; keep
               // only parametrized reads (e.g. balanceOf) as individual forms.
               if (isReadSection) {
@@ -170,6 +189,14 @@ export function GeneratedApp({
                   {showTokenActions ? <TokenActions model={model} runtime={runtime} /> : null}
                   {showVaultActions ? <VaultActions model={model} runtime={runtime} /> : null}
                   {showBatchActions ? <Erc1155Actions model={model} runtime={runtime} /> : null}
+                  {showGovernorActions ? <GovernorActions model={model} runtime={runtime} /> : null}
+                  {showNftGallery ? (
+                    <Erc721Actions
+                      model={model}
+                      runtime={runtime}
+                      {...(activeContract?.address ? { address: activeContract.address } : {})}
+                    />
+                  ) : null}
                   {isReadSection ? <ReadDataGrid model={model} runtime={runtime} /> : null}
                   {pause.length > 0 ? <PausePanelHost model={model} runtime={runtime} /> : null}
                   {roles.length > 0 ? <RoleManagerHost model={model} runtime={runtime} /> : null}

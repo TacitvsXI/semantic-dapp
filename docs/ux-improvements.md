@@ -37,6 +37,17 @@ form, so they need no further work - listed here so the baseline is clear:
 
 ## Recently shipped
 
+- **ERC-721 gallery** - collections now open with a visual gallery instead of a
+  wall of `ownerOf` / `tokenURI` read forms: it auto-lists the connected owner's
+  tokens (when Enumerable), lets you inspect any token id, and resolves metadata
+  across `ipfs://`, base64 `data:` and http(s) into name + image + owner cards.
+  (`components` `NftGallery` + `renderer` `Erc721Actions`)
+- **Governor console** - `propose` no longer renders as three parallel
+  `address[]` / `uint256[]` / `bytes[]` inputs: a proposal builder shows
+  index-aligned (target, value in ETH, calldata) action rows + description, and a
+  vote helper offers For / Against / Abstain with an optional reason and a live
+  proposal-`state` lookup. (`components` `GovernorPanel` + `renderer`
+  `GovernorActions`)
 - **ERC-1155 batch transfer panel** - `safeBatchTransferFrom` no longer renders
   as two disconnected `uint256[]` inputs you have to keep aligned by hand.
   Instead a batch builder shows paired **(token id, amount)** rows with add /

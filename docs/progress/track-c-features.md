@@ -40,9 +40,21 @@ the box. Tracked separately from hardening (Track A) and "it just works" UX
       connected account as `from`. Replaces the array-based generic card. Tests:
       `BatchTransferPanel.test.tsx`, `Erc1155Actions.test.tsx`.
 
+- [x] **Governor proposal-builder panel** - `GovernorPanel` (components) +
+      `GovernorActions` (renderer): a Propose tab with index-aligned target /
+      value (ETH) / calldata rows + description, and a Vote tab with For / Against
+      / Abstain, optional reason (`castVoteWithReason`), and a live `state`
+      lookup. Replaces the raw triple-array `propose` form and bare `castVote`.
+      Tests: `GovernorPanel.test.tsx`, `GovernorActions.test.tsx`.
+- [x] **ERC-721 gallery** - `NftGallery` (components) + `Erc721Actions`
+      (renderer): auto-lists the connected owner's tokens when Enumerable, lets
+      you inspect any token id, and resolves `tokenURI` metadata across ipfs://,
+      base64 `data:` and http(s) (name + image + owner cards). Tests:
+      `metadata.test.ts`, `NftGallery.test.tsx`, `Erc721Actions.test.tsx`.
+
 ## Next candidates
 
 - [ ] **npm publish** - publish `@semantic-dapp/*` (spec/execution/components/
       renderer + CLI) so the generated app can be embedded downstream.
-- [ ] **More detectors / panels** - e.g. Governor proposal-builder panel, ERC-1155
-      batch balance viewer, ERC-721 gallery.
+- [ ] **More panels** - e.g. Governor proposal list/state board, ERC-1155 batch
+      balance viewer, per-NFT transfer from the gallery.

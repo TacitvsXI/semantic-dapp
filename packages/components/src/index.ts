@@ -20,5 +20,7 @@ export * from './pause/PausePanel.js';
 export * from './roles/RoleManager.js';
 export * from './overview/OverviewPanel.js';
 export * from './erc20/index.js';
+export * from './erc721/index.js';
 export * from './erc1155/index.js';
+export * from './governor/index.js';
 export * from './vault/index.js';

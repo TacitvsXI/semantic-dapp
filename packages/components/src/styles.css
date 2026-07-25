@@ -532,6 +532,92 @@
   font-size: 12px;
   color: var(--sd-muted);
 }
+
+/* Governor console */
+.sd-gov__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.sd-gov__action {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid var(--sd-border, rgba(127, 127, 127, 0.25));
+  border-radius: 8px;
+}
+.sd-gov__action-line {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.sd-gov__action-line .sd-input {
+  flex: 1;
+}
+.sd-gov textarea.sd-input {
+  resize: vertical;
+  font-family: inherit;
+}
+
+/* ERC-721 gallery */
+.sd-nft__toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.sd-nft__add {
+  display: flex;
+  gap: 6px;
+}
+.sd-nft__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+.sd-nft__card {
+  border: 1px solid var(--sd-border, rgba(127, 127, 127, 0.25));
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--sd-surface-2, rgba(127, 127, 127, 0.06));
+}
+.sd-nft__media {
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--sd-surface-2, rgba(127, 127, 127, 0.12));
+}
+.sd-nft__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.sd-nft__placeholder {
+  font-family: ui-monospace, monospace;
+  font-size: 20px;
+  color: var(--sd-muted);
+}
+.sd-nft__body {
+  padding: 8px 10px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.sd-nft__name {
+  margin: 0;
+  font-size: 14px;
+}
+.sd-nft__id,
+.sd-nft__owner {
+  margin: 0;
+  font-size: 12px;
+  color: var(--sd-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
 .sd-card__reviewed {
   margin-left: 8px;
   font-size: 11px;
