@@ -27,10 +27,13 @@ jobs:
 
       - uses: pnpm/action-setup@v4
 
+      # No registry-url on purpose: it writes an .npmrc with an (empty)
+      # _authToken, and a static token makes pnpm fall back from OIDC to token
+      # auth. pnpm defaults to the npmjs registry and drives the OIDC exchange
+      # itself from the GitHub Actions id-token.
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-          registry-url: 'https://registry.npmjs.org'
           cache: pnpm
 
       - name: Install dependencies
