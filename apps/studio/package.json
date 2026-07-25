@@ -1,6 +1,6 @@
 {
   "name": "@semantic-dapp/studio",
-  "version": "0.1.0-beta",
+  "version": "0.1.1",
   "description": "Semantic Dapp Studio — import, review and preview generated dApps.",
   "license": "AGPL-3.0-only",
   "type": "module",

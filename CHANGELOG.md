@@ -5,6 +5,28 @@ All notable changes to this project are documented here. The format is based on
 follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) once it reaches
 `1.0.0`. While in `0.x`, minor versions may include breaking changes.
 
+## [0.1.1] - 2026-07-25
+
+First npm release: all nine `@semantic-dapp/*` packages published under the scope,
+plus new user-facing panels.
+
+### Added
+
+- **Governor proposal-builder & board**: a `GovernorPanel` with Propose / Vote tabs
+  and a `ProposalBoard` that tracks proposals by id with live `state`, proposer,
+  vote-start/end and `hasVoted` for the connected account.
+- **ERC-721 gallery**: `NftGallery` + `Erc721Actions` list the connected owner's
+  tokens, inspect any token id, resolve `tokenURI` metadata (ipfs/data/http), and
+  transfer owned tokens inline (`safeTransferFrom`).
+- **ERC-1155 batch panel**, **ERC-4626 vault panel**, **ERC-2612 permit** detector
+  and decimals-aware amount widgets.
+
+### Changed
+
+- **npm publishing**: `publishConfig.access=public`, repo metadata and
+  `release`/`release:dry` scripts on every package; OIDC trusted-publishing
+  workflow (`.github/workflows/release.yml`) and `docs/RELEASING.md`.
+
 ## [0.1.0-beta] - 2026-07-19
 
 First public beta: the full pipeline from a contract to a shippable dApp, proven

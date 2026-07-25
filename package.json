@@ -1,6 +1,6 @@
 {
   "name": "semantic-dapp",
-  "version": "0.1.0-beta",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "description": "Generate usable user dApps and admin consoles from EVM contract ABI, NatSpec and source code.",

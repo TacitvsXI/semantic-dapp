@@ -1,6 +1,6 @@
 {
   "name": "@semantic-dapp/generated-app",
-  "version": "0.1.0-beta",
+  "version": "0.1.1",
   "description": "Standalone template that renders a SemanticBundle without the studio.",
   "license": "AGPL-3.0-only",
   "type": "module",

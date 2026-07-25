@@ -1,6 +1,6 @@
 {
   "name": "@semantic-dapp/classifier",
-  "version": "0.1.0-beta",
+  "version": "0.1.1",
   "description": "Route contract functions into semantic operations (audience, type, confidence).",
   "license": "AGPL-3.0-only",
   "homepage": "https://github.com/TacitvsXI/semantic-dapp#readme",

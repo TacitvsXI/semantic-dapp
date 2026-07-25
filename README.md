@@ -12,7 +12,7 @@ Semantic Dapp turns any deployed EVM contract into a clean **user dApp**, an **a
 
 [![CI](https://github.com/TacitvsXI/semantic-dapp/actions/workflows/ci.yml/badge.svg)](https://github.com/TacitvsXI/semantic-dapp/actions/workflows/ci.yml)
 [![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)
-[![Release](https://img.shields.io/badge/release-v0.1.0--beta-14b8a6.svg)](CHANGELOG.md)
+[![Release](https://img.shields.io/badge/release-v0.1.1-14b8a6.svg)](CHANGELOG.md)
 [![npm](https://img.shields.io/npm/v/@semantic-dapp/cli/latest.svg?logo=npm&color=cb3837)](https://www.npmjs.com/package/@semantic-dapp/cli)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -141,7 +141,7 @@ semantic-dapp --help
 | [`@semantic-dapp/renderer`](https://www.npmjs.com/package/@semantic-dapp/renderer)                                                                                                                                                                                                       | Renders a full app from a manifest + runtime             |
 | [`@semantic-dapp/execution`](https://www.npmjs.com/package/@semantic-dapp/execution) · [`resolver`](https://www.npmjs.com/package/@semantic-dapp/resolver) · [`export`](https://www.npmjs.com/package/@semantic-dapp/export) · [`cli`](https://www.npmjs.com/package/@semantic-dapp/cli) | Tx execution, contract resolution, portable bundles, CLI |
 
-> Beta: published as `0.1.0-beta`. APIs may shift before `1.0`.
+> Beta: published as `0.1.1`. APIs may shift before `1.0`.
 
 ## Try the demos
 
