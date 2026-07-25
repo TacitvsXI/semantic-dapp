@@ -55,6 +55,8 @@
     "gen:demos": "node scripts/gen-demos.mjs",
     "gen:pages": "node scripts/gen-pages-bundle.mjs",
     "clean": "turbo run clean && rm -rf node_modules",
+    "release:dry": "pnpm -w build && pnpm -r publish --dry-run --no-git-checks",
+    "release": "pnpm -w build && pnpm -r publish --no-git-checks",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\"",
     "prepare": "husky || true"
