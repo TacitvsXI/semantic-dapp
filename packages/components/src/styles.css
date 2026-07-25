@@ -507,6 +507,31 @@
 .sd-vault__preview strong {
   font-family: ui-monospace, monospace;
 }
+
+/* ERC-1155 batch transfer panel */
+.sd-batch__from {
+  font-size: 13px;
+  color: var(--sd-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.sd-batch__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sd-batch__head,
+.sd-batch__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+.sd-batch__head {
+  font-size: 12px;
+  color: var(--sd-muted);
+}
 .sd-card__reviewed {
   margin-left: 8px;
   font-size: 11px;

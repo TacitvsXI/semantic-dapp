@@ -1,7 +1,13 @@
 import type { ContractModel } from '@semantic-dapp/spec';
 import type { ResolvedSemantic, StandardDetection, StandardDetector } from './types.js';
 import { erc20Detector } from './erc20.js';
-import { erc721Detector, erc1155Detector, erc4626Detector, erc2612Detector } from './standards.js';
+import {
+  erc721Detector,
+  erc1155Detector,
+  erc4626Detector,
+  erc2612Detector,
+  governorDetector,
+} from './standards.js';
 import {
   ownableDetector,
   accessControlDetector,
@@ -19,6 +25,7 @@ export const ALL_DETECTORS: StandardDetector[] = [
   erc721Detector,
   erc1155Detector,
   erc4626Detector,
+  governorDetector,
   ownableDetector,
   accessControlDetector,
   pausableDetector,

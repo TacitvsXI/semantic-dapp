@@ -234,6 +234,42 @@ describe('classifyContract with ERC-2612 permit', () => {
   });
 });
 
+describe('classifyContract with a Governor', () => {
+  const governorAbi = [
+    fn('propose', ['address[]', 'uint256[]', 'bytes[]', 'string'], ['uint256']),
+    fn('castVote', ['uint256', 'uint8'], ['uint256']),
+    fn('execute', ['address[]', 'uint256[]', 'bytes[]', 'bytes32'], ['uint256'], 'payable'),
+    fn('state', ['uint256'], ['uint8'], 'view'),
+    fn('proposalSnapshot', ['uint256'], ['uint256'], 'view'),
+    fn('proposalDeadline', ['uint256'], ['uint256'], 'view'),
+    fn('votingDelay', [], ['uint256'], 'view'),
+    fn('votingPeriod', [], ['uint256'], 'view'),
+    fn('hasVoted', ['uint256', 'address'], ['bool'], 'view'),
+  ] as const satisfies Abi;
+  const result = classifyContract(normalizeAbi(governorAbi as unknown as Abi), 'gov');
+
+  it('detects the governor standard', () => {
+    expect(result.standards).toContain('governor');
+  });
+
+  it('routes propose / castVote / execute to governance operations', () => {
+    const propose = result.operations.find((o) => o.function.startsWith('propose('));
+    expect(propose?.operationType).toBe('governance-propose');
+    expect(propose?.audience).toBe('user');
+    const vote = result.operations.find((o) => o.function === 'castVote(uint256,uint8)');
+    expect(vote?.operationType).toBe('governance-vote');
+    const execute = result.operations.find((o) => o.function.startsWith('execute('));
+    expect(execute?.operationType).toBe('governance-execute');
+    expect(execute?.risk?.level).toBe('high');
+  });
+
+  it('keeps the proposalId as an integer, not a token amount', () => {
+    const vote = result.operations.find((o) => o.function === 'castVote(uint256,uint8)');
+    const proposalId = vote?.inputs.find((i) => i.name === 'a0');
+    expect(proposalId?.widget).not.toBe('token-amount');
+  });
+});
+
 describe('applyReview', () => {
   it('confirms and moves operations, marking them reviewed', () => {
     const manifest = buildManifest(model, { projectName: 'FIX', contractId: 'token' });

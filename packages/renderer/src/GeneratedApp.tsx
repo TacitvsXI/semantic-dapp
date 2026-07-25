@@ -10,6 +10,7 @@ import {
 } from './OperationCard.js';
 import { TokenActions } from './TokenActions.js';
 import { VaultActions } from './VaultActions.js';
+import { Erc1155Actions } from './Erc1155Actions.js';
 import { OverviewSummary } from './OverviewSummary.js';
 import { ReadDataGrid } from './ReadDataGrid.js';
 import { RpcHealthBanner } from './RpcHealthBanner.js';
@@ -21,6 +22,11 @@ import { useAmountMeta } from './useAmountMeta.js';
 const ERC20_USER_PANEL_SIGNATURES = new Set([
   'transfer(address,uint256)',
   'approve(address,uint256)',
+]);
+
+/** Batch transfer is shown by Erc1155Actions; hide the duplicate array-based card. */
+const ERC1155_USER_PANEL_SIGNATURES = new Set([
+  'safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)',
 ]);
 
 /** Deposit/mint/withdraw/redeem (plus share transfer/approve) are shown by VaultActions. */
@@ -65,6 +71,7 @@ export function GeneratedApp({
     ? manifest.contracts.find((c) => c.id === contractId)
     : manifest.contracts[0];
   const isVault = activeContract?.standards.includes('erc-4626') ?? false;
+  const isErc1155 = activeContract?.standards.includes('erc-1155') ?? false;
   const isErc20 = (activeContract?.standards.includes('erc-20') ?? false) && !isVault;
   const isFungible = (activeContract?.standards.includes('erc-20') ?? false) || isVault;
   const amountMeta = useAmountMeta(model, runtime, isFungible);
@@ -135,6 +142,7 @@ export function GeneratedApp({
             .map((section) => {
               const showTokenActions = section.id === 'user' && isErc20;
               const showVaultActions = section.id === 'user' && isVault;
+              const showBatchActions = section.id === 'user' && isErc1155;
               const isReadSection = section.id === 'read';
               const { pause, roles, rest } = groupOperations(section.operations);
               let cards = rest;
@@ -144,6 +152,11 @@ export function GeneratedApp({
                 );
               } else if (showTokenActions) {
                 cards = rest.filter((v) => !ERC20_USER_PANEL_SIGNATURES.has(v.operation.function));
+              }
+              if (showBatchActions) {
+                cards = cards.filter(
+                  (v) => !ERC1155_USER_PANEL_SIGNATURES.has(v.operation.function),
+                );
               }
               // No-arg getters are shown together in the live data grid; keep
               // only parametrized reads (e.g. balanceOf) as individual forms.
@@ -156,6 +169,7 @@ export function GeneratedApp({
                 <div key={section.id} className="sd-section">
                   {showTokenActions ? <TokenActions model={model} runtime={runtime} /> : null}
                   {showVaultActions ? <VaultActions model={model} runtime={runtime} /> : null}
+                  {showBatchActions ? <Erc1155Actions model={model} runtime={runtime} /> : null}
                   {isReadSection ? <ReadDataGrid model={model} runtime={runtime} /> : null}
                   {pause.length > 0 ? <PausePanelHost model={model} runtime={runtime} /> : null}
                   {roles.length > 0 ? <RoleManagerHost model={model} runtime={runtime} /> : null}

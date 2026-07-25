@@ -19,6 +19,11 @@ export const operationTypeSchema = z.enum([
   'unpause',
   'upgrade',
   'ownership-transfer',
+  // Governance (Governor / IGovernor). Additive: older manifests never used
+  // these, so no schema migration is required.
+  'governance-propose',
+  'governance-vote',
+  'governance-execute',
   // Generic buckets for non-standard functions (ADR-006). Additive: older
   // manifests never used these, so no schema migration is required.
   'admin-config',

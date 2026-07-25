@@ -333,3 +333,169 @@ export const erc2612Detector: StandardDetector = {
   detect: detectErc2612,
   semantics: ERC2612_SEMANTICS,
 };
+
+/* ------------------------------- Governor ------------------------------- */
+
+const GOVERNOR_MEMBERS: StandardMember[] = [
+  fn('propose(address[],uint256[],bytes[],string)'),
+  fn('castVote(uint256,uint8)'),
+  fn('state(uint256)'),
+  fn('proposalSnapshot(uint256)'),
+  fn('proposalDeadline(uint256)'),
+  fn('votingDelay()'),
+  fn('votingPeriod()'),
+  fn('castVoteWithReason(uint256,uint8,string)', false),
+  fn('castVoteWithReasonAndParams(uint256,uint8,string,bytes)', false),
+  fn('execute(address[],uint256[],bytes[],bytes32)', false),
+  fn('queue(address[],uint256[],bytes[],bytes32)', false),
+  fn('cancel(address[],uint256[],bytes[],bytes32)', false),
+  fn('quorum(uint256)', false),
+  fn('hasVoted(uint256,address)', false),
+  fn('getVotes(address,uint256)', false),
+  fn('proposalProposer(uint256)', false),
+  fn('proposalThreshold()', false),
+  fn('name()', false),
+  fn('version()', false),
+  fn('COUNTING_MODE()', false),
+  ev(
+    'ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)',
+  ),
+  ev('VoteCast(address,uint256,uint8,uint256,string)'),
+];
+
+const GOVERNOR_SEMANTICS: Record<string, FunctionSemantic> = {
+  'propose(address[],uint256[],bytes[],string)': {
+    operationType: 'governance-propose',
+    audience: 'user',
+    title: 'Create proposal',
+    description: 'Submit a new proposal: targets, values, calldatas and a description.',
+    isRead: false,
+    risk: 'medium',
+  },
+  'castVote(uint256,uint8)': {
+    operationType: 'governance-vote',
+    audience: 'user',
+    title: 'Cast vote',
+    description: 'Vote on a proposal (0 = Against, 1 = For, 2 = Abstain).',
+    isRead: false,
+    risk: 'low',
+  },
+  'castVoteWithReason(uint256,uint8,string)': {
+    operationType: 'governance-vote',
+    audience: 'user',
+    title: 'Cast vote with reason',
+    isRead: false,
+    risk: 'low',
+  },
+  'castVoteWithReasonAndParams(uint256,uint8,string,bytes)': {
+    operationType: 'governance-vote',
+    audience: 'user',
+    title: 'Cast vote with reason and params',
+    isRead: false,
+    risk: 'low',
+  },
+  'queue(address[],uint256[],bytes[],bytes32)': {
+    operationType: 'governance-execute',
+    audience: 'user',
+    title: 'Queue proposal',
+    description: 'Queue a succeeded proposal in the timelock before execution.',
+    isRead: false,
+    risk: 'medium',
+  },
+  'execute(address[],uint256[],bytes[],bytes32)': {
+    operationType: 'governance-execute',
+    audience: 'user',
+    title: 'Execute proposal',
+    description: 'Execute a succeeded (and queued) proposal - runs the encoded calls on-chain.',
+    isRead: false,
+    risk: 'high',
+  },
+  'cancel(address[],uint256[],bytes[],bytes32)': {
+    operationType: 'admin-config',
+    audience: 'admin',
+    title: 'Cancel proposal',
+    isRead: false,
+    risk: 'high',
+  },
+  'state(uint256)': {
+    operationType: 'read',
+    audience: 'user',
+    title: 'Proposal state',
+    isRead: true,
+  },
+  'proposalSnapshot(uint256)': {
+    operationType: 'read',
+    audience: 'user',
+    title: 'Proposal snapshot (vote start)',
+    isRead: true,
+  },
+  'proposalDeadline(uint256)': {
+    operationType: 'read',
+    audience: 'user',
+    title: 'Proposal deadline (vote end)',
+    isRead: true,
+  },
+  'proposalProposer(uint256)': {
+    operationType: 'read',
+    audience: 'user',
+    title: 'Proposal proposer',
+    isRead: true,
+  },
+  'hasVoted(uint256,address)': {
+    operationType: 'read',
+    audience: 'user',
+    title: 'Has voted',
+    isRead: true,
+  },
+  'getVotes(address,uint256)': {
+    operationType: 'read',
+    audience: 'user',
+    title: 'Votes at timepoint',
+    isRead: true,
+  },
+  'quorum(uint256)': {
+    operationType: 'read',
+    audience: 'user',
+    title: 'Quorum',
+    isRead: true,
+  },
+  'votingDelay()': {
+    operationType: 'read',
+    audience: 'user',
+    title: 'Voting delay',
+    isRead: true,
+  },
+  'votingPeriod()': {
+    operationType: 'read',
+    audience: 'user',
+    title: 'Voting period',
+    isRead: true,
+  },
+  'proposalThreshold()': {
+    operationType: 'read',
+    audience: 'user',
+    title: 'Proposal threshold',
+    isRead: true,
+  },
+};
+
+export function detectGovernor(model: ContractModel): StandardDetection {
+  return detectByMembers(model, {
+    standard: 'governor',
+    members: GOVERNOR_MEMBERS,
+    coreRequired: [
+      'propose(address[],uint256[],bytes[],string)',
+      'castVote(uint256,uint8)',
+      'state(uint256)',
+      'proposalSnapshot(uint256)',
+      'proposalDeadline(uint256)',
+    ],
+    threshold: 0.6,
+  });
+}
+
+export const governorDetector: StandardDetector = {
+  id: 'governor',
+  detect: detectGovernor,
+  semantics: GOVERNOR_SEMANTICS,
+};

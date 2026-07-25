@@ -26,9 +26,23 @@ the box. Tracked separately from hardening (Track A) and "it just works" UX
       approve), `nonces` / `DOMAIN_SEPARATOR` as reads, and the permit `value`
       renders as a decimals-aware amount widget. Tests in `standards.test.ts` +
       `classify.test.ts`.
+- [x] **Governor detector** - member-based detector for OpenZeppelin `Governor`
+      (`propose` / `castVote` / `state` / `proposalSnapshot` / `proposalDeadline`
+      core) tagging contracts `governor`. Adds additive `governance-propose` /
+      `governance-vote` / `governance-execute` operation types; `propose` /
+      `castVote` route to the user tab, `execute` is high-risk, and the proposal
+      lifecycle reads (`state`, quorum, votes, deadlines) are labelled. Tests in
+      `standards.test.ts` + `classify.test.ts`.
+- [x] **ERC-1155 batch panel** - `BatchTransferPanel` (components) +
+      `Erc1155Actions` (renderer): paired (token id, amount) rows kept
+      index-aligned for you instead of two disconnected `uint256[]` inputs,
+      encoding `safeBatchTransferFrom(from, to, ids, amounts, "0x")` with the
+      connected account as `from`. Replaces the array-based generic card. Tests:
+      `BatchTransferPanel.test.tsx`, `Erc1155Actions.test.tsx`.
 
 ## Next candidates
 
 - [ ] **npm publish** - publish `@semantic-dapp/*` (spec/execution/components/
       renderer + CLI) so the generated app can be embedded downstream.
-- [ ] **More detectors** - e.g. ERC-2612 permit, ERC-1155 batch, Governor.
+- [ ] **More detectors / panels** - e.g. Governor proposal-builder panel, ERC-1155
+      batch balance viewer, ERC-721 gallery.

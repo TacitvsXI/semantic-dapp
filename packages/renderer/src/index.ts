@@ -5,6 +5,7 @@ export * from './FunctionRunner.js';
 export * from './OperationCard.js';
 export * from './TokenActions.js';
 export * from './VaultActions.js';
+export * from './Erc1155Actions.js';
 export * from './OverviewSummary.js';
 export * from './ReadDataGrid.js';
 export * from './useAmountMeta.js';

@@ -37,6 +37,12 @@ form, so they need no further work - listed here so the baseline is clear:
 
 ## Recently shipped
 
+- **ERC-1155 batch transfer panel** - `safeBatchTransferFrom` no longer renders
+  as two disconnected `uint256[]` inputs you have to keep aligned by hand.
+  Instead a batch builder shows paired **(token id, amount)** rows with add /
+  remove, encodes the index-aligned arrays for you, and sends from the connected
+  account. Appears on the User tab whenever a contract is tagged `erc-1155`.
+  (`components` `BatchTransferPanel` + `renderer` `Erc1155Actions`)
 - **Amount widgets in the generic form** - any input the classifier tags
   `token-amount` (fungible `transfer`/`mint`/`approve`/… amounts) now renders a
   **decimals-aware** widget in the generic `FunctionForm`: you type human units

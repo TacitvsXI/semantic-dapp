@@ -1,7 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import type { Abi } from 'abitype';
 import { normalizeAbi } from '@semantic-dapp/spec';
-import { detectErc721, detectErc1155, detectErc4626, detectErc2612 } from './standards.js';
+import {
+  detectErc721,
+  detectErc1155,
+  detectErc4626,
+  detectErc2612,
+  detectGovernor,
+} from './standards.js';
 
 function fn(name: string, inputs: string[], outputs: string[], mut = 'nonpayable') {
   return {
@@ -69,6 +75,23 @@ const erc2612Abi = [
   fn('permit', ['address', 'address', 'uint256', 'uint256', 'uint8', 'bytes32', 'bytes32'], []),
   fn('nonces', ['address'], ['uint256'], 'view'),
   fn('DOMAIN_SEPARATOR', [], ['bytes32'], 'view'),
+] as const satisfies Abi;
+
+const governorAbi = [
+  fn('propose', ['address[]', 'uint256[]', 'bytes[]', 'string'], ['uint256']),
+  fn('castVote', ['uint256', 'uint8'], ['uint256']),
+  fn('castVoteWithReason', ['uint256', 'uint8', 'string'], ['uint256']),
+  fn('execute', ['address[]', 'uint256[]', 'bytes[]', 'bytes32'], ['uint256'], 'payable'),
+  fn('queue', ['address[]', 'uint256[]', 'bytes[]', 'bytes32'], ['uint256']),
+  fn('state', ['uint256'], ['uint8'], 'view'),
+  fn('proposalSnapshot', ['uint256'], ['uint256'], 'view'),
+  fn('proposalDeadline', ['uint256'], ['uint256'], 'view'),
+  fn('votingDelay', [], ['uint256'], 'view'),
+  fn('votingPeriod', [], ['uint256'], 'view'),
+  fn('quorum', ['uint256'], ['uint256'], 'view'),
+  fn('hasVoted', ['uint256', 'address'], ['bool'], 'view'),
+  fn('getVotes', ['address', 'uint256'], ['uint256'], 'view'),
+  fn('name', [], ['string'], 'view'),
 ] as const satisfies Abi;
 
 describe('detectErc721', () => {
@@ -141,5 +164,33 @@ describe('detectErc2612', () => {
       fn('DOMAIN_SEPARATOR', [], ['bytes32'], 'view'),
     ] as unknown as Abi);
     expect(detectErc2612(noErc20).detected).toBe(false);
+  });
+});
+
+describe('detectGovernor', () => {
+  it('detects an OpenZeppelin-style Governor', () => {
+    const result = detectGovernor(normalizeAbi(governorAbi as unknown as Abi));
+    expect(result.detected).toBe(true);
+    expect(result.confidence).toBeGreaterThanOrEqual(0.6);
+  });
+
+  it('does not detect a plain ERC-20', () => {
+    const erc20 = normalizeAbi([
+      fn('balanceOf', ['address'], ['uint256'], 'view'),
+      fn('transfer', ['address', 'uint256'], ['bool']),
+      fn('approve', ['address', 'uint256'], ['bool']),
+    ] as unknown as Abi);
+    expect(detectGovernor(erc20).detected).toBe(false);
+  });
+
+  it('requires the full proposal lifecycle core', () => {
+    const partial = normalizeAbi([
+      fn('propose', ['address[]', 'uint256[]', 'bytes[]', 'string'], ['uint256']),
+      fn('castVote', ['uint256', 'uint8'], ['uint256']),
+      fn('votingDelay', [], ['uint256'], 'view'),
+      fn('votingPeriod', [], ['uint256'], 'view'),
+      // missing state / proposalSnapshot / proposalDeadline
+    ] as unknown as Abi);
+    expect(detectGovernor(partial).detected).toBe(false);
   });
 });
