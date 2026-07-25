@@ -560,6 +560,59 @@
   font-family: inherit;
 }
 
+/* Governor proposal board */
+.sd-board__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sd-board__row {
+  border: 1px solid var(--sd-border, rgba(127, 127, 127, 0.25));
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+.sd-board__main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.sd-board__id {
+  font-family: ui-monospace, monospace;
+  font-weight: 600;
+}
+.sd-board__voted {
+  font-size: 12px;
+  color: var(--sd-muted);
+}
+.sd-board__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin: 6px 0 0;
+}
+.sd-board__meta dt {
+  font-size: 11px;
+  color: var(--sd-muted);
+}
+.sd-board__meta dd {
+  margin: 0;
+  font-size: 13px;
+  font-family: ui-monospace, monospace;
+}
+.sd-pstate--ok {
+  background: var(--sd-ok-bg, rgba(34, 160, 90, 0.15));
+  color: var(--sd-ok, #1a7f4b);
+}
+.sd-pstate--active {
+  background: rgba(37, 99, 235, 0.15);
+  color: #1d4ed8;
+}
+.sd-pstate--muted {
+  background: rgba(127, 127, 127, 0.15);
+  color: var(--sd-muted);
+}
+
 /* ERC-721 gallery */
 .sd-nft__toolbar {
   display: flex;
@@ -607,6 +660,19 @@
 .sd-nft__name {
   margin: 0;
   font-size: 14px;
+}
+.sd-nft__transfer-btn {
+  margin-top: 8px;
+}
+.sd-nft__transfer {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+.sd-nft__transfer-actions {
+  display: flex;
+  gap: 6px;
 }
 .sd-nft__id,
 .sd-nft__owner {

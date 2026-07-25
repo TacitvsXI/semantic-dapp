@@ -52,9 +52,20 @@ the box. Tracked separately from hardening (Track A) and "it just works" UX
       base64 `data:` and http(s) (name + image + owner cards). Tests:
       `metadata.test.ts`, `NftGallery.test.tsx`, `Erc721Actions.test.tsx`.
 
+- [x] **Governor proposal board** - `ProposalBoard` (components) wired into
+      `GovernorActions`: track proposals by id and see live `state` badges,
+      proposer, vote-start / vote-end timepoints and whether the connected
+      account has voted (`proposalSnapshot` / `proposalDeadline` /
+      `proposalProposer` / `hasVoted`, all optional). Tests:
+      `ProposalBoard.test.tsx`.
+- [x] **Per-NFT transfer** - inline recipient form on gallery cards the connected
+      account owns, encoding `safeTransferFrom(owner, to, id)` (falls back to
+      `transferFrom`) with recipient validation. In `NftGallery` +
+      `Erc721Actions`. Tests: `NftGallery.test.tsx`.
+
 ## Next candidates
 
 - [ ] **npm publish** - publish `@semantic-dapp/*` (spec/execution/components/
       renderer + CLI) so the generated app can be embedded downstream.
-- [ ] **More panels** - e.g. Governor proposal list/state board, ERC-1155 batch
-      balance viewer, per-NFT transfer from the gallery.
+- [ ] **More panels** - e.g. ERC-1155 batch balance viewer, Governor proposal
+      discovery via `ProposalCreated` logs (needs event access in the runtime).

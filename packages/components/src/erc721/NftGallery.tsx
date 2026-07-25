@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { isAddress, getAddress } from 'viem';
 import { AddressView } from '../components/AddressView.js';
 import { SafeText } from '../components/SafeText.js';
 
@@ -23,6 +24,12 @@ export interface NftGalleryProps {
   onAdd?: (id: string) => void;
   onRefresh?: () => void;
   emptyHint?: string;
+  /** Connected account: enables the transfer action on tokens it owns. */
+  connectedAddress?: string;
+  /** Transfer a token the connected account owns. */
+  onTransfer?: (id: string, to: `0x${string}`) => void;
+  /** Token id with a transfer in flight. */
+  transferBusyId?: string;
 }
 
 function tokenUrl(explorerUrl: string | undefined, address: string | undefined, id: string) {
@@ -39,6 +46,9 @@ export function NftGallery({
   onAdd,
   onRefresh,
   emptyHint,
+  connectedAddress,
+  onTransfer,
+  transferBusyId,
 }: NftGalleryProps) {
   const [idInput, setIdInput] = useState('');
 
@@ -90,47 +100,122 @@ export function NftGallery({
 
       <div className="sd-nft__grid">
         {items.map((item) => (
-          <article className="sd-nft__card" key={item.id}>
-            <div className="sd-nft__media">
-              {item.image ? (
-                <img src={item.image} alt={item.name ?? `Token ${item.id}`} loading="lazy" />
-              ) : (
-                <div className="sd-nft__placeholder" aria-hidden="true">
-                  #{item.id}
-                </div>
-              )}
-            </div>
-            <div className="sd-nft__body">
-              <h4 className="sd-nft__name">
-                <SafeText value={item.name} fallback={`Token #${item.id}`} maxLength={60} />
-              </h4>
-              <p className="sd-nft__id">
-                #{item.id}
-                {tokenUrl(explorerUrl, address, item.id) ? (
-                  <>
-                    {' · '}
-                    <a
-                      href={tokenUrl(explorerUrl, address, item.id)}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      explorer
-                    </a>
-                  </>
-                ) : null}
-              </p>
-              {item.owner ? (
-                <p className="sd-nft__owner">
-                  Owner{' '}
-                  <AddressView address={item.owner} {...(explorerUrl ? { explorerUrl } : {})} />
-                </p>
-              ) : null}
-              {item.loading ? <p className="sd-field__hint">Loading…</p> : null}
-              {item.error ? <p className="sd-field__warn">{item.error}</p> : null}
-            </div>
-          </article>
+          <NftCard
+            key={item.id}
+            item={item}
+            {...(explorerUrl ? { explorerUrl } : {})}
+            {...(address !== undefined ? { address } : {})}
+            {...(connectedAddress !== undefined ? { connectedAddress } : {})}
+            {...(onTransfer ? { onTransfer } : {})}
+            busy={transferBusyId === item.id}
+          />
         ))}
       </div>
     </section>
+  );
+}
+
+interface NftCardProps {
+  item: NftItem;
+  explorerUrl?: string;
+  address?: string;
+  connectedAddress?: string;
+  onTransfer?: (id: string, to: `0x${string}`) => void;
+  busy?: boolean;
+}
+
+function NftCard({ item, explorerUrl, address, connectedAddress, onTransfer, busy }: NftCardProps) {
+  const [open, setOpen] = useState(false);
+  const [to, setTo] = useState('');
+  const [error, setError] = useState<string | null>(null);
+
+  const owned =
+    !!onTransfer &&
+    !!connectedAddress &&
+    !!item.owner &&
+    item.owner.toLowerCase() === connectedAddress.toLowerCase();
+
+  const send = (event: React.FormEvent) => {
+    event.preventDefault();
+    setError(null);
+    if (!isAddress(to.trim())) {
+      setError('Invalid recipient.');
+      return;
+    }
+    onTransfer?.(item.id, getAddress(to.trim()));
+    setOpen(false);
+    setTo('');
+  };
+
+  return (
+    <article className="sd-nft__card">
+      <div className="sd-nft__media">
+        {item.image ? (
+          <img src={item.image} alt={item.name ?? `Token ${item.id}`} loading="lazy" />
+        ) : (
+          <div className="sd-nft__placeholder" aria-hidden="true">
+            #{item.id}
+          </div>
+        )}
+      </div>
+      <div className="sd-nft__body">
+        <h4 className="sd-nft__name">
+          <SafeText value={item.name} fallback={`Token #${item.id}`} maxLength={60} />
+        </h4>
+        <p className="sd-nft__id">
+          #{item.id}
+          {tokenUrl(explorerUrl, address, item.id) ? (
+            <>
+              {' · '}
+              <a href={tokenUrl(explorerUrl, address, item.id)} target="_blank" rel="noreferrer">
+                explorer
+              </a>
+            </>
+          ) : null}
+        </p>
+        {item.owner ? (
+          <p className="sd-nft__owner">
+            Owner <AddressView address={item.owner} {...(explorerUrl ? { explorerUrl } : {})} />
+          </p>
+        ) : null}
+        {item.loading ? <p className="sd-field__hint">Loading…</p> : null}
+        {item.error ? <p className="sd-field__warn">{item.error}</p> : null}
+
+        {owned ? (
+          open ? (
+            <form className="sd-nft__transfer" onSubmit={send}>
+              <input
+                className="sd-input"
+                placeholder="recipient 0x…"
+                value={to}
+                onChange={(e) => setTo(e.target.value)}
+                aria-label={`Recipient for token ${item.id}`}
+              />
+              {error ? <p className="sd-field__error">{error}</p> : null}
+              <div className="sd-nft__transfer-actions">
+                <button type="submit" className="sd-btn sd-btn--write" disabled={busy}>
+                  {busy ? 'Working…' : 'Send'}
+                </button>
+                <button
+                  type="button"
+                  className="sd-btn sd-btn--ghost"
+                  onClick={() => setOpen(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          ) : (
+            <button
+              type="button"
+              className="sd-btn sd-btn--ghost sd-nft__transfer-btn"
+              onClick={() => setOpen(true)}
+            >
+              Transfer
+            </button>
+          )
+        ) : null}
+      </div>
+    </article>
   );
 }

@@ -40,10 +40,15 @@ export function Erc721Actions({ model, runtime, address, maxEnumerate = 24 }: Er
   const [loading, setLoading] = useState(false);
   const owner = runtime.wallet.address;
 
+  const [transferId, setTransferId] = useState<string | undefined>(undefined);
+
   const ownerOfFn = findFn(model, 'ownerOf(uint256)');
   const tokenUriFn = findFn(model, 'tokenURI(uint256)');
   const balanceOfFn = findFn(model, 'balanceOf(address)');
   const tokenOfOwnerByIndexFn = findFn(model, 'tokenOfOwnerByIndex(address,uint256)');
+  const transferFn =
+    findFn(model, 'safeTransferFrom(address,address,uint256)') ??
+    findFn(model, 'transferFrom(address,address,uint256)');
   const enumerable = balanceOfFn !== undefined && tokenOfOwnerByIndexFn !== undefined;
 
   const readValue = useCallback(
@@ -120,6 +125,20 @@ export function Erc721Actions({ model, runtime, address, maxEnumerate = 24 }: Er
     }
   }, [enumerable, owner, enumerateOwner, items, hydrate]);
 
+  const transfer = useCallback(
+    async (id: string, to: `0x${string}`) => {
+      if (!transferFn || !owner) return;
+      setTransferId(id);
+      try {
+        await runtime.submitWrite(transferFn, [owner, to, id]);
+        void hydrate(id);
+      } finally {
+        setTransferId(undefined);
+      }
+    },
+    [transferFn, owner, runtime, hydrate],
+  );
+
   if (!tokenUriFn && !ownerOfFn) return null;
 
   return (
@@ -131,6 +150,9 @@ export function Erc721Actions({ model, runtime, address, maxEnumerate = 24 }: Er
         {...(address !== undefined ? { address } : {})}
         onAdd={addId}
         onRefresh={refresh}
+        {...(owner !== undefined ? { connectedAddress: owner } : {})}
+        {...(transferFn && owner ? { onTransfer: transfer } : {})}
+        {...(transferId !== undefined ? { transferBusyId: transferId } : {})}
         emptyHint={
           enumerable
             ? 'Connect a wallet to list your tokens, or inspect any token id.'

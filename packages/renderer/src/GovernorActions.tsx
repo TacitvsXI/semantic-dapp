@@ -1,5 +1,11 @@
+import { useCallback, useState } from 'react';
 import type { ContractFunction, ContractModel } from '@semantic-dapp/spec';
-import { GovernorPanel, TxStatusView } from '@semantic-dapp/components';
+import {
+  GovernorPanel,
+  ProposalBoard,
+  TxStatusView,
+  type ProposalRow,
+} from '@semantic-dapp/components';
 import type { ContractRuntime } from './runtime.js';
 
 export interface GovernorActionsProps {
@@ -26,6 +32,67 @@ export function GovernorActions({ model, runtime }: GovernorActionsProps) {
   const castVoteFn = findFn(model, CAST_VOTE_SIG);
   const castVoteReasonFn = findFn(model, CAST_VOTE_REASON_SIG);
   const stateFn = findFn(model, STATE_SIG);
+  const snapshotFn = findFn(model, 'proposalSnapshot(uint256)');
+  const deadlineFn = findFn(model, 'proposalDeadline(uint256)');
+  const proposerFn = findFn(model, 'proposalProposer(uint256)');
+  const hasVotedFn = findFn(model, 'hasVoted(uint256,address)');
+  const voter = runtime.wallet.address;
+
+  const [proposals, setProposals] = useState<ProposalRow[]>([]);
+
+  const readValue = useCallback(
+    async (fn: ContractFunction | undefined, args: unknown[]): Promise<string | undefined> => {
+      if (!fn) return undefined;
+      try {
+        const out = await runtime.callRead(fn, args);
+        const value = out[0]?.value;
+        return typeof value === 'string' ? value : undefined;
+      } catch {
+        return undefined;
+      }
+    },
+    [runtime],
+  );
+
+  const hydrateProposal = useCallback(
+    async (id: string) => {
+      const patch = (next: Partial<ProposalRow>) =>
+        setProposals((prev) => prev.map((p) => (p.id === id ? { ...p, ...next } : p)));
+      patch({ loading: true, error: undefined });
+      const state = await readValue(stateFn, [id]);
+      if (state === undefined) {
+        patch({ loading: false, error: 'Proposal not found' });
+        return;
+      }
+      const next: Partial<ProposalRow> = { loading: false, state: Number(state) };
+      const snapshot = await readValue(snapshotFn, [id]);
+      if (snapshot !== undefined) next.snapshot = snapshot;
+      const deadline = await readValue(deadlineFn, [id]);
+      if (deadline !== undefined) next.deadline = deadline;
+      const proposer = await readValue(proposerFn, [id]);
+      if (proposer !== undefined) next.proposer = proposer;
+      if (voter) {
+        const voted = await readValue(hasVotedFn, [id, voter]);
+        if (voted !== undefined) next.hasVoted = voted === 'true';
+      }
+      patch(next);
+    },
+    [readValue, stateFn, snapshotFn, deadlineFn, proposerFn, hasVotedFn, voter],
+  );
+
+  const trackProposal = useCallback(
+    (id: string) => {
+      setProposals((prev) =>
+        prev.some((p) => p.id === id) ? prev : [...prev, { id, loading: true }],
+      );
+      void hydrateProposal(id);
+    },
+    [hydrateProposal],
+  );
+
+  const refreshProposals = useCallback(() => {
+    for (const p of proposals) void hydrateProposal(p.id);
+  }, [proposals, hydrateProposal]);
 
   const proposeTx = proposeFn ? runtime.getTxState(proposeFn.signature) : undefined;
   const voteTx = castVoteFn ? runtime.getTxState(castVoteFn.signature) : undefined;
@@ -66,6 +133,14 @@ export function GovernorActions({ model, runtime }: GovernorActionsProps) {
           : {})}
       />
       {activeTx ? <TxStatusView state={activeTx} explorerUrl={runtime.explorerUrl} /> : null}
+      {stateFn ? (
+        <ProposalBoard
+          items={proposals}
+          {...(runtime.explorerUrl ? { explorerUrl: runtime.explorerUrl } : {})}
+          onAdd={trackProposal}
+          onRefresh={refreshProposals}
+        />
+      ) : null}
     </div>
   );
 }
