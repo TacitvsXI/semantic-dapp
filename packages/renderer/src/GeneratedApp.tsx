@@ -143,9 +143,21 @@ export function GeneratedApp({
               <RawFunctionCard key={func.selector} func={func} runtime={runtime} />
             ))}
             <h2 className="sd-raw__group-title">Write</h2>
-            {rawWrites.length === 0 ? <p className="sd-empty">No write functions</p> : null}
+            {rawWrites.length > 0 ? (
+              <aside className="sd-raw__write-banner" role="note" data-testid="raw-write-banner">
+                Unclassified writes are fail-closed: confirm and type <code>CONFIRM</code> before
+                send. Highest uncertainty — verify target and args.
+              </aside>
+            ) : (
+              <p className="sd-empty">No write functions</p>
+            )}
             {rawWrites.map((func) => (
-              <RawFunctionCard key={func.selector} func={func} runtime={runtime} />
+              <RawFunctionCard
+                key={func.selector}
+                func={func}
+                runtime={runtime}
+                safety={safetyContext}
+              />
             ))}
           </div>
         ) : (

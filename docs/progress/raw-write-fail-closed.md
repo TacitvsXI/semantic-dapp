@@ -1,6 +1,7 @@
 # Raw writes fail-closed
 
-> **Status:** planned (not started)  
+> **Status:** Phase 1 done · Phase 2/3 planned
+
 > **Origin:** r/ethdev feedback ([thread](https://www.reddit.com/r/ethdev/comments/1v6zlzr/i_got_tired_of_rebuilding_contract_admin_uis_so_i/)) — u/Specific-Sector7422  
 > **North star fit:** self-custody + custody trust — the fallback path must be _more_ conservative than the classified path, not less.
 
@@ -25,14 +26,14 @@ Unclassified / Raw writes are the _highest_ semantic uncertainty — and current
 
 ## Phase 1 — Fail-closed Raw confirm (P0)
 
-- [ ] Pass `safety?: SafetyContext` into `RawFunctionCard` (from `GeneratedApp` / studio).
-- [ ] Every **raw write** builds confirm via `writeWarnings` + explicit warning:
+- [x] Pass `safety?: SafetyContext` into `RawFunctionCard` (from `GeneratedApp` / studio).
+- [x] Every **raw write** builds confirm via `rawWriteWarnings` + explicit warning:
       _“Unclassified / Raw — highest uncertainty.”_
-- [ ] Default raw-write risk floor: at least `high`; **typed `CONFIRM` for all raw writes**
+- [x] Default raw-write risk floor: at least `high`; **typed `CONFIRM` for all raw writes**
       (stricter than semantic `high`, which only types on `critical`).
-- [ ] Short banner above Raw → Write group explaining the gate.
-- [ ] Tests: raw write cannot submit without confirm; unclassified warning present.
-- [ ] README: align “Raw fallback” wording with fail-closed behavior.
+- [x] Short banner above Raw → Write group explaining the gate.
+- [x] Tests: raw write cannot submit without confirm; unclassified warning present.
+- [x] README: align “Raw fallback” wording with fail-closed behavior.
 
 **Touch:** `packages/renderer/src/OperationCard.tsx` (`RawFunctionCard`),
 `GeneratedApp.tsx`, `packages/spec/src/safety.ts` (helper), `ConfirmDialog` /
@@ -88,4 +89,7 @@ Any drift ⇒ invalidate preview / block send.
 
 ## Log
 
+- 2026-07-26: **Phase 1 shipped** — `RawFunctionCard` fail-closed confirm + typed CONFIRM;
+  `rawWriteWarnings`; Raw write banner; README aligned; tests in `RawFunctionCard.test.tsx` /
+  `ConfirmDialog` / `safety`.
 - 2026-07-26: Plan captured from r/ethdev review; linked from universal-hardening backlog.

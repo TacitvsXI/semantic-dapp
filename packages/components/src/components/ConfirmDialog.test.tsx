@@ -55,6 +55,33 @@ describe('ConfirmDialog', () => {
     expect(confirmed).toBe(true);
   });
 
+  it('blocks when requireTypedConfirm is set even for non-critical risk', () => {
+    let confirmed = false;
+    render(
+      <ConfirmDialog
+        open
+        title="Raw write"
+        risk="high"
+        requireTypedConfirm
+        onConfirm={() => {
+          confirmed = true;
+        }}
+        onCancel={() => {}}
+      />,
+    );
+    const proceed = screen.getByTestId('confirm-proceed') as HTMLButtonElement;
+    expect(proceed.disabled).toBe(true);
+    fireEvent.click(proceed);
+    expect(confirmed).toBe(false);
+
+    fireEvent.change(screen.getByLabelText('Type CONFIRM to proceed'), {
+      target: { value: 'CONFIRM' },
+    });
+    expect(proceed.disabled).toBe(false);
+    fireEvent.click(proceed);
+    expect(confirmed).toBe(true);
+  });
+
   it('shows preflight safety warnings', () => {
     render(
       <ConfirmDialog

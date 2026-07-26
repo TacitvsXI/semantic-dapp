@@ -142,3 +142,20 @@ export function writeWarnings(ctx: WriteSafetyContext): SafetyWarning[] {
 
   return warnings;
 }
+
+/** Always present on unclassified Raw writes — highest semantic uncertainty. */
+export const RAW_WRITE_UNCERTAINTY_WARNING: SafetyWarning = {
+  severity: 'danger',
+  title: 'Unclassified / Raw',
+  detail:
+    'This function has no semantic classification — highest uncertainty. Verify the target and calldata before sending.',
+};
+
+/**
+ * Preflight warnings for a Raw-tab write. Always includes the unclassified
+ * uncertainty warning, then the usual chain/provenance checks. Risk floor for
+ * Raw writes is handled by the caller (`high` + typed CONFIRM).
+ */
+export function rawWriteWarnings(ctx: Omit<WriteSafetyContext, 'risk'>): SafetyWarning[] {
+  return [RAW_WRITE_UNCERTAINTY_WARNING, ...writeWarnings(ctx)];
+}

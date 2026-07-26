@@ -1,4 +1,4 @@
-import { writeWarnings, type ContractFunction } from '@semantic-dapp/spec';
+import { rawWriteWarnings, writeWarnings, type ContractFunction } from '@semantic-dapp/spec';
 import {
   AudienceBadge,
   ConfidenceBadge,
@@ -124,10 +124,28 @@ function MissingFunctionNotice({ signature }: { signature: string }) {
 export interface RawFunctionCardProps {
   func: ContractFunction;
   runtime: ContractRuntime;
+  /** Contract-level safety context for Raw write preflight warnings. */
+  safety?: SafetyContext;
 }
 
-/** A raw ABI function card (lossless fallback). */
-export function RawFunctionCard({ func, runtime }: RawFunctionCardProps) {
+/** A raw ABI function card (lossless fallback). Writes are fail-closed. */
+export function RawFunctionCard({ func, runtime, safety }: RawFunctionCardProps) {
+  // Unclassified writes are the highest uncertainty path — gate stricter than
+  // classified high-risk (typed CONFIRM on every Raw write, not only critical).
+  const confirm = !func.isRead
+    ? {
+        risk: 'high' as const,
+        title: func.name,
+        warnings: rawWriteWarnings({
+          walletChainId: runtime.wallet.chainId,
+          contractChainId: safety?.contractChainId,
+          verified: safety?.verified,
+          stale: safety?.stale,
+        }),
+        requireTypedConfirm: true,
+      }
+    : undefined;
+
   return (
     <section className="sd-card sd-raw-card">
       <header className="sd-card__header">
@@ -139,10 +157,11 @@ export function RawFunctionCard({ func, runtime }: RawFunctionCardProps) {
           <span className={`sd-badge ${func.isRead ? 'sd-badge--read' : 'sd-badge--write'}`}>
             {func.isRead ? 'read' : 'write'}
           </span>
+          {!func.isRead ? <RiskBadge level="high" reason="Unclassified Raw write" /> : null}
           {func.isPayable ? <span className="sd-badge sd-badge--payable">payable</span> : null}
         </div>
       </header>
-      <FunctionRunner func={func} runtime={runtime} />
+      <FunctionRunner func={func} runtime={runtime} confirm={confirm} />
     </section>
   );
 }

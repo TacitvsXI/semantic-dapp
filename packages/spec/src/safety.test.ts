@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { sanitizeText, writeWarnings } from './safety.js';
+import {
+  RAW_WRITE_UNCERTAINTY_WARNING,
+  rawWriteWarnings,
+  sanitizeText,
+  writeWarnings,
+} from './safety.js';
 
 describe('sanitizeText', () => {
   it('passes clean text through unchanged', () => {
@@ -69,5 +74,25 @@ describe('writeWarnings', () => {
 
   it('returns nothing when all is well', () => {
     expect(writeWarnings({ walletChainId: 1, contractChainId: 1, verified: true })).toHaveLength(0);
+  });
+});
+
+describe('rawWriteWarnings', () => {
+  it('always leads with the unclassified / Raw uncertainty warning', () => {
+    const warnings = rawWriteWarnings({});
+    expect(warnings[0]).toEqual(RAW_WRITE_UNCERTAINTY_WARNING);
+  });
+
+  it('appends chain/provenance warnings after the uncertainty warning', () => {
+    const warnings = rawWriteWarnings({
+      walletChainId: 1,
+      contractChainId: 137,
+      verified: false,
+    });
+    expect(warnings.map((w) => w.title)).toEqual([
+      'Unclassified / Raw',
+      'Wrong network',
+      'Unverified source',
+    ]);
   });
 });

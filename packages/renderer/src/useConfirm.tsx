@@ -10,6 +10,8 @@ export interface ConfirmMeta {
   signature?: string;
   summary?: ConfirmSummaryRow[];
   warnings?: SafetyWarning[];
+  /** Force typed CONFIRM even when risk is not critical (e.g. Raw writes). */
+  requireTypedConfirm?: boolean;
   confirmLabel?: string;
 }
 
@@ -48,6 +50,7 @@ export function useConfirm() {
       signature={pending?.meta.signature}
       summary={pending?.meta.summary}
       warnings={pending?.meta.warnings}
+      requireTypedConfirm={pending?.meta.requireTypedConfirm}
       confirmLabel={pending?.meta.confirmLabel}
       onConfirm={() => settle(true)}
       onCancel={() => settle(false)}

@@ -24,6 +24,8 @@ export interface RunnerConfirm {
   title?: string;
   /** Preflight warnings surfaced in the confirmation modal. */
   warnings?: SafetyWarning[];
+  /** Force typed CONFIRM even when risk is not critical (e.g. Raw writes). */
+  requireTypedConfirm?: boolean;
 }
 
 export interface FunctionRunnerProps {
@@ -116,6 +118,7 @@ export function FunctionRunner({
         signature: func.signature,
         summary: summarizeArgs(func.inputs, args),
         warnings: confirm.warnings,
+        requireTypedConfirm: confirm.requireTypedConfirm,
       });
       if (!ok) return;
     }

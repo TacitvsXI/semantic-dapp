@@ -20,6 +20,11 @@ export interface ConfirmDialogProps {
   summary?: ConfirmSummaryRow[];
   /** Preflight safety warnings shown before the confirm button. */
   warnings?: SafetyWarning[];
+  /**
+   * Require typing `CONFIRM` even when risk is not `critical`
+   * (e.g. unclassified Raw writes).
+   */
+  requireTypedConfirm?: boolean;
   confirmLabel?: string;
   onConfirm: () => void;
   onCancel: () => void;
@@ -52,11 +57,12 @@ export function ConfirmDialog({
   signature,
   summary,
   warnings,
+  requireTypedConfirm,
   confirmLabel,
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
-  const critical = risk === 'critical';
+  const needsTypedConfirm = risk === 'critical' || requireTypedConfirm === true;
   const [typed, setTyped] = useState('');
 
   useEffect(() => {
@@ -74,7 +80,7 @@ export function ConfirmDialog({
 
   if (!open) return null;
 
-  const confirmBlocked = critical && typed.trim().toUpperCase() !== 'CONFIRM';
+  const confirmBlocked = needsTypedConfirm && typed.trim().toUpperCase() !== 'CONFIRM';
 
   return (
     <div className="sd-modal" role="presentation" onClick={onCancel}>
@@ -115,7 +121,7 @@ export function ConfirmDialog({
           </dl>
         ) : null}
 
-        {critical ? (
+        {needsTypedConfirm ? (
           <label className="sd-field sd-modal__gate">
             <span className="sd-field__name">
               Type <code>CONFIRM</code> to proceed

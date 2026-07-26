@@ -343,6 +343,20 @@
   color: var(--sd-muted);
   margin: 8px 0 0;
 }
+.sd-raw__write-banner {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--sd-emergency);
+  border-left: 3px solid var(--sd-emergency);
+  background: color-mix(in srgb, var(--sd-emergency) 10%, var(--sd-surface));
+  color: var(--sd-text);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.sd-raw__write-banner code {
+  font-size: 12px;
+}
 .sd-empty {
   color: var(--sd-muted);
   font-size: 13px;
