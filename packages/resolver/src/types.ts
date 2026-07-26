@@ -4,7 +4,14 @@ import type { Abi, Address, Hex } from 'viem';
 export type AbiSourceId = 'sourcify' | 'block-explorer' | 'manual';
 
 /** How a proxy was recognised, if at all. */
-export type ProxyKind = 'eip1967-transparent' | 'eip1967-uups' | 'eip1967-beacon' | 'unknown';
+export type ProxyKind =
+  | 'eip1967-transparent'
+  | 'eip1967-uups'
+  | 'eip1967-beacon'
+  | 'eip1167-minimal'
+  | 'legacy-implementation'
+  | 'gnosis-safe'
+  | 'unknown';
 
 export interface ContractSourceFile {
   path: string;
@@ -68,6 +75,12 @@ export interface ProxyInfo {
   implementation?: Address;
   admin?: Address;
   beacon?: Address;
+  /**
+   * True when we know this is a proxy but could not resolve a verified ABI for the
+   * implementation, so the ABI in use is the proxy shell itself. Callers should warn
+   * the user rather than present the shell as the real contract.
+   */
+  unresolvedImplementation?: boolean;
 }
 
 export interface Provenance {

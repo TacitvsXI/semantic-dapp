@@ -113,10 +113,20 @@ export async function resolveContract(options: ResolveOptions): Promise<ResolveR
     }
   }
 
-  // On-chain proxy but implementation ABI not found: fall back to the proxy itself.
+  // On-chain proxy but implementation ABI not found: fall back to the proxy itself
+  // and flag that the ABI in use is the shell, not the implementation.
   if (!found && proxyInfo && target !== address) {
     found = await tryAdapters(adapters, baseQuery(address), tried);
-    if (found) target = address;
+    if (found) {
+      target = address;
+      proxyInfo = { ...proxyInfo, unresolvedImplementation: true };
+    }
+  }
+
+  // Proxy whose implementation we never located (e.g. beacon read failed): the ABI
+  // we have is the proxy address itself, so mark it as an unresolved shell too.
+  if (found && proxyInfo?.isProxy && target === address && proxyInfo.implementation === undefined) {
+    proxyInfo = { ...proxyInfo, unresolvedImplementation: true };
   }
 
   if (!found) {

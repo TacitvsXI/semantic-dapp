@@ -53,14 +53,18 @@ else degrades to Raw. The two make-or-break gaps are **proxy resolution** and
 
 ### P0 — proxy transparency & robustness
 
-- [ ] **Never present a proxy shell as the contract.** If the model looks like a proxy
-      (tiny ABI + `implementation()`/`admin()`/1967 slots/`fallback`), flag it and, in the
-      app, resolve the implementation before classifying.
-- [ ] **Broaden proxy detection** beyond EIP-1967: EIP-1167 minimal-proxy clones, beacon
-      proxies, Aragon `AppProxyUpgradeable`, delegatecall "delegator" patterns
-      (Compound `*Delegator`), and explorer-reported `Implementation`.
-- [ ] **Proxy UX in the renderer/studio:** a clear banner "this is a proxy → showing the
-      implementation at 0x…" with a manual-override address field.
+- [x] **Never present a proxy shell as the contract.** The resolver now sets
+      `proxy.unresolvedImplementation` when it detects a proxy but can't fetch a verified ABI
+      for the implementation, and the studio shows a prominent banner instead of silently
+      rendering the shell.
+- [x] **Broaden proxy detection** beyond EIP-1967 slots: EIP-1167 minimal-proxy clones
+      (canonical + PUSH0 bytecode), legacy `implementation()` getters (EIP-1822/OZ pre-1967,
+      code-verified to avoid false positives), and Gnosis Safe `masterCopy()`. Beacon +
+      explorer-reported implementation were already handled. Unit-tested in `proxy.test.ts`.
+- [~] **Proxy UX in the renderer/studio:** banner shipped (shows kind + implementation
+  address when known). Still TODO: a manual-override address/ABI field to re-resolve the
+  implementation in one click. Aragon `AppProxyUpgradeable` / Compound `*Delegator`
+  shapes also still pending.
 
 ### P1 — coverage (understand more, safely)
 
@@ -92,4 +96,7 @@ else degrades to Raw. The two make-or-break gaps are **proxy resolution** and
 - 2026-07-26: signature-aware `mint` shipped (fixes cToken/NFT-paid-mint mislabels).
 - 2026-07-26: name-rule audit round 1 — shape-aware `withdraw`; dropped generic `add`/`remove`
   from admin-config (avoids false-admin on DeFi user actions). Corpus baseline refreshed.
+- 2026-07-26: proxy transparency — broadened detection (EIP-1167 clones, legacy
+  `implementation()`, Gnosis `masterCopy()`) + `unresolvedImplementation` flag + studio
+  shell-warning banner so a proxy shell is never silently shown as the real contract.
 - 2026-07-26: real-contract regression harness added (10 contracts, offline baseline).

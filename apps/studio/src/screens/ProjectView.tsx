@@ -271,6 +271,24 @@ export function ProjectView({ project: initialProject, onBack, onUpdated }: Proj
 
       {importError ? <p className="studio-error">{importError}</p> : null}
 
+      {project.proxy?.unresolvedImplementation ? (
+        <div className="studio-banner studio-banner--warn">
+          <span>
+            This is a <strong>{project.proxy.kind}</strong> proxy, but no verified ABI was found for
+            its implementation
+            {project.proxy.implementation ? (
+              <>
+                {' '}
+                (<code>{project.proxy.implementation}</code>)
+              </>
+            ) : null}
+            . You are seeing the <strong>proxy shell</strong> - the real functions live in the
+            implementation. Import the implementation address directly, or paste its ABI, to get the
+            true interface.
+          </span>
+        </div>
+      ) : null}
+
       {stale ? (
         <div className="studio-banner studio-banner--warn">
           <span>
