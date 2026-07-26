@@ -70,9 +70,11 @@ else degrades to Raw. The two make-or-break gaps are **proxy resolution** and
 
 ### P1 — make improvements measurable
 
-- [ ] **Real-contract regression harness.** A curated corpus (~20 addresses across
-      tokens/NFT/vault/DeFi/governance/proxy) → snapshot classification → opt-in CI check
-      (needs an explorer key). Every rule change shows what improved/regressed.
+- [x] **Real-contract regression harness.** Curated corpus of 10 real mainnet contracts
+      with **vendored ABIs** → offline, deterministic classification snapshot
+      (`scripts/corpus/`). `pnpm corpus` diffs current output vs `baseline.json`;
+      `pnpm corpus:update` refreshes it. Every rule change now shows what improved/regressed
+      on real contracts. See `scripts/corpus/README.md`.
 
 ### P2 — polish
 
@@ -84,3 +86,4 @@ else degrades to Raw. The two make-or-break gaps are **proxy resolution** and
 
 - 2026-07-26: baseline captured; backlog created.
 - 2026-07-26: signature-aware `mint` shipped (fixes cToken/NFT-paid-mint mislabels).
+- 2026-07-26: real-contract regression harness added (10 contracts, offline baseline).

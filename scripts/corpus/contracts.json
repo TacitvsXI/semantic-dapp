@@ -1,0 +1,64 @@
+[
+  {
+    "label": "WETH",
+    "chainId": 1,
+    "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+    "category": "token"
+  },
+  {
+    "label": "DAI",
+    "chainId": 1,
+    "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+    "category": "token"
+  },
+  {
+    "label": "USDC",
+    "chainId": 1,
+    "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "category": "token",
+    "followProxy": true
+  },
+  {
+    "label": "BAYC",
+    "chainId": 1,
+    "address": "0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D",
+    "category": "nft"
+  },
+  {
+    "label": "Compound-cDAI",
+    "chainId": 1,
+    "address": "0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643",
+    "category": "lending"
+  },
+  {
+    "label": "UniswapV2Router02",
+    "chainId": 1,
+    "address": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
+    "category": "defi"
+  },
+  {
+    "label": "UniswapV3Pool-USDC-ETH",
+    "chainId": 1,
+    "address": "0x88e6A0c2dDD26FEEb64F039a2c41296FcB3f5640",
+    "category": "defi"
+  },
+  {
+    "label": "AaveV3Pool",
+    "chainId": 1,
+    "address": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+    "category": "defi",
+    "followProxy": true
+  },
+  {
+    "label": "ENSRegistry",
+    "chainId": 1,
+    "address": "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e",
+    "category": "registry"
+  },
+  {
+    "label": "Seaport-1.6",
+    "chainId": 1,
+    "address": "0x0000000000000068F116a894984e2DB1123eB395",
+    "category": "marketplace"
+  }
+]

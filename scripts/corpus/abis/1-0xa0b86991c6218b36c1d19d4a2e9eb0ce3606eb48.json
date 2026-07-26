@@ -1,0 +1,112 @@
+{
+  "label": "USDC",
+  "chainId": 1,
+  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+  "contractName": "FiatTokenProxy",
+  "via": "address",
+  "abi": [
+    {
+      "type": "function",
+      "name": "upgradeTo",
+      "inputs": [
+        {
+          "name": "newImplementation",
+          "type": "address"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "constant": false,
+      "payable": false
+    },
+    {
+      "type": "function",
+      "name": "upgradeToAndCall",
+      "inputs": [
+        {
+          "name": "newImplementation",
+          "type": "address"
+        },
+        {
+          "name": "data",
+          "type": "bytes"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "payable",
+      "constant": false,
+      "payable": true
+    },
+    {
+      "type": "function",
+      "name": "implementation",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "constant": true,
+      "payable": false
+    },
+    {
+      "type": "function",
+      "name": "changeAdmin",
+      "inputs": [
+        {
+          "name": "newAdmin",
+          "type": "address"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "constant": false,
+      "payable": false
+    },
+    {
+      "type": "function",
+      "name": "admin",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "constant": true,
+      "payable": false
+    },
+    {
+      "type": "event",
+      "name": "AdminChanged",
+      "inputs": [
+        {
+          "name": "previousAdmin",
+          "type": "address",
+          "indexed": false
+        },
+        {
+          "name": "newAdmin",
+          "type": "address",
+          "indexed": false
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "Upgraded",
+      "inputs": [
+        {
+          "name": "implementation",
+          "type": "address",
+          "indexed": false
+        }
+      ],
+      "anonymous": false
+    }
+  ]
+}
