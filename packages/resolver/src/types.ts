@@ -13,6 +13,7 @@ export type ProxyKind =
   | 'gnosis-safe'
   | 'erc897-delegate'
   | 'delegator'
+  | 'eip2535-diamond'
   | 'unknown';
 
 export interface ContractSourceFile {
@@ -83,6 +84,17 @@ export interface ProxyInfo {
    * the user rather than present the shell as the real contract.
    */
   unresolvedImplementation?: boolean;
+  /**
+   * EIP-2535 diamond facet addresses from the loupe (`facetAddresses()`), when
+   * `kind === 'eip2535-diamond'`. The diamond address stays the call target; these
+   * are only used to fetch and merge facet ABIs.
+   */
+  facets?: Address[];
+  /**
+   * True when at least one facet ABI could not be resolved, so the merged ABI may
+   * be incomplete. Parallel to {@link unresolvedImplementation} for single-impl proxies.
+   */
+  unresolvedFacets?: boolean;
 }
 
 export interface Provenance {

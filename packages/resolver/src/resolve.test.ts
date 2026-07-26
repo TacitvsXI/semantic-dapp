@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { getAddress, type Address, type Hex } from 'viem';
+import { encodeAbiParameters, getAddress, type Address, type Hex } from 'viem';
 import { resolveContract } from './resolve.js';
 import { EIP1967_IMPLEMENTATION_SLOT } from './proxy.js';
+import { FACET_ADDRESSES_SELECTOR } from './diamond.js';
 import type {
   AbiSourceAdapter,
   AbiSourceId,
@@ -108,6 +109,99 @@ describe('resolveContract', () => {
     expect(result.ok).toBe(false);
     if (!result.ok) {
       expect(result.triedSources).toEqual(['sourcify', 'block-explorer']);
+    }
+  });
+
+  it('merges facet ABIs for an EIP-2535 diamond', async () => {
+    const facetA = getAddress('0x3333333333333333333333333333333333333333');
+    const facetB = getAddress('0x4444444444444444444444444444444444444444');
+    const encoded = encodeAbiParameters([{ type: 'address[]' }], [[facetA, facetB]]);
+    const reader: ChainReader = {
+      getStorageAt: async () => ZERO_WORD,
+      getCode: async ({ address }) =>
+        address === facetA || address === facetB || address === ADDRESS ? '0xabcdef' : '0x',
+      call: async ({ data }) => (data.startsWith(FACET_ADDRESSES_SELECTOR) ? encoded : undefined),
+    };
+
+    const shellAbi = [
+      {
+        type: 'function',
+        name: 'facetAddresses',
+        inputs: [],
+        outputs: [{ type: 'address[]' }],
+        stateMutability: 'view',
+      },
+    ] as unknown as ResolvedSource['abi'];
+    const facetAAbi = [
+      {
+        type: 'function',
+        name: 'transfer',
+        inputs: [
+          { name: 'to', type: 'address' },
+          { name: 'amount', type: 'uint256' },
+        ],
+        outputs: [{ type: 'bool' }],
+        stateMutability: 'nonpayable',
+      },
+    ] as unknown as ResolvedSource['abi'];
+    const facetBAbi = [
+      {
+        type: 'function',
+        name: 'mint',
+        inputs: [
+          { name: 'to', type: 'address' },
+          { name: 'amount', type: 'uint256' },
+        ],
+        outputs: [],
+        stateMutability: 'nonpayable',
+      },
+    ] as unknown as ResolvedSource['abi'];
+
+    const adapters = [
+      fakeAdapter('sourcify', 'Sourcify', (q) => {
+        if (q.address === ADDRESS) return hit({ abi: shellAbi, contractName: 'Diamond' });
+        if (q.address === facetA) return hit({ abi: facetAAbi, contractName: 'TransferFacet' });
+        if (q.address === facetB) return hit({ abi: facetBAbi, contractName: 'MintFacet' });
+        return miss();
+      }),
+    ];
+
+    const result = await resolveContract({ address: ADDRESS, chainId: 1, reader, adapters });
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.contract.proxy?.kind).toBe('eip2535-diamond');
+      expect(result.contract.proxy?.facets).toEqual([facetA, facetB]);
+      expect(result.contract.proxy?.unresolvedFacets).toBe(false);
+      const names = result.contract.abi
+        .filter((i) => i.type === 'function')
+        .map((i) => (i as { name: string }).name)
+        .sort();
+      expect(names).toEqual(['facetAddresses', 'mint', 'transfer']);
+      // Call target stays the diamond.
+      expect(result.contract.address).toBe(ADDRESS);
+    }
+  });
+
+  it('flags unresolvedFacets when a facet ABI is missing', async () => {
+    const facetA = getAddress('0x3333333333333333333333333333333333333333');
+    const facetB = getAddress('0x4444444444444444444444444444444444444444');
+    const encoded = encodeAbiParameters([{ type: 'address[]' }], [[facetA, facetB]]);
+    const reader: ChainReader = {
+      getStorageAt: async () => ZERO_WORD,
+      getCode: async () => '0xabcdef',
+      call: async ({ data }) => (data.startsWith(FACET_ADDRESSES_SELECTOR) ? encoded : undefined),
+    };
+    const adapters = [
+      fakeAdapter('sourcify', 'Sourcify', (q) => {
+        if (q.address === ADDRESS) return hit({ contractName: 'Diamond' });
+        if (q.address === facetA) return hit({ contractName: 'TransferFacet' });
+        return miss(); // facetB missing
+      }),
+    ];
+    const result = await resolveContract({ address: ADDRESS, chainId: 1, reader, adapters });
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.contract.proxy?.unresolvedFacets).toBe(true);
     }
   });
 });

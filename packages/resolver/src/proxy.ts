@@ -1,4 +1,5 @@
 import { getAddress, type Address, type Hex } from 'viem';
+import { enumerateDiamondFacets } from './diamond.js';
 import type { ChainReader, ProxyInfo } from './types.js';
 
 /** EIP-1967 storage slots. */
@@ -140,6 +141,14 @@ export async function detectProxy(reader: ChainReader, address: Address): Promis
   const masterCopy = await callAddressGetter(reader, address, MASTERCOPY_SELECTOR);
   if (masterCopy && (await hasCode(reader, masterCopy))) {
     return { isProxy: true, kind: 'gnosis-safe', implementation: masterCopy };
+  }
+
+  // EIP-2535 Diamond: loupe `facetAddresses()` returns one or more contracts with
+  // code. Checked last among proxy shapes so a single-impl proxy that happens to
+  // expose a similarly-named getter is not misclassified. No single `implementation`.
+  const facets = await enumerateDiamondFacets(reader, address);
+  if (facets && facets.length > 0) {
+    return { isProxy: true, kind: 'eip2535-diamond', facets };
   }
 
   return { isProxy: false, kind: 'unknown' };

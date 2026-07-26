@@ -72,6 +72,35 @@ describe('detectUpgradeable', () => {
     ] as unknown as Abi);
     expect(detectUpgradeable(model).detected).toBe(true);
   });
+
+  it('detects an EIP-2535 diamondCut as upgradeable', () => {
+    const diamondCut = {
+      type: 'function',
+      name: 'diamondCut',
+      stateMutability: 'nonpayable',
+      inputs: [
+        {
+          name: '_diamondCut',
+          type: 'tuple[]',
+          components: [
+            { name: 'facetAddress', type: 'address' },
+            { name: 'action', type: 'uint8' },
+            { name: 'functionSelectors', type: 'bytes4[]' },
+          ],
+        },
+        { name: '_init', type: 'address' },
+        { name: '_calldata', type: 'bytes' },
+      ],
+      outputs: [],
+    } as const;
+    const model = normalizeAbi([
+      diamondCut,
+      fn('facetAddresses', [], ['address[]'], 'view'),
+    ] as unknown as Abi);
+    const result = detectUpgradeable(model);
+    expect(result.detected).toBe(true);
+    expect(result.matched).toContain('diamondCut((address,uint8,bytes4[])[],address,bytes)');
+  });
 });
 
 describe('detectAccessModel', () => {

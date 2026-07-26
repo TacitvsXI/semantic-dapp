@@ -274,9 +274,13 @@ export function ImportWizard({ onCancel, onCreated }: ImportWizardProps) {
                 {resolved.proxy?.isProxy ? (
                   <li>
                     Proxy: <strong>{resolved.proxy.kind}</strong>
-                    {resolved.proxy.implementation
-                      ? ` → impl ${resolved.proxy.implementation}`
-                      : ''}
+                    {resolved.proxy.kind === 'eip2535-diamond' && resolved.proxy.facets
+                      ? ` · ${resolved.proxy.facets.length} facet${resolved.proxy.facets.length === 1 ? '' : 's'}${
+                          resolved.proxy.unresolvedFacets ? ' (some ABIs missing)' : ''
+                        }`
+                      : resolved.proxy.implementation
+                        ? ` → impl ${resolved.proxy.implementation}`
+                        : ''}
                   </li>
                 ) : null}
                 <li>Confidence: {(resolved.confidence * 100).toFixed(0)}%</li>

@@ -112,7 +112,9 @@ export function ProjectView({ project: initialProject, onBack, onUpdated }: Proj
         ...((patch.implementation ?? project.proxy?.implementation)
           ? { implementation: patch.implementation ?? project.proxy?.implementation }
           : {}),
+        ...(project.proxy?.facets ? { facets: project.proxy.facets } : {}),
         unresolvedImplementation: false,
+        unresolvedFacets: false,
       },
       ...(patch.provenance ? { provenance: patch.provenance } : {}),
       ...(patch.codeHash ? { codeHash: patch.codeHash } : {}),
@@ -247,9 +249,11 @@ export function ProjectView({ project: initialProject, onBack, onUpdated }: Proj
                   {project.provenance.matchType ? ` (${project.provenance.matchType})` : ''}
                   {project.proxy?.isProxy
                     ? ` · ${project.proxy.kind}${
-                        project.proxy.implementation
-                          ? ` → ${project.proxy.implementation.slice(0, 10)}…`
-                          : ''
+                        project.proxy.kind === 'eip2535-diamond' && project.proxy.facets
+                          ? ` · ${project.proxy.facets.length} facet${project.proxy.facets.length === 1 ? '' : 's'}`
+                          : project.proxy.implementation
+                            ? ` → ${project.proxy.implementation.slice(0, 10)}…`
+                            : ''
                       }`
                     : ''}
                 </span>
@@ -297,6 +301,32 @@ export function ProjectView({ project: initialProject, onBack, onUpdated }: Proj
 
       {importError ? <p className="studio-error">{importError}</p> : null}
 
+      {project.proxy?.kind === 'eip2535-diamond' ? (
+        <div
+          className={`studio-banner ${project.proxy.unresolvedFacets ? 'studio-banner--warn' : 'studio-banner--info'}`}
+        >
+          <span>
+            This is an <strong>EIP-2535 diamond</strong>
+            {project.proxy.facets && project.proxy.facets.length > 0 ? (
+              <>
+                {' '}
+                with <strong>{project.proxy.facets.length}</strong> facet
+                {project.proxy.facets.length === 1 ? '' : 's'}
+              </>
+            ) : null}
+            . Calls go to the diamond address; the ABI is merged from the facets
+            {project.proxy.unresolvedFacets
+              ? ' — some facet ABIs could not be verified, so the interface may be incomplete. Paste a missing facet ABI below if you have it.'
+              : '.'}
+          </span>
+          {project.proxy.unresolvedFacets ? (
+            <button className="sd-btn sd-btn--write" onClick={() => setShowOverride((s) => !s)}>
+              {showOverride ? 'Hide' : 'Add facet ABI'}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
+
       {project.proxy?.unresolvedImplementation ? (
         <div className="studio-banner studio-banner--warn">
           <span>
@@ -317,7 +347,9 @@ export function ProjectView({ project: initialProject, onBack, onUpdated }: Proj
         </div>
       ) : null}
 
-      {project.proxy?.unresolvedImplementation && showOverride ? (
+      {(project.proxy?.unresolvedImplementation ||
+        (project.proxy?.kind === 'eip2535-diamond' && project.proxy.unresolvedFacets)) &&
+      showOverride ? (
         <ProxyOverride project={project} onApply={applyProxyOverride} />
       ) : null}
 

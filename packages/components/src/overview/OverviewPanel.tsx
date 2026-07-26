@@ -30,6 +30,7 @@ const STANDARD_LABELS: Record<string, string> = {
   'access-control': 'AccessControl',
   pausable: 'Pausable',
   upgradeable: 'Upgradeable',
+  'eip2535-diamond': 'EIP-2535 Diamond',
 };
 
 /** A summary header for a generated app: identity, standards and network. */

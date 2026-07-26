@@ -197,10 +197,19 @@ owner()/admin/...)`, `_checkOwner()`, `_checkRole(ROLE)`, `hasRole(ROLE, msg.sen
 
 - [ ] Confidence calibration against the corpus (thresholds in ADR-001).
 - [ ] Per-standard input-widget coverage review.
-- [ ] Multi-contract / diamond (EIP-2535) facets.
+- [x] **Multi-contract / diamond (EIP-2535) facets.** Resolver detects diamonds via loupe
+      `facetAddresses()`, enumerates facets with code, fetches each facet ABI, and merges them
+      (selector-deduped) into one call surface — diamond address stays the call target. New
+      `ProxyKind` `eip2535-diamond` + `facets` / `unresolvedFacets` on `ProxyInfo`. Studio shows a
+      diamond banner (facet count; warn + paste ABI when facets are incomplete). `diamondCut` is
+      labelled `upgrade`/`critical` in the upgradeable detector. Unit-tested (loupe, merge, resolve).
 
 ## Log
 
+- 2026-07-26: **EIP-2535 diamond facets** — loupe `facetAddresses()` detection, per-facet ABI fetch +
+  selector-deduped merge, diamond stays call target. Studio banner for facet count /
+  unresolvedFacets; `diamondCut` → upgrade/critical. Closes the multi-contract/diamond P2 item
+  (merge-first, not N Studio contracts).
 - 2026-07-26: **Governor Bravo/Alpha shapes** — new `governor-bravo` detector for Compound-style
   governance (5-arg propose with `signatures[]`, id-based queue/execute/cancel, Alpha's bool `castVote`
   or Bravo's uint8). Disjoint from OZ IGovernor, so no collision. Labels propose/vote/lifecycle + getters.

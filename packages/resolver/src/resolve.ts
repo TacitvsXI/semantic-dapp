@@ -1,6 +1,7 @@
-import { keccak256, type Address, type Hex } from 'viem';
+import { keccak256, type Abi, type Address, type Hex } from 'viem';
 import { sourcifyAdapter } from './adapters/sourcify.js';
 import { blockExplorerAdapter } from './adapters/explorer.js';
+import { mergeAbis } from './diamond.js';
 import { detectProxy } from './proxy.js';
 import type {
   AbiSourceAdapter,
@@ -123,9 +124,52 @@ export async function resolveContract(options: ResolveOptions): Promise<ResolveR
     }
   }
 
+  // EIP-2535 diamond: fetch each facet ABI and merge into one call surface. The
+  // diamond address stays the call target; missing facet ABIs are flagged.
+  if (proxyInfo?.kind === 'eip2535-diamond' && proxyInfo.facets && proxyInfo.facets.length > 0) {
+    const abis: Abi[] = [];
+    let primary: Found | undefined = found && target === address ? found : undefined;
+    if (primary) abis.push(primary.source.abi);
+
+    let missing = 0;
+    let resolvedFacets = 0;
+    for (const facet of proxyInfo.facets) {
+      if (facet.toLowerCase() === address.toLowerCase()) continue;
+      const facetFound = await tryAdapters(adapters, baseQuery(facet), tried);
+      if (facetFound) {
+        abis.push(facetFound.source.abi);
+        resolvedFacets += 1;
+        if (!primary) primary = facetFound;
+      } else {
+        missing += 1;
+      }
+    }
+
+    if (abis.length > 0 && primary) {
+      // Stash the merged ABI on the found source so the common path below uses it.
+      found = {
+        adapter: primary.adapter,
+        source: { ...primary.source, abi: mergeAbis(abis) },
+      };
+      proxyInfo = {
+        ...proxyInfo,
+        unresolvedFacets: missing > 0 || resolvedFacets === 0,
+      };
+    } else if (found) {
+      proxyInfo = { ...proxyInfo, unresolvedFacets: true };
+    }
+  }
+
   // Proxy whose implementation we never located (e.g. beacon read failed): the ABI
   // we have is the proxy address itself, so mark it as an unresolved shell too.
-  if (found && proxyInfo?.isProxy && target === address && proxyInfo.implementation === undefined) {
+  // Diamonds are handled above via unresolvedFacets — don't also flag them here.
+  if (
+    found &&
+    proxyInfo?.isProxy &&
+    target === address &&
+    proxyInfo.implementation === undefined &&
+    proxyInfo.kind !== 'eip2535-diamond'
+  ) {
     proxyInfo = { ...proxyInfo, unresolvedImplementation: true };
   }
 
@@ -137,7 +181,9 @@ export async function resolveContract(options: ResolveOptions): Promise<ResolveR
     };
   }
 
-  const codeHash = reader ? await codeHashOf(reader, target) : undefined;
+  // For diamonds, hash the diamond bytecode (call target). Facet upgrades can
+  // change storage without changing this hash — loupe re-query is the durable check.
+  const codeHash = reader ? await codeHashOf(reader, address) : undefined;
 
   const provenance: Provenance = {
     source: found.adapter.id,

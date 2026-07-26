@@ -177,6 +177,8 @@ export const pausableDetector: StandardDetector = {
 
 /* ----------------------------- Upgradeable ------------------------------ */
 
+const DIAMOND_CUT = 'diamondCut((address,uint8,bytes4[])[],address,bytes)';
+
 const UPGRADEABLE_SEMANTICS: Record<string, FunctionSemantic> = {
   'upgradeTo(address)': {
     operationType: 'upgrade',
@@ -194,19 +196,52 @@ const UPGRADEABLE_SEMANTICS: Record<string, FunctionSemantic> = {
     isRead: false,
     risk: 'critical',
   },
+  [DIAMOND_CUT]: {
+    operationType: 'upgrade',
+    audience: 'admin',
+    title: 'Diamond cut',
+    description:
+      'Add, replace or remove facet functions on this EIP-2535 diamond. Changes the live interface.',
+    isRead: false,
+    risk: 'critical',
+  },
   'proxiableUUID()': {
     operationType: 'read',
     audience: 'developer',
     title: 'Proxiable UUID',
     isRead: true,
   },
+  'facetAddresses()': {
+    operationType: 'read',
+    audience: 'developer',
+    title: 'Facet addresses',
+    description: 'EIP-2535 loupe: every facet currently wired into this diamond.',
+    isRead: true,
+  },
+  'facets()': {
+    operationType: 'read',
+    audience: 'developer',
+    title: 'Facets',
+    description: 'EIP-2535 loupe: facet addresses with their function selectors.',
+    isRead: true,
+  },
 };
 
 export function detectUpgradeable(model: ContractModel): StandardDetection {
   const fns = new Set(model.functions.map((f) => f.signature));
-  const candidates = ['upgradeTo(address)', 'upgradeToAndCall(address,bytes)', 'proxiableUUID()'];
+  const candidates = [
+    'upgradeTo(address)',
+    'upgradeToAndCall(address,bytes)',
+    DIAMOND_CUT,
+    'proxiableUUID()',
+    'facetAddresses()',
+    'facets()',
+  ];
   const matched = candidates.filter((s) => fns.has(s));
-  const hasEntrypoint = fns.has('upgradeTo(address)') || fns.has('upgradeToAndCall(address,bytes)');
+  const hasEntrypoint =
+    fns.has('upgradeTo(address)') ||
+    fns.has('upgradeToAndCall(address,bytes)') ||
+    fns.has(DIAMOND_CUT);
   return {
     standard: 'upgradeable',
     detected: hasEntrypoint,
@@ -216,7 +251,7 @@ export function detectUpgradeable(model: ContractModel): StandardDetection {
       detail: `upgradeable: ${sig} present`,
     })),
     matched,
-    missing: hasEntrypoint ? [] : ['upgradeTo(address)|upgradeToAndCall(address,bytes)'],
+    missing: hasEntrypoint ? [] : ['upgradeTo(address)|upgradeToAndCall(address,bytes)|diamondCut'],
   };
 }
 

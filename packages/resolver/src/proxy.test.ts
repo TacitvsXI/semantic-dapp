@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getAddress, type Address, type Hex } from 'viem';
+import { encodeAbiParameters, getAddress, type Address, type Hex } from 'viem';
 import {
   addressFromStorageWord,
   detectProxy,
@@ -8,6 +8,7 @@ import {
   EIP1967_BEACON_SLOT,
   EIP1967_IMPLEMENTATION_SLOT,
 } from './proxy.js';
+import { FACET_ADDRESSES_SELECTOR } from './diamond.js';
 import type { ChainReader } from './types.js';
 
 const ZERO_WORD: Hex = `0x${'0'.repeat(64)}`;
@@ -179,6 +180,24 @@ describe('detectProxy', () => {
       kind: 'gnosis-safe',
       implementation: BEACON_IMPL,
     });
+  });
+
+  it('detects an EIP-2535 diamond via facetAddresses() loupe', async () => {
+    const facetA = getAddress('0x6666666666666666666666666666666666666666');
+    const facetB = getAddress('0x7777777777777777777777777777777777777777');
+    const encoded = encodeAbiParameters([{ type: 'address[]' }], [[facetA, facetB]]);
+    const reader = makeReader({
+      calls: { [FACET_ADDRESSES_SELECTOR]: encoded },
+      codeFor: (address) =>
+        address === facetA || address === facetB ? ('0xabcdef' as Hex) : ('0x' as Hex),
+    });
+    const proxy = await detectProxy(reader, ADMIN);
+    expect(proxy).toMatchObject({
+      isProxy: true,
+      kind: 'eip2535-diamond',
+      facets: [facetA, facetB],
+    });
+    expect(proxy.implementation).toBeUndefined();
   });
 
   it('returns not-a-proxy for a plain contract', async () => {
