@@ -87,6 +87,44 @@ describe('classifyContract — heuristic rule engine', () => {
   });
 });
 
+describe('classifyContract — signature-aware mint', () => {
+  it('routes mint(address,uint256) to Admin as a privileged, high-risk supply', () => {
+    const abi = [
+      fn('owner', [], ['address'], 'view'),
+      fn('mint', ['address', 'uint256'], []),
+    ] as const satisfies Abi;
+    const result = classifyContract(normalizeAbi(abi as unknown as Abi), 'c');
+    const mint = result.operations.find((o) => o.function === 'mint(address,uint256)');
+    expect(mint?.audience).toBe('admin');
+    expect(mint?.operationType).toBe('token-mint');
+    expect(mint?.risk?.level).toBe('high');
+    expect(mint?.permission?.kind).toBe('ownable');
+  });
+
+  it('treats a payable mint as a user-facing public/paid mint', () => {
+    const abi = [fn('mint', ['uint256'], [], 'payable')] as const satisfies Abi;
+    const result = classifyContract(normalizeAbi(abi as unknown as Abi), 'c');
+    const mint = result.operations.find((o) => o.function === 'mint(uint256)');
+    expect(mint?.audience).toBe('user');
+    expect(mint?.operationType).toBe('token-mint');
+    expect(mint?.permission).toBeUndefined();
+  });
+
+  it('treats a cToken-style mint(uint256) as a user deposit, not a privileged mint', () => {
+    const abi = [
+      fn('mint', ['uint256'], ['uint256']),
+      fn('redeem', ['uint256'], ['uint256']),
+      fn('underlying', [], ['address'], 'view'),
+    ] as const satisfies Abi;
+    const result = classifyContract(normalizeAbi(abi as unknown as Abi), 'c');
+    const mint = result.operations.find((o) => o.function === 'mint(uint256)');
+    expect(mint?.audience).toBe('user');
+    expect(mint?.operationType).toBe('fund-deposit');
+    expect(mint?.risk?.level).toBe('low');
+    expect(mint?.permission).toBeUndefined();
+  });
+});
+
 describe('humanize', () => {
   it('splits camelCase into a title', () => {
     expect(humanize('setFeeRecipient')).toBe('Set fee recipient');

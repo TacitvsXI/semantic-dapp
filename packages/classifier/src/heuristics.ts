@@ -54,7 +54,6 @@ interface NameRule {
 
 /** First match wins. Patterns run against the lowercased function name. */
 const NAME_RULES: NameRule[] = [
-  { test: /^mint/, operationType: 'token-mint', audience: 'admin', risk: 'high', title: 'Mint' },
   { test: /^burn/, operationType: 'token-burn', audience: 'user', risk: 'medium', title: 'Burn' },
   {
     test: /^(unpause|resume)/,
@@ -140,6 +139,76 @@ export const nameHeuristicRule: ClassificationRule = {
       return match;
     }
     return undefined;
+  },
+};
+
+/* ------------------------------- mint shape ------------------------------ */
+
+/**
+ * `mint` means very different things across contracts, so route it by shape, not
+ * by name alone (correctness > coverage):
+ *   - payable                       -> public / paid mint (NFT drop, sale): user.
+ *   - mint(address, uint256)        -> privileged token supply (OZ ERC-20): admin.
+ *   - mint(uint256[, address]) etc. -> deposit-like (cToken/pool): a user action.
+ *
+ * ERC-4626 `mint(uint256,address)` is already handled by the standard rule
+ * (priority 100), so this only sees non-standard mints. Higher priority than the
+ * generic name heuristics (50) but below detected standards.
+ */
+export const mintShapeRule: ClassificationRule = {
+  id: 'mint-shape',
+  match(ctx: RuleContext): RuleMatch | undefined {
+    if (ctx.func.isRead) return undefined;
+    if (!/^mint/i.test(ctx.func.name)) return undefined;
+    const types = ctx.func.inputs.map((i) => i.type);
+
+    if (ctx.func.isPayable) {
+      return {
+        operationType: 'token-mint',
+        audience: 'user',
+        title: 'Mint',
+        risk: 'medium',
+        confidence: 0.55,
+        evidence: {
+          source: 'signature',
+          detail: `${ctx.func.name} is payable - looks like a public/paid mint, not a privileged one`,
+          weight: 0.55,
+        },
+        priority: 60,
+      };
+    }
+
+    const privilegedShape =
+      types.length === 2 && /^address$/.test(types[0] ?? '') && /^uint\d*$/.test(types[1] ?? '');
+    if (privilegedShape) {
+      return {
+        operationType: 'token-mint',
+        audience: 'admin',
+        title: 'Mint',
+        risk: 'high',
+        confidence: 0.6,
+        evidence: {
+          source: 'signature',
+          detail: 'mint(address,uint256) is a privileged token-supply shape',
+          weight: 0.6,
+        },
+        priority: 60,
+      };
+    }
+
+    return {
+      operationType: 'fund-deposit',
+      audience: 'user',
+      title: 'Mint',
+      risk: 'low',
+      confidence: 0.5,
+      evidence: {
+        source: 'signature',
+        detail: `${ctx.func.name}(${types.join(',')}) has no privileged-supply shape; treated as a user deposit`,
+        weight: 0.5,
+      },
+      priority: 60,
+    };
   },
 };
 
@@ -233,6 +302,7 @@ export const fallbackRule: ClassificationRule = {
 export const DEFAULT_RULES: ClassificationRule[] = [
   standardRule,
   riskHeuristicRule,
+  mintShapeRule,
   nameHeuristicRule,
   readRule,
   fallbackRule,
