@@ -175,6 +175,34 @@ describe('classifyContract — name-heuristic audit (no over-claimed privilege)'
   });
 });
 
+describe('classifyContract — risk precision (payable is not inherently risky)', () => {
+  it('keeps a payable deposit at low risk (payable is expected, not risky)', () => {
+    const abi = [fn('deposit', [], [], 'payable')] as const satisfies Abi;
+    const result = classifyContract(normalizeAbi(abi as unknown as Abi), 'c');
+    const d = result.operations.find((o) => o.function === 'deposit()');
+    expect(d?.audience).toBe('user');
+    expect(d?.operationType).toBe('fund-deposit');
+    // Routing rule (deposit → low, priority 50) beats the payable floor (45).
+    expect(d?.risk?.level).toBe('low');
+  });
+
+  it('still applies a medium floor to a payable writer no rule understands', () => {
+    const abi = [fn('contribute', [], [], 'payable')] as const satisfies Abi;
+    const result = classifyContract(normalizeAbi(abi as unknown as Abi), 'c');
+    const c = result.operations.find((o) => o.function === 'contribute()');
+    // No name/shape rule matches, so the payable floor makes it medium (safe default).
+    expect(c?.risk?.level).toBe('medium');
+  });
+
+  it('keeps dangerous names high even when payable', () => {
+    const abi = [fn('migrate', ['address'], [], 'payable')] as const satisfies Abi;
+    const result = classifyContract(normalizeAbi(abi as unknown as Abi), 'c');
+    const m = result.operations.find((o) => o.function === 'migrate(address)');
+    // Dangerous-name tier (priority 70) overrides the payable floor.
+    expect(m?.risk?.level).toBe('high');
+  });
+});
+
 describe('humanize', () => {
   it('splits camelCase into a title', () => {
     expect(humanize('setFeeRecipient')).toBe('Set fee recipient');

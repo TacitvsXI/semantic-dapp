@@ -13,7 +13,7 @@
       "approve(address,uint256) => token-approve/user/medium",
       "balanceOf(address) => read/user",
       "decimals() => read/user",
-      "deposit() => fund-deposit/user/medium",
+      "deposit() => fund-deposit/user/low",
       "name() => read/user",
       "symbol() => read/user",
       "totalSupply() => read/user",

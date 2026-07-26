@@ -116,8 +116,12 @@ owner()/admin/...)`, `_checkOwner()`, `_checkRole(ROLE)`, `hasRole(ROLE, msg.sen
       ("restricted to owner", "requires MINTER_ROLE") as a hover tooltip pulled from the operation's
       modifier/source-ast evidence. Custody operators can see _why_ a function is admin at a glance.
       Unit-tested in `Badges.test.tsx`.
-- [ ] **Risk heuristic precision.** `payable` alone shouldn't imply medium risk for obvious user
-      deposits; `upgrade`/`setAdmin`/`migrate` stay high.
+- [x] **Risk heuristic precision.** `payable` no longer inflates risk on its own: the payable rule
+      became a _medium floor_ at priority 45 (below the routing rules), so an obvious user action that
+      happens to be payable keeps the risk its routing rule assigned, while an unrecognised payable
+      writer still defaults to medium. Destructive/`upgrade`/`setAdmin`/`migrate` names stay
+      critical/high at priority 70. Verified on the corpus: WETH `deposit()` moved medium → low
+      (correct); nothing else changed. Unit-tested in `heuristics.test.ts`.
 
 ### P0 — transaction trust (the core for self-custody)
 
@@ -161,6 +165,10 @@ owner()/admin/...)`, `_checkOwner()`, `_checkRole(ROLE)`, `hasRole(ROLE, msg.sen
 
 ## Log
 
+- 2026-07-26: **risk precision** — `payable` is no longer treated as inherently risky. It's now a
+  medium _floor_ (priority 45, below routing) so obvious user actions keep their assigned risk while
+  unknown payable writers still default to medium; destructive/upgrade/admin names stay high at 70.
+  Corpus confirmed the intended, single change: WETH `deposit()` medium → low.
 - 2026-07-26: **proxy implementation override** shipped — the "proxy shell" banner now has a "Fix
   implementation" action to resolve a verified ABI from a manually-entered implementation address or
   paste the impl ABI directly. Call target stays the proxy; only the ABI/manifest are rebuilt.

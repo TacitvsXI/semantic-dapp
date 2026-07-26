@@ -262,9 +262,16 @@ const DESTRUCTIVE = /(selfdestruct|destroy|\bkill\b|shutdown|drain|rug|nuke)/;
 const DANGEROUS = /(withdrawall|emergencywithdraw|migrate|setowner|setadmin|upgrade)/;
 
 /**
- * Raise the risk level for dangerous shapes without changing routing. Higher
- * priority than name heuristics for the risk field only (it never sets a type),
- * but standards (priority 100) still win.
+ * Raise the risk level for dangerous shapes without changing routing (it never
+ * sets a type). Two tiers, because "payable" is not itself dangerous:
+ *   - Destructive/dangerous *names* (selfdestruct, upgrade, setAdmin, migrate…)
+ *     win at priority 70 — above routing, so they always override a benign risk.
+ *   - `payable` only sets a *medium floor* at priority 45 — BELOW the routing
+ *     rules (name=50, mint/withdraw=60, standards=100). So an obvious user action
+ *     that happens to be payable (a `deposit()`/`stake()`/paid mint) keeps the
+ *     low/medium risk its routing rule assigned, while a payable function no rule
+ *     understood still gets flagged medium as a safe default. Accepting value is
+ *     expected for deposits; it shouldn't inflate their risk.
  */
 export const riskHeuristicRule: ClassificationRule = {
   id: 'risk-heuristic',
@@ -294,8 +301,11 @@ export const riskHeuristicRule: ClassificationRule = {
       return {
         risk: 'medium',
         confidence: 0.4,
-        evidence: { source: 'signature', detail: `${ctx.func.name} is payable (accepts value)` },
-        priority: 70,
+        evidence: {
+          source: 'signature',
+          detail: `${ctx.func.name} is payable (accepts value); medium unless a routing rule knows better`,
+        },
+        priority: 45,
       };
     }
     return undefined;
