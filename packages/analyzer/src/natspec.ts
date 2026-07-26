@@ -189,7 +189,10 @@ function parseModifiers(tail: string): string[] {
  * source files. Returns an empty object when there is nothing to parse.
  */
 export function parseNatSpec(sources: SourceFile[] | undefined): SourceDocs {
-  const docs: SourceDocs = {};
+  // Keyed by arbitrary function names, so use a null-prototype object to avoid
+  // collisions with Object.prototype members (e.g. a `toString`/`constructor`
+  // function in the contract).
+  const docs: SourceDocs = Object.create(null) as SourceDocs;
   if (!sources?.length) return docs;
 
   for (const file of sources) {

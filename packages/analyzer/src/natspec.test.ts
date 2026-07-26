@@ -65,6 +65,20 @@ describe('parseNatSpec', () => {
     expect(parseNatSpec(undefined)).toEqual({});
     expect(parseNatSpec([])).toEqual({});
   });
+
+  it('handles function names that collide with Object.prototype keys', () => {
+    const src = `
+      /// @notice Render as string.
+      function toString(uint256 x) external onlyOwner {}
+      /// @notice Ctor-like name.
+      function constructor2() external {}
+    `;
+    // Must not throw (regression: null-prototype accumulator).
+    const parsed = parseNatSpec([{ content: src }]);
+    const doc = matchDoc(parsed['toString'], ['uint256']);
+    expect(doc?.notice).toBe('Render as string.');
+    expect(doc?.modifiers).toContain('onlyOwner');
+  });
 });
 
 describe('privilegeFromModifiers', () => {

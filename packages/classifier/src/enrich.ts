@@ -41,7 +41,9 @@ export function enrichOperations(
 
   return operations.map((op) => {
     const name = op.function.slice(0, op.function.indexOf('('));
-    const doc = matchDoc(docs[name], argTypesOf(op.function));
+    // Guard against prototype keys when `docs` came back from JSON.parse.
+    const candidates = Object.prototype.hasOwnProperty.call(docs, name) ? docs[name] : undefined;
+    const doc = matchDoc(candidates, argTypesOf(op.function));
     if (!doc) return op;
     return enrichOne(op, doc);
   });
