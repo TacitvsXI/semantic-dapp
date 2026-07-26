@@ -266,6 +266,11 @@
   border-color: var(--sd-emergency);
   color: var(--sd-emergency-text);
 }
+.sd-badge--permission {
+  border-color: var(--sd-admin);
+  color: var(--sd-admin);
+  cursor: help;
+}
 
 .sd-evidence {
   margin-top: 6px;

@@ -103,7 +103,7 @@ else degrades to Raw. The two make-or-break gaps are **proxy resolution** and
       functions gained human descriptions; all 3 privilege upgrades (DAI `rely`, BAYC
       `flipSaleState`/`reserveApes`) were correct. See `natspec.test.ts` + `enrich.test.ts`.
 - [x] **Body-level access detection.** `parseNatSpec` now also mines `require/if (msg.sender ==
-    owner()/admin/...)`, `_checkOwner()`, `_checkRole(ROLE)`, `hasRole(ROLE, msg.sender)`, and
+  owner()/admin/...)`, `_checkOwner()`, `_checkRole(ROLE)`, `hasRole(ROLE, msg.sender)`, and
       custom `onlyX` modifiers whose _definition_ contains such a check. Each function gets a
       resolved, serialisable `AccessHint {kind, role?, detail}` that `enrichOperations` uses to
       promote user→admin with a concrete permission + human evidence (upgrade-only). Unit-tested
@@ -111,9 +111,11 @@ else degrades to Raw. The two make-or-break gaps are **proxy resolution** and
       **Known limitation:** checks hidden behind an internal call (Compound's public `_setX` →
       internal `_setXFresh` where the `if (msg.sender != admin)` lives) are not followed — that
       needs intra-contract call-graph analysis and is deferred (risk of complexity/overfit).
-- [ ] **Surface the evidence in the UI.** The `AccessHint.detail` is already carried as operation
-      evidence ("restricted to owner" / "requires MINTER_ROLE"); still TODO to render it as a
-      visible badge/tooltip on admin functions so custody operators can trust the label.
+- [x] **Surface the evidence in the UI.** `PermissionBadge` (🔒 "owner only" / "role: MINTER_ROLE"
+      / "restricted") now renders on every privileged operation card, with the access justification
+      ("restricted to owner", "requires MINTER_ROLE") as a hover tooltip pulled from the operation's
+      modifier/source-ast evidence. Custody operators can see _why_ a function is admin at a glance.
+      Unit-tested in `Badges.test.tsx`.
 - [ ] **Risk heuristic precision.** `payable` alone shouldn't imply medium risk for obvious user
       deposits; `upgrade`/`setAdmin`/`migrate` stay high.
 
@@ -177,3 +179,6 @@ else degrades to Raw. The two make-or-break gaps are **proxy resolution** and
   `AccessHint` that upgrades user→admin (upgrade-only). Re-measured on 6 real contracts: still 3
   correct upgrades (BAYC/DAI covered by modifiers; Compound hides checks behind internal `*Fresh`
   calls — a documented limitation; ENS uses per-node auth, correctly not global admin).
+- 2026-07-26: `PermissionBadge` renders the gating (owner / role / custom) on privileged operation
+  cards with the access justification as a tooltip — the "why is this admin?" trust signal for
+  custody operators.

@@ -3,6 +3,7 @@ import {
   AudienceBadge,
   ConfidenceBadge,
   EvidenceList,
+  PermissionBadge,
   RiskBadge,
   type AmountContext,
 } from '@semantic-dapp/components';
@@ -37,6 +38,10 @@ export function OperationCard({ view, runtime, review, safety, amount }: Operati
   const hints = operation.inputs.map((input) => input.widget);
   const risk = operation.risk?.level;
   const privileged = operation.permission !== undefined && operation.permission.kind !== 'none';
+  // Prefer the human justification for the gating (modifier / body-level check).
+  const accessDetail = operation.evidence.find(
+    (e) => e.source === 'modifier' || e.source === 'source-ast',
+  )?.detail;
   const warnings = operation.isRead
     ? []
     : writeWarnings({
@@ -63,6 +68,12 @@ export function OperationCard({ view, runtime, review, safety, amount }: Operati
         </div>
         <div className="sd-card__badges">
           <AudienceBadge audience={operation.audience} />
+          {privileged && operation.permission ? (
+            <PermissionBadge
+              permission={operation.permission}
+              {...(accessDetail ? { detail: accessDetail } : {})}
+            />
+          ) : null}
           <ConfidenceBadge confidence={operation.confidence} />
           {operation.risk ? (
             <RiskBadge level={operation.risk.level} reason={operation.risk.reason} />
