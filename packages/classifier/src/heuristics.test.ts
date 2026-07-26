@@ -125,6 +125,56 @@ describe('classifyContract — signature-aware mint', () => {
   });
 });
 
+describe('classifyContract — name-heuristic audit (no over-claimed privilege)', () => {
+  it('treats a bare withdraw as a user action, not admin', () => {
+    const abi = [
+      fn('deposit', [], [], 'payable'),
+      fn('withdraw', ['uint256'], []),
+    ] as const satisfies Abi;
+    const result = classifyContract(normalizeAbi(abi as unknown as Abi), 'c');
+    const w = result.operations.find((o) => o.function === 'withdraw(uint256)');
+    expect(w?.audience).toBe('user');
+    expect(w?.operationType).toBe('fund-withdraw');
+    expect(w?.permission).toBeUndefined();
+  });
+
+  it('treats a no-arg withdraw() as a privileged drain (admin, high)', () => {
+    const abi = [fn('withdraw', [], [])] as const satisfies Abi;
+    const result = classifyContract(normalizeAbi(abi as unknown as Abi), 'c');
+    const w = result.operations.find((o) => o.function === 'withdraw()');
+    expect(w?.audience).toBe('admin');
+    expect(w?.operationType).toBe('fund-withdraw');
+    expect(w?.risk?.level).toBe('high');
+  });
+
+  it('does not label generic add/remove (e.g. addLiquidity) as admin', () => {
+    const abi = [
+      fn('addLiquidity', ['address', 'address', 'uint256', 'uint256'], ['uint256']),
+      fn('removeLiquidity', ['address', 'address', 'uint256'], ['uint256']),
+    ] as const satisfies Abi;
+    const result = classifyContract(normalizeAbi(abi as unknown as Abi), 'c');
+    for (const sig of [
+      'addLiquidity(address,address,uint256,uint256)',
+      'removeLiquidity(address,address,uint256)',
+    ]) {
+      const op = result.operations.find((o) => o.function === sig);
+      expect(op?.audience).not.toBe('admin');
+      expect(op?.operationType).toBe('unknown');
+    }
+  });
+
+  it('still routes explicit config setters to admin', () => {
+    const abi = [
+      fn('owner', [], ['address'], 'view'),
+      fn('setFee', ['uint256'], []),
+    ] as const satisfies Abi;
+    const result = classifyContract(normalizeAbi(abi as unknown as Abi), 'c');
+    const s = result.operations.find((o) => o.function === 'setFee(uint256)');
+    expect(s?.audience).toBe('admin');
+    expect(s?.operationType).toBe('admin-config');
+  });
+});
+
 describe('humanize', () => {
   it('splits camelCase into a title', () => {
     expect(humanize('setFeeRecipient')).toBe('Set fee recipient');

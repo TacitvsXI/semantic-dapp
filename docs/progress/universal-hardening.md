@@ -41,9 +41,13 @@ else degrades to Raw. The two make-or-break gaps are **proxy resolution** and
       non-4626 = deposit-like (user). Was: all `mint*` → admin/high (wrong for cToken
       deposits and NFT paid mints). Done in `heuristics.ts` (`mintShapeRule`), tested in
       `heuristics.test.ts`. Verified on live cDAI: `mint(uint256)` → `fund-deposit/user/low`.
-- [ ] **Audit every name rule for false positives.** `burn`, `withdraw`, `deposit`,
-      `claim`, `set*` — verify against the real corpus; prefer lower confidence + user
-      audience when the shape is ambiguous rather than asserting admin.
+- [x] **Audit name rules for false positives (round 1).** `withdraw` is now shape-aware
+      (`withdraw(uint256…)` → user; no-arg `withdraw()` → privileged drain), fixing WETH
+      unwrap (was admin) and keeping BAYC owner-withdraw as admin/high. Removed the too-generic
+      `add`/`remove` from the admin-config rule so `addLiquidity`/`removeLiquidity` fall to Raw
+      instead of a false `admin` label. Verified via the corpus (WETH/BAYC/Uniswap diffs are
+      intended) and unit-tested. Remaining verbs (`burn`, `deposit`, `claim`, `set*`) reviewed
+      and left as-is.
 - [ ] **Risk heuristic precision.** `payable` alone shouldn't imply medium risk for
       obvious user deposits; `upgrade`/`setAdmin`/`migrate` stay high.
 
@@ -86,4 +90,6 @@ else degrades to Raw. The two make-or-break gaps are **proxy resolution** and
 
 - 2026-07-26: baseline captured; backlog created.
 - 2026-07-26: signature-aware `mint` shipped (fixes cToken/NFT-paid-mint mislabels).
+- 2026-07-26: name-rule audit round 1 — shape-aware `withdraw`; dropped generic `add`/`remove`
+  from admin-config (avoids false-admin on DeFi user actions). Corpus baseline refreshed.
 - 2026-07-26: real-contract regression harness added (10 contracts, offline baseline).

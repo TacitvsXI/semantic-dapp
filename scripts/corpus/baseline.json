@@ -19,7 +19,7 @@
       "totalSupply() => read/user",
       "transfer(address,uint256) => token-transfer/user/low",
       "transferFrom(address,address,uint256) => token-transfer/user/medium",
-      "withdraw(uint256) => fund-withdraw/admin/medium"
+      "withdraw(uint256) => fund-withdraw/user/medium"
     ]
   },
   "DAI": {
@@ -119,7 +119,7 @@
       "totalSupply() => read/user",
       "transferFrom(address,address,uint256) => token-transfer/user/medium",
       "transferOwnership(address) => ownership-transfer/admin/high",
-      "withdraw() => fund-withdraw/admin/medium"
+      "withdraw() => fund-withdraw/admin/high"
     ]
   },
   "Compound-cDAI": {
@@ -189,26 +189,26 @@
     "counts": {
       "ops": 24,
       "writes": 17,
-      "classifiedWrites": 8,
-      "unknownWrites": 9
+      "classifiedWrites": 0,
+      "unknownWrites": 17
     },
-    "avgConfidencePct": 34,
+    "avgConfidencePct": 24,
     "ops": [
       "WETH() => read/user",
-      "addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256) => admin-config/admin/medium",
-      "addLiquidityETH(address,uint256,uint256,uint256,address,uint256) => admin-config/admin/medium",
+      "addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256) => unknown/developer",
+      "addLiquidityETH(address,uint256,uint256,uint256,address,uint256) => unknown/developer/medium",
       "factory() => read/user",
       "getAmountIn(uint256,uint256,uint256) => read/user",
       "getAmountOut(uint256,uint256,uint256) => read/user",
       "getAmountsIn(uint256,address[]) => read/user",
       "getAmountsOut(uint256,address[]) => read/user",
       "quote(uint256,uint256,uint256) => read/user",
-      "removeLiquidity(address,address,uint256,uint256,uint256,address,uint256) => admin-config/admin/medium",
-      "removeLiquidityETH(address,uint256,uint256,uint256,address,uint256) => admin-config/admin/medium",
-      "removeLiquidityETHSupportingFeeOnTransferTokens(address,uint256,uint256,uint256,address,uint256) => admin-config/admin/medium",
-      "removeLiquidityETHWithPermit(address,uint256,uint256,uint256,address,uint256,bool,uint8,bytes32,bytes32) => admin-config/admin/medium",
-      "removeLiquidityETHWithPermitSupportingFeeOnTransferTokens(address,uint256,uint256,uint256,address,uint256,bool,uint8,bytes32,bytes32) => admin-config/admin/medium",
-      "removeLiquidityWithPermit(address,address,uint256,uint256,uint256,address,uint256,bool,uint8,bytes32,bytes32) => admin-config/admin/medium",
+      "removeLiquidity(address,address,uint256,uint256,uint256,address,uint256) => unknown/developer",
+      "removeLiquidityETH(address,uint256,uint256,uint256,address,uint256) => unknown/developer",
+      "removeLiquidityETHSupportingFeeOnTransferTokens(address,uint256,uint256,uint256,address,uint256) => unknown/developer",
+      "removeLiquidityETHWithPermit(address,uint256,uint256,uint256,address,uint256,bool,uint8,bytes32,bytes32) => unknown/developer",
+      "removeLiquidityETHWithPermitSupportingFeeOnTransferTokens(address,uint256,uint256,uint256,address,uint256,bool,uint8,bytes32,bytes32) => unknown/developer",
+      "removeLiquidityWithPermit(address,address,uint256,uint256,uint256,address,uint256,bool,uint8,bytes32,bytes32) => unknown/developer",
       "swapETHForExactTokens(uint256,address[],address,uint256) => unknown/developer/medium",
       "swapExactETHForTokens(uint256,address[],address,uint256) => unknown/developer/medium",
       "swapExactETHForTokensSupportingFeeOnTransferTokens(uint256,address[],address,uint256) => unknown/developer/medium",

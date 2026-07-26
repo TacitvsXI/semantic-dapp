@@ -85,13 +85,6 @@ const NAME_RULES: NameRule[] = [
     description: 'Moves funds out of the contract. Privileged.',
   },
   {
-    test: /^withdraw/,
-    operationType: 'fund-withdraw',
-    audience: 'admin',
-    risk: 'medium',
-    title: 'Withdraw',
-  },
-  {
     test: /(claim|harvest|getreward|collect)/,
     operationType: 'claim',
     audience: 'user',
@@ -106,7 +99,10 @@ const NAME_RULES: NameRule[] = [
     title: 'Deposit',
   },
   {
-    test: /^(set|update|config|configure|change|add|remove|register|deregister|whitelist|blacklist|allow|deny|enable|disable|grant|revoke)/,
+    // `add`/`remove` are deliberately excluded: they're too generic and mislabel user
+    // DeFi actions (addLiquidity/removeLiquidity) as admin. Ambiguous verbs fall through
+    // to Raw rather than falsely asserting privilege.
+    test: /^(set|update|config|configure|change|register|deregister|whitelist|blacklist|allow|deny|enable|disable|grant|revoke)/,
     operationType: 'admin-config',
     audience: 'admin',
     risk: 'medium',
@@ -212,6 +208,54 @@ export const mintShapeRule: ClassificationRule = {
   },
 };
 
+/* ----------------------------- withdraw shape ---------------------------- */
+
+/**
+ * `withdraw` is ambiguous by name (WETH unwrap = user; BAYC `withdraw()` = owner
+ * draining proceeds), so split it by shape:
+ *   - withdraw(uint256 ...) -> withdraws a specified amount: a user action.
+ *   - withdraw() / no amount -> drains everything: privileged (admin, high).
+ * Truly definitive gating needs the source modifier (a later NatSpec pass); until
+ * then this shape split is the best generalizable signal. Emergency/rescue names
+ * are handled earlier by the name heuristics.
+ */
+export const withdrawShapeRule: ClassificationRule = {
+  id: 'withdraw-shape',
+  match(ctx: RuleContext): RuleMatch | undefined {
+    if (ctx.func.isRead) return undefined;
+    if (!/^withdraw/i.test(ctx.func.name)) return undefined;
+    const firstUint = /^uint\d*$/.test(ctx.func.inputs[0]?.type ?? '');
+    if (firstUint) {
+      return {
+        operationType: 'fund-withdraw',
+        audience: 'user',
+        title: 'Withdraw',
+        risk: 'medium',
+        confidence: 0.5,
+        evidence: {
+          source: 'signature',
+          detail: `${ctx.func.name} withdraws a specified amount - a user action`,
+          weight: 0.5,
+        },
+        priority: 60,
+      };
+    }
+    return {
+      operationType: 'fund-withdraw',
+      audience: 'admin',
+      title: 'Withdraw',
+      risk: 'high',
+      confidence: 0.5,
+      evidence: {
+        source: 'signature',
+        detail: `${ctx.func.name} takes no amount - looks like a privileged drain`,
+        weight: 0.5,
+      },
+      priority: 60,
+    };
+  },
+};
+
 /* ---------------------------- risk heuristics ---------------------------- */
 
 const DESTRUCTIVE = /(selfdestruct|destroy|\bkill\b|shutdown|drain|rug|nuke)/;
@@ -303,6 +347,7 @@ export const DEFAULT_RULES: ClassificationRule[] = [
   standardRule,
   riskHeuristicRule,
   mintShapeRule,
+  withdrawShapeRule,
   nameHeuristicRule,
   readRule,
   fallbackRule,
