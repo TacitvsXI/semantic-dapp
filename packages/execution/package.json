@@ -39,7 +39,7 @@
   },
   "dependencies": {
     "@semantic-dapp/spec": "workspace:*",
-    "viem": "^2.21.55"
+    "viem": "^2.55.8"
   },
   "peerDependencies": {
     "@tanstack/react-query": "^5.62.0",
@@ -58,7 +58,7 @@
     }
   },
   "devDependencies": {
-    "@tanstack/react-query": "^5.62.7",
+    "@tanstack/react-query": "^5.101.4",
     "react": "^18.3.1",
     "wagmi": "^2.14.6"
   }

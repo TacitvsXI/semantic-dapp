@@ -40,7 +40,7 @@
     "@semantic-dapp/components": "workspace:*",
     "@semantic-dapp/execution": "workspace:*",
     "@semantic-dapp/spec": "workspace:*",
-    "viem": "^2.21.55"
+    "viem": "^2.55.8"
   },
   "peerDependencies": {
     "react": "^18.3.1",
