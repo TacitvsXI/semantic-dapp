@@ -63,3 +63,123 @@ body {
   color: #9aa6c3;
   font-size: 12px;
 }
+
+.app-footer a {
+  color: #9ec1ff;
+}
+
+.app-header__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.load-panel {
+  position: fixed;
+  inset: 12px;
+  z-index: 40;
+  max-width: 640px;
+  max-height: calc(100vh - 24px);
+  margin: 0 auto;
+  overflow: auto;
+  padding: 20px;
+  border-radius: 14px;
+  border: 1px solid #2a3550;
+  background: #121a2e;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+}
+
+@media (min-width: 720px) {
+  .load-panel {
+    inset: 10vh auto auto 50%;
+    transform: translateX(-50%);
+    width: min(640px, calc(100vw - 32px));
+    max-height: 80vh;
+  }
+}
+
+.load-panel__head {
+  margin-bottom: 12px;
+}
+
+.load-panel__title {
+  margin: 0 0 6px;
+  font-size: 18px;
+}
+
+.load-panel__hint {
+  margin: 0;
+  color: #93a1bd;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.load-panel__tabs {
+  display: flex;
+  gap: 6px;
+  margin: 14px 0;
+}
+
+.load-panel__tab {
+  border: 1px solid #2a3550;
+  background: transparent;
+  color: #c5d0e6;
+  border-radius: 999px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.load-panel__tab--active {
+  background: #243152;
+  border-color: #3d5080;
+  color: #fff;
+}
+
+.load-panel__fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.load-panel__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: #93a1bd;
+}
+
+.load-panel__field--wide {
+  grid-column: 1 / -1;
+}
+
+.load-panel__field input,
+.load-panel__field textarea {
+  border: 1px solid #2a3550;
+  border-radius: 8px;
+  background: #0b1020;
+  color: #e6ebf5;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 13px;
+  resize: vertical;
+}
+
+.load-panel__error {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #d9534f;
+  color: #f4a7a5;
+  background: rgba(217, 83, 79, 0.08);
+  font-size: 13px;
+}
+
+.load-panel__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}

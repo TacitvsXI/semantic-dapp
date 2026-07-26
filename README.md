@@ -151,7 +151,7 @@ semantic-dapp --help
 
 ## Try the demos
 
-The [**live demo**](https://tacitvsxi.github.io/semantic-dapp/) renders a generated dApp for a real mainnet ERC-20 (USDC) - reads run against a public RPC, and connecting a wallet enables writes. Or run them locally:
+The [**live demo**](https://tacitvsxi.github.io/semantic-dapp/) renders a generated dApp for a real mainnet ERC-20 (USDC) - reads run against a public RPC, and connecting a wallet enables writes. Use **Load your contract** on that page to paste an address or ABI and try your own contract in the browser. Or run demos locally:
 
 Three self-contained demos built from real compiled contracts:
 

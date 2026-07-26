@@ -70,6 +70,9 @@ importers:
       '@rainbow-me/rainbowkit':
         specifier: ^2.2.11
         version: 2.2.11(@tanstack/react-query@5.101.2(react@18.3.1))(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)(viem@2.55.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.4.3))(wagmi@2.19.5(@tanstack/query-core@5.101.2)(@tanstack/react-query@5.101.2(react@18.3.1))(@types/react@18.3.31)(bufferutil@4.1.0)(react@18.3.1)(typescript@5.9.3)(utf-8-validate@5.0.10)(viem@2.55.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.4.3))(zod@4.4.3))
+      '@semantic-dapp/classifier':
+        specifier: workspace:*
+        version: link:../../packages/classifier
       '@semantic-dapp/components':
         specifier: workspace:*
         version: link:../../packages/components
@@ -82,6 +85,9 @@ importers:
       '@semantic-dapp/renderer':
         specifier: workspace:*
         version: link:../../packages/renderer
+      '@semantic-dapp/resolver':
+        specifier: workspace:*
+        version: link:../../packages/resolver
       '@semantic-dapp/spec':
         specifier: workspace:*
         version: link:../../packages/spec
@@ -107,9 +113,6 @@ importers:
       '@playwright/test':
         specifier: ^1.49.1
         version: 1.61.1
-      '@semantic-dapp/classifier':
-        specifier: workspace:*
-        version: link:../../packages/classifier
       '@types/react':
         specifier: ^18.3.18
         version: 18.3.31
@@ -122,6 +125,9 @@ importers:
       vite:
         specifier: ^6.0.7
         version: 6.4.3(@types/node@22.20.1)(yaml@2.9.0)
+      vitest:
+        specifier: ^2.1.8
+        version: 2.1.9(@types/node@22.20.1)(jsdom@25.0.1(bufferutil@4.1.0)(utf-8-validate@5.0.10))
 
   apps/studio:
     dependencies:
