@@ -26,6 +26,10 @@ export interface FunctionFormProps {
   secondaryLabel?: string;
   /** The secondary action is in flight. */
   secondaryBusy?: boolean;
+  /** Disable only the primary submit (Preview can stay available). */
+  submitDisabled?: boolean;
+  /** Fired when any input value changes (e.g. to invalidate a stale preview). */
+  onFieldsChange?: () => void;
 }
 
 /**
@@ -44,6 +48,8 @@ export function FunctionForm({
   onSecondary,
   secondaryLabel,
   secondaryBusy,
+  submitDisabled,
+  onFieldsChange,
 }: FunctionFormProps) {
   const [values, setValues] = useState<FieldValue[]>(() =>
     func.inputs.map((input) => defaultFieldValue(input)),
@@ -57,6 +63,7 @@ export function FunctionForm({
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
+    if (submitDisabled) return;
     const result = encodeInputs(func.inputs, values);
     setErrors(result.errors);
     if (result.ok && result.values) {
@@ -92,6 +99,7 @@ export function FunctionForm({
                 updated[index] = next;
                 return updated;
               });
+              onFieldsChange?.();
             }}
           />
         ))
@@ -110,7 +118,7 @@ export function FunctionForm({
         <button
           type="submit"
           className={`sd-btn ${func.isRead ? 'sd-btn--read' : 'sd-btn--write'}`}
-          disabled={busy || disabled}
+          disabled={busy || disabled || submitDisabled}
         >
           {busy ? 'Working…' : label}
         </button>

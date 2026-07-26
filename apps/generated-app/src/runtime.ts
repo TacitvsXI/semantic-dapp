@@ -208,6 +208,7 @@ export function useContractRuntime(config: RuntimeConfig): ContractRuntime {
       disconnect: () => disconnect(),
       switchChain: () => switchChain({ chainId: config.chainId }),
     },
+    ...(target ? { target } : {}),
     callRead,
     submitWrite,
     previewWrite,

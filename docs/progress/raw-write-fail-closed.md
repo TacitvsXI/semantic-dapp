@@ -1,6 +1,6 @@
 # Raw writes fail-closed
 
-> **Status:** Phase 1 done · Phase 2/3 planned
+> **Status:** Phase 1–2 done · Phase 3 planned
 
 > **Origin:** r/ethdev feedback ([thread](https://www.reddit.com/r/ethdev/comments/1v6zlzr/i_got_tired_of_rebuilding_contract_admin_uis_so_i/)) — u/Specific-Sector7422  
 > **North star fit:** self-custody + custody trust — the fallback path must be _more_ conservative than the classified path, not less.
@@ -45,12 +45,12 @@ Unclassified / Raw writes are the _highest_ semantic uncertainty — and current
 
 ## Phase 2 — Mandatory preview + invalidation (P0/P1)
 
-- [ ] Raw writes: Submit disabled until a **successful** preview matches current args.
-- [ ] Preview fingerprint: args + value + chainId + account + target + function.
-- [ ] Clear preview on form / network / account change (no stale panel).
-- [ ] Submit rejects if fingerprint ≠ current; force Preview again.
-- [ ] Copy: “Preview required before send” on raw writes.
-- [ ] Tests for invalidate-on-edit and submit-without-fresh-preview.
+- [x] Raw writes: Submit disabled until a **successful** preview matches current args.
+- [x] Preview fingerprint: args + value + chainId + account + target + function.
+- [x] Clear preview on form / network / account change (no stale panel).
+- [x] Submit rejects if fingerprint ≠ current; force Preview again.
+- [x] Copy: “Preview required before send” on raw writes.
+- [x] Tests for invalidate-on-edit and submit-without-fresh-preview.
 
 **Touch:** `FunctionRunner.tsx`, tests; optionally same rule for semantic high/critical.
 
@@ -89,6 +89,9 @@ Any drift ⇒ invalidate preview / block send.
 
 ## Log
 
+- 2026-07-26: **Phase 2 shipped** — Raw writes require successful Preview; fingerprint binds
+  args/chain/account/target; form + wallet/target drift clears preview; Submit blocked until
+  match. `buildPreviewFingerprint` + `requirePreview` on `FunctionRunner`.
 - 2026-07-26: **Phase 1 shipped** — `RawFunctionCard` fail-closed confirm + typed CONFIRM;
   `rawWriteWarnings`; Raw write banner; README aligned; tests in `RawFunctionCard.test.tsx` /
   `ConfirmDialog` / `safety`.

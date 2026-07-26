@@ -18,6 +18,8 @@ export interface WalletState {
  */
 export interface ContractRuntime {
   wallet: WalletState;
+  /** Call target address (proxy / diamond shell). Used to invalidate stale previews. */
+  target?: string;
   /** Execute a read (view/pure) call. */
   callRead: (func: ContractFunction, args: unknown[]) => Promise<FormattedOutput[]>;
   /** Simulate + submit a write; the runtime tracks the tx lifecycle. */

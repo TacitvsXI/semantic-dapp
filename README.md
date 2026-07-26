@@ -104,7 +104,7 @@ flowchart LR
     E -.export.-> H[Standalone dApp<br/>+ CLI]
 ```
 
-Everything upstream of the UI is **deterministic-first**: known patterns are recognized by rules with explicit evidence and confidence. AI may _propose_ a label, but it never signs a transaction and never hides uncertainty — anything unproven falls back to the Raw tab, where writes are **fail-closed** (confirm + typed `CONFIRM`; stricter than classified high-risk).
+Everything upstream of the UI is **deterministic-first**: known patterns are recognized by rules with explicit evidence and confidence. AI may _propose_ a label, but it never signs a transaction and never hides uncertainty — anything unproven falls back to the Raw tab, where writes are **fail-closed** (mandatory Preview, confirm + typed `CONFIRM`; stricter than classified high-risk).
 
 ## Quick start
 
@@ -194,7 +194,7 @@ Don't see your pattern? The Raw tab always exposes **every** ABI function, and t
 
 - **Deterministic-first** - known standards recognized by rules, not by a generative model.
 - **AI-assisted, not AI-trusted** - AI may propose; it never signs or hides uncertainty.
-- **Safe fallback** - unproven meaning lands in Raw; writes there are fail-closed (confirm + typed `CONFIRM`), not one-click.
+- **Safe fallback** - unproven meaning lands in Raw; writes there are fail-closed (Preview + confirm + typed `CONFIRM`), not one-click.
 - **Nothing is lost** - every ABI function stays reachable.
 - **Trusted components** - UI is built from verified components, not arbitrary generated React.
 - **Self-hostable by default** - run locally, export, and host without any cloud.

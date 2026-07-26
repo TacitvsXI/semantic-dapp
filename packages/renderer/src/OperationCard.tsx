@@ -161,7 +161,12 @@ export function RawFunctionCard({ func, runtime, safety }: RawFunctionCardProps)
           {func.isPayable ? <span className="sd-badge sd-badge--payable">payable</span> : null}
         </div>
       </header>
-      <FunctionRunner func={func} runtime={runtime} confirm={confirm} />
+      <FunctionRunner
+        func={func}
+        runtime={runtime}
+        confirm={confirm}
+        requirePreview={!func.isRead}
+      />
     </section>
   );
 }

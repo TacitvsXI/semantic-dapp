@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type {
   ContractFunction,
   InputWidget,
@@ -17,6 +17,7 @@ import { decodeExecutionError } from '@semantic-dapp/execution';
 import type { ContractRuntime } from './runtime.js';
 import { useConfirm, summarizeArgs } from './useConfirm.js';
 import { WritePreviewView } from './WritePreviewView.js';
+import { buildPreviewFingerprint } from './previewFingerprint.js';
 
 export interface RunnerConfirm {
   risk?: RiskLevel;
@@ -33,6 +34,11 @@ export interface FunctionRunnerProps {
   runtime: ContractRuntime;
   /** When set, gate the write behind a confirmation modal with these details. */
   confirm?: RunnerConfirm;
+  /**
+   * When true, writes require a successful Preview matching the current
+   * args/network/account/target before Submit is enabled (Raw fail-closed).
+   */
+  requirePreview?: boolean;
   submitLabel?: string;
   /** Manifest widget hints, index-aligned with `func.inputs`. */
   hints?: (InputWidget | undefined)[];
@@ -49,6 +55,7 @@ export function FunctionRunner({
   func,
   runtime,
   confirm,
+  requirePreview = false,
   submitLabel,
   hints,
   amount,
@@ -59,11 +66,39 @@ export function FunctionRunner({
   const [preview, setPreview] = useState<WritePreview | null>(null);
   const [previewArgs, setPreviewArgs] = useState<string[]>([]);
   const [previewBusy, setPreviewBusy] = useState(false);
+  const [boundFingerprint, setBoundFingerprint] = useState<string | null>(null);
   const { confirm: askConfirm, dialog } = useConfirm();
 
   const txState = runtime.getTxState(func.signature);
   const needsWallet = !func.isRead && !runtime.wallet.isConnected;
   const canPreview = !func.isRead && typeof runtime.previewWrite === 'function';
+  const previewGateActive = requirePreview && !func.isRead;
+  const previewReady =
+    !previewGateActive || (boundFingerprint !== null && preview?.success === true);
+
+  const contextKey = `${runtime.wallet.chainId ?? ''}:${runtime.wallet.address ?? ''}:${runtime.target ?? ''}`;
+
+  useEffect(() => {
+    setPreview(null);
+    setBoundFingerprint(null);
+    setPreviewArgs([]);
+  }, [contextKey]);
+
+  const clearPreview = () => {
+    setPreview(null);
+    setBoundFingerprint(null);
+    setPreviewArgs([]);
+  };
+
+  const fingerprintFor = (args: unknown[], value?: bigint) =>
+    buildPreviewFingerprint({
+      signature: func.signature,
+      args,
+      chainId: runtime.wallet.chainId,
+      account: runtime.wallet.address,
+      target: runtime.target,
+      value,
+    });
 
   const runWrite = async (args: unknown[]) => {
     setBusy(true);
@@ -86,10 +121,24 @@ export function FunctionRunner({
       const result = await runtime.previewWrite(func, args);
       setPreview(result);
       setPreviewArgs(summarizeArgs(func.inputs, args).map((row) => `${row.label}: ${row.value}`));
+      if (result.success) {
+        setBoundFingerprint(
+          buildPreviewFingerprint({
+            signature: func.signature,
+            args,
+            chainId: runtime.wallet.chainId,
+            account: runtime.wallet.address,
+            target: runtime.target ?? result.to,
+            value: result.value,
+          }),
+        );
+      } else {
+        setBoundFingerprint(null);
+      }
     } catch (error) {
       const decoded = decodeExecutionError(error);
       setReadError(`${decoded.title}: ${decoded.detail}`);
-      setPreview(null);
+      clearPreview();
     } finally {
       setPreviewBusy(false);
     }
@@ -108,6 +157,31 @@ export function FunctionRunner({
         setBusy(false);
       }
       return;
+    }
+
+    if (previewGateActive) {
+      if (!canPreview) {
+        setReadError('Preview required before send, but preview is unavailable.');
+        return;
+      }
+      const fp = fingerprintFor(args, preview?.value);
+      // Prefer binding against the preview target when the host omitted runtime.target.
+      const fpWithPreviewTarget = buildPreviewFingerprint({
+        signature: func.signature,
+        args,
+        chainId: runtime.wallet.chainId,
+        account: runtime.wallet.address,
+        target: runtime.target ?? preview?.to,
+        value: preview?.value,
+      });
+      if (
+        !preview?.success ||
+        (boundFingerprint !== fp && boundFingerprint !== fpWithPreviewTarget)
+      ) {
+        setReadError('Preview required before send. Run Preview again after changing inputs.');
+        clearPreview();
+        return;
+      }
     }
 
     if (confirm) {
@@ -135,6 +209,8 @@ export function FunctionRunner({
         submitLabel={submitLabel}
         busy={busy}
         disabled={needsWallet}
+        submitDisabled={previewGateActive && !previewReady}
+        onFieldsChange={preview || boundFingerprint ? clearPreview : undefined}
         {...(hints !== undefined ? { hints } : {})}
         {...(amount !== undefined ? { amount } : {})}
         {...(canPreview
@@ -144,6 +220,14 @@ export function FunctionRunner({
 
       {needsWallet ? (
         <p className="sd-runner__hint">Connect a wallet to send this transaction.</p>
+      ) : null}
+
+      {previewGateActive && !needsWallet && !previewReady ? (
+        <p className="sd-runner__hint" data-testid="preview-required-hint">
+          {canPreview
+            ? 'Preview required before send.'
+            : 'Preview required before send, but preview is unavailable.'}
+        </p>
       ) : null}
 
       {preview ? <WritePreviewView preview={preview} argSummary={previewArgs} /> : null}

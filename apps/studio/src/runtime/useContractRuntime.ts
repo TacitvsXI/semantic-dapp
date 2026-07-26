@@ -242,6 +242,7 @@ export function useContractRuntime(project: Project, hooks?: RuntimeHooks): Cont
       disconnect: () => disconnect(),
       switchChain: () => switchChain({ chainId: project.contract.chainId }),
     },
+    ...(target ? { target } : {}),
     callRead,
     submitWrite,
     previewWrite,
