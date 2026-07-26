@@ -2,6 +2,7 @@ import type { OperationDefinition, RiskLevel } from '@semantic-dapp/spec';
 import {
   matchDoc,
   privilegeFromModifiers,
+  type AccessHint,
   type SourceDocs,
   type FunctionDoc,
 } from '@semantic-dapp/analyzer';
@@ -67,16 +68,18 @@ function enrichOne(op: OperationDefinition, doc: FunctionDoc): OperationDefiniti
     });
   }
 
-  // 3. Access modifiers -> privilege upgrade (writes only).
+  // 3. Access gating -> privilege upgrade (writes only). Prefer the resolved
+  //    AccessHint (covers custom modifiers + body-level checks); fall back to the
+  //    raw modifier list for docs assembled without a full parse (e.g. tests).
   if (!next.isRead) {
-    const priv = privilegeFromModifiers(doc.modifiers);
-    if (priv) {
+    const access = doc.access ?? accessFromModifiers(doc.modifiers);
+    if (access) {
       const wasUser = next.audience === 'user' || next.audience === 'developer';
       if (wasUser) next.audience = 'admin';
 
-      if (priv.role) {
-        next.permission = { kind: 'access-control', role: priv.role };
-      } else if (priv.ownable) {
+      if (access.kind === 'access-control') {
+        next.permission = { kind: 'access-control', ...(access.role ? { role: access.role } : {}) };
+      } else if (access.kind === 'ownable') {
         next.permission = { kind: 'ownable' };
       } else if (!next.permission) {
         next.permission = { kind: 'custom' };
@@ -88,14 +91,23 @@ function enrichOne(op: OperationDefinition, doc: FunctionDoc): OperationDefiniti
       };
       next.confidence = Math.max(next.confidence, 0.8);
       next.evidence.push({
-        source: 'modifier',
-        detail: priv.role
-          ? `gated by onlyRole(${priv.role})`
-          : `gated by ${priv.modifier} - a privileged modifier`,
+        // Body-level checks are source-derived; modifier gating is a modifier signal.
+        source: /gated by/.test(access.detail) ? 'modifier' : 'source-ast',
+        detail: access.detail,
         weight: 0.3,
       });
     }
   }
 
   return next;
+}
+
+/** Map raw modifier names to an AccessHint (fallback when no full parse ran). */
+function accessFromModifiers(modifiers: string[]): AccessHint | undefined {
+  const priv = privilegeFromModifiers(modifiers);
+  if (!priv) return undefined;
+  if (priv.role)
+    return { kind: 'access-control', role: priv.role, detail: `gated by onlyRole(${priv.role})` };
+  if (priv.ownable) return { kind: 'ownable', detail: `gated by ${priv.modifier}` };
+  return { kind: 'custom', detail: `gated by ${priv.modifier}` };
 }

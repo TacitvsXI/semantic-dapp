@@ -62,6 +62,24 @@ describe('enrichOperations (via classifyContract docs)', () => {
     expect(w?.permission).toMatchObject({ kind: 'access-control', role: 'TREASURER_ROLE' });
   });
 
+  it('upgrades from a resolved body-level access hint (no modifier)', () => {
+    const docs: SourceDocs = {
+      withdraw: [
+        {
+          name: 'withdraw',
+          paramTypes: ['uint256'],
+          modifiers: [],
+          access: { kind: 'custom', detail: 'restricted to admin' },
+        },
+      ],
+    };
+    const { operations } = classifyContract(model, 'c', { docs });
+    const w = operations.find((o) => o.function === 'withdraw(uint256)');
+    expect(w?.audience).toBe('admin');
+    expect(w?.permission?.kind).toBe('custom');
+    expect(w?.evidence.some((e) => e.source === 'source-ast')).toBe(true);
+  });
+
   it('never demotes: no modifier leaves the user verdict intact', () => {
     const docs: SourceDocs = {
       withdraw: [{ name: 'withdraw', paramTypes: ['uint256'], modifiers: ['nonReentrant'] }],

@@ -81,6 +81,58 @@ describe('parseNatSpec', () => {
   });
 });
 
+describe('body-level access detection', () => {
+  it('detects a custom modifier whose definition checks the caller', () => {
+    const src = `
+      contract C {
+        modifier auth() { require(msg.sender == admin, "no"); _; }
+        function poke(uint256 x) external auth {}
+      }
+    `;
+    const docs = parseNatSpec([{ content: src }]);
+    const doc = matchDoc(docs['poke'], ['uint256']);
+    expect(doc?.access?.kind).toBe('custom');
+    expect(doc?.access?.detail).toMatch(/auth/);
+  });
+
+  it('detects an inline require(msg.sender == owner()) with no modifier', () => {
+    const src = `
+      contract C {
+        function sweep() external {
+          require(msg.sender == owner(), "not owner");
+        }
+      }
+    `;
+    const docs = parseNatSpec([{ content: src }]);
+    const doc = matchDoc(docs['sweep'], []);
+    expect(doc?.access).toMatchObject({ kind: 'ownable' });
+  });
+
+  it('detects _checkRole(ROLE) and captures the role', () => {
+    const src = `
+      contract C {
+        function setThing(uint256 v) public {
+          _checkRole(MANAGER_ROLE);
+        }
+      }
+    `;
+    const docs = parseNatSpec([{ content: src }]);
+    const doc = matchDoc(docs['setThing'], ['uint256']);
+    expect(doc?.access).toMatchObject({ kind: 'access-control', role: 'MANAGER_ROLE' });
+  });
+
+  it('does not flag a function with no caller check', () => {
+    const src = `
+      contract C {
+        function ping(uint256 x) external { emit Pinged(x); }
+      }
+    `;
+    const docs = parseNatSpec([{ content: src }]);
+    // ping has no docs, no modifiers and no access check -> not recorded at all.
+    expect(docs['ping']).toBeUndefined();
+  });
+});
+
 describe('privilegeFromModifiers', () => {
   it('recognises onlyOwner as an ownable privilege', () => {
     expect(privilegeFromModifiers(['onlyOwner'])).toMatchObject({ ownable: true });

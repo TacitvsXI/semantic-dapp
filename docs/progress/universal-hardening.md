@@ -102,12 +102,18 @@ else degrades to Raw. The two make-or-break gaps are **proxy resolution** and
       permission (upgrade-only; absence proves nothing). Measured on real contracts: ~40% of
       functions gained human descriptions; all 3 privilege upgrades (DAI `rely`, BAYC
       `flipSaleState`/`reserveApes`) were correct. See `natspec.test.ts` + `enrich.test.ts`.
-- [ ] **Body-level access detection.** Mine `require(msg.sender == owner/admin/...)`,
-      `_checkRole(...)`, `_checkOwner()`, custom `onlyX` modifiers whose _definition_ contains
-      such a check, and `hasRole(...)` guards. This is what Compound/USDC/older contracts use
-      instead of standard modifiers — general, high-impact, not overfit.
-- [ ] **Surface the evidence in the UI.** Show _why_ a function is admin ("gated by `onlyOwner`"
-      / "requires `MINTER_ROLE`") so custody operators can trust the label.
+- [x] **Body-level access detection.** `parseNatSpec` now also mines `require/if (msg.sender ==
+    owner()/admin/...)`, `_checkOwner()`, `_checkRole(ROLE)`, `hasRole(ROLE, msg.sender)`, and
+      custom `onlyX` modifiers whose _definition_ contains such a check. Each function gets a
+      resolved, serialisable `AccessHint {kind, role?, detail}` that `enrichOperations` uses to
+      promote user→admin with a concrete permission + human evidence (upgrade-only). Unit-tested
+      in `natspec.test.ts` + `enrich.test.ts`.
+      **Known limitation:** checks hidden behind an internal call (Compound's public `_setX` →
+      internal `_setXFresh` where the `if (msg.sender != admin)` lives) are not followed — that
+      needs intra-contract call-graph analysis and is deferred (risk of complexity/overfit).
+- [ ] **Surface the evidence in the UI.** The `AccessHint.detail` is already carried as operation
+      evidence ("restricted to owner" / "requires MINTER_ROLE"); still TODO to render it as a
+      visible badge/tooltip on admin functions so custody operators can trust the label.
 - [ ] **Risk heuristic precision.** `payable` alone shouldn't imply medium risk for obvious user
       deposits; `upgrade`/`setAdmin`/`migrate` stay high.
 
@@ -166,3 +172,8 @@ else degrades to Raw. The two make-or-break gaps are **proxy resolution** and
   non-goal (treadmill + wrong audience). Refocused the roadmap on universal admin/permission
   correctness (body-level access detection) and transaction trust (calldata preview + dry-run),
   which serve builders / custody / self-custody on _any_ contract. See "Who this is for".
+- 2026-07-26: body-level access detection shipped — inline `require/if (msg.sender==…)`,
+  `_checkOwner`/`_checkRole`/`hasRole`, and custom privileged modifiers now resolve to an
+  `AccessHint` that upgrades user→admin (upgrade-only). Re-measured on 6 real contracts: still 3
+  correct upgrades (BAYC/DAI covered by modifiers; Compound hides checks behind internal `*Fresh`
+  calls — a documented limitation; ENS uses per-node auth, correctly not global admin).

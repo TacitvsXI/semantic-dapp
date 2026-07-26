@@ -11,6 +11,15 @@
  * can persist it alongside a project without keeping the full source in memory.
  */
 
+/** A resolved access-control signal for a function, from modifiers or its body. */
+export interface AccessHint {
+  kind: 'ownable' | 'access-control' | 'custom';
+  /** Role identifier for access-control gating, when known. */
+  role?: string;
+  /** Human-readable justification, e.g. "restricted to owner". */
+  detail: string;
+}
+
 /** Parsed documentation for a single function declaration found in source. */
 export interface FunctionDoc {
   name: string;
@@ -26,6 +35,13 @@ export interface FunctionDoc {
   paramTypes: string[];
   /** Applied modifiers, e.g. `onlyOwner`, `onlyRole(ADMIN_ROLE)`, `nonReentrant`. */
   modifiers: string[];
+  /**
+   * Resolved access gating, if any - from a privileged modifier (standard or a
+   * custom modifier whose body checks the caller) or from a body-level check
+   * (`require(msg.sender == ...)`, `_checkRole(...)`, `hasRole(...)`). Only ever a
+   * positive signal; absence never implies "public".
+   */
+  access?: AccessHint;
 }
 
 /** Docs keyed by function name (a name may have several overloads). */
@@ -184,9 +200,115 @@ function parseModifiers(tail: string): string[] {
   return modifiers;
 }
 
+/** Return the body of a `{ … }` block given the index of its opening brace. */
+function extractBody(content: string, openBraceIndex: number, maxLen = 8000): string {
+  if (content[openBraceIndex] !== '{') return '';
+  let depth = 0;
+  const end = Math.min(content.length, openBraceIndex + maxLen);
+  for (let i = openBraceIndex; i < end; i++) {
+    const ch = content[i];
+    if (ch === '{') depth++;
+    else if (ch === '}') {
+      depth--;
+      if (depth === 0) return content.slice(openBraceIndex + 1, i);
+    }
+  }
+  return content.slice(openBraceIndex + 1, end);
+}
+
+const MODIFIER_DEF_RE = /\bmodifier\s+([A-Za-z_]\w*)\s*(?:\([^)]*\))?\s*\{/g;
+
 /**
- * Parse NatSpec docs + modifiers for every function declaration across the given
- * source files. Returns an empty object when there is nothing to parse.
+ * Detect a caller-restricting access check inside a block of Solidity code
+ * (a modifier body or a function body). Ordered most-specific first.
+ */
+function detectAccessInCode(code: string): AccessHint | undefined {
+  if (!code) return undefined;
+
+  // Role-based (OpenZeppelin AccessControl and look-alikes).
+  const checkRole = /_checkRole\s*\(\s*([A-Za-z_]\w*)/.exec(code);
+  if (checkRole)
+    return { kind: 'access-control', role: checkRole[1], detail: `requires role ${checkRole[1]}` };
+  const hasRole = /hasRole\s*\(\s*([A-Za-z_]\w*)\s*,\s*(?:_?msgSender\(\)|msg\.sender)\s*\)/.exec(
+    code,
+  );
+  if (hasRole)
+    return { kind: 'access-control', role: hasRole[1], detail: `requires role ${hasRole[1]}` };
+  const inlineRole = /onlyRole\s*\(\s*([A-Za-z_]\w*)\s*\)/.exec(code);
+  if (inlineRole)
+    return {
+      kind: 'access-control',
+      role: inlineRole[1],
+      detail: `requires role ${inlineRole[1]}`,
+    };
+
+  // Owner-based.
+  if (/_checkOwner\s*\(/.test(code)) return { kind: 'ownable', detail: 'restricted to owner' };
+  if (
+    /(?:_?msgSender\(\)|msg\.sender)\s*==\s*owner\s*\(\s*\)/.test(code) ||
+    /owner\s*\(\s*\)\s*==\s*(?:_?msgSender\(\)|msg\.sender)/.test(code) ||
+    /(?:_?msgSender\(\)|msg\.sender)\s*==\s*_owner\b/.test(code)
+  ) {
+    return { kind: 'ownable', detail: 'restricted to owner' };
+  }
+
+  // Generic single-authority checks (admin/governance/wards/...).
+  const eq =
+    /(?:require|if)\s*\(\s*(?:_?msgSender\(\)|msg\.sender)\s*(==|!=)\s*([A-Za-z_][\w.]*(?:\(\))?)/.exec(
+      code,
+    );
+  if (eq && !/^owner/i.test(eq[2] ?? '')) {
+    return { kind: 'custom', detail: `restricted to ${eq[2]}` };
+  }
+  if (/wards\s*\[\s*msg\.sender\s*\]/.test(code)) {
+    return { kind: 'custom', detail: 'restricted to authorized wards' };
+  }
+  return undefined;
+}
+
+/** Collect custom modifiers whose *definition* restricts the caller. */
+function collectPrivilegedModifiers(files: SourceFile[]): Map<string, AccessHint> {
+  const map = new Map<string, AccessHint>();
+  for (const file of files) {
+    const content = file.content;
+    MODIFIER_DEF_RE.lastIndex = 0;
+    let m: RegExpExecArray | null;
+    while ((m = MODIFIER_DEF_RE.exec(content)) !== null) {
+      const name = m[1];
+      if (!name || map.has(name)) continue;
+      const body = extractBody(content, MODIFIER_DEF_RE.lastIndex - 1, 2000);
+      const access = detectAccessInCode(body);
+      if (access) map.set(name, access);
+    }
+  }
+  return map;
+}
+
+/** Resolve access gating for a function from its modifiers, then its body. */
+function resolveAccess(
+  modifiers: string[],
+  body: string,
+  privilegedCustom: Map<string, AccessHint>,
+): AccessHint | undefined {
+  for (const modifier of modifiers) {
+    const std = privilegeFromModifiers([modifier]);
+    if (std) {
+      if (std.role)
+        return { kind: 'access-control', role: std.role, detail: `gated by onlyRole(${std.role})` };
+      if (std.ownable) return { kind: 'ownable', detail: `gated by ${std.modifier}` };
+      return { kind: 'custom', detail: `gated by ${std.modifier}` };
+    }
+    const bare = modifier.replace(/\(.*$/, '');
+    const custom = privilegedCustom.get(bare);
+    if (custom) return { ...custom, detail: `gated by ${bare} (${custom.detail})` };
+  }
+  return detectAccessInCode(body);
+}
+
+/**
+ * Parse NatSpec docs, modifiers and access gating for every function declaration
+ * across the given source files. Returns an empty object when there's nothing to
+ * parse.
  */
 export function parseNatSpec(sources: SourceFile[] | undefined): SourceDocs {
   // Keyed by arbitrary function names, so use a null-prototype object to avoid
@@ -195,9 +317,13 @@ export function parseNatSpec(sources: SourceFile[] | undefined): SourceDocs {
   const docs: SourceDocs = Object.create(null) as SourceDocs;
   if (!sources?.length) return docs;
 
-  for (const file of sources) {
-    const content = file?.content;
-    if (!content || content.length > 2_000_000) continue; // guard against pathological inputs
+  const files = sources.filter(
+    (f): f is SourceFile => !!f?.content && f.content.length <= 2_000_000,
+  );
+  const privilegedCustom = collectPrivilegedModifiers(files);
+
+  for (const file of files) {
+    const content = file.content;
     FUNCTION_RE.lastIndex = 0;
     let match: RegExpExecArray | null;
     while ((match = FUNCTION_RE.exec(content)) !== null) {
@@ -206,14 +332,19 @@ export function parseNatSpec(sources: SourceFile[] | undefined): SourceDocs {
       const parsed = parseDocBlock(groups.doc);
       const paramTypes = parseParamTypes(groups.params ?? '');
       const modifiers = parseModifiers(groups.tail ?? '');
+      const body = groups.end === '{' ? extractBody(content, FUNCTION_RE.lastIndex - 1) : '';
+      const access = resolveAccess(modifiers, body, privilegedCustom);
       // Nothing useful for this declaration - don't record noise.
-      if (!parsed.notice && !parsed.dev && !parsed.params && modifiers.length === 0) continue;
+      if (!parsed.notice && !parsed.dev && !parsed.params && modifiers.length === 0 && !access) {
+        continue;
+      }
 
       const doc: FunctionDoc = { name: groups.name, paramTypes, modifiers };
       if (parsed.notice) doc.notice = parsed.notice;
       if (parsed.dev) doc.dev = parsed.dev;
       if (parsed.returns) doc.returns = parsed.returns;
       if (parsed.params) doc.params = parsed.params;
+      if (access) doc.access = access;
 
       (docs[groups.name] ??= []).push(doc);
     }
