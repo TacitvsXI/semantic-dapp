@@ -1,6 +1,8 @@
+import { buildExecutionEnvelope } from './executionEnvelope.js';
+
 /**
- * Stable fingerprint for a write preview: args + wallet/network/target + function.
- * Used to invalidate stale previews and block submit when the form drifts.
+ * @deprecated Prefer {@link buildExecutionEnvelope}. Kept as a thin helper for
+ * Phase 2-style arg/network fingerprints without calldata.
  */
 export function buildPreviewFingerprint(input: {
   signature: string;
@@ -10,19 +12,21 @@ export function buildPreviewFingerprint(input: {
   target?: string;
   value?: bigint;
 }): string {
-  return JSON.stringify({
+  const env = buildExecutionEnvelope({
     signature: input.signature,
-    args: input.args.map(serializePreviewArg),
-    chainId: input.chainId ?? null,
-    account: input.account?.toLowerCase() ?? null,
-    target: input.target?.toLowerCase() ?? null,
-    value: input.value !== undefined ? input.value.toString() : '0',
+    args: input.args,
+    calldata: '0x',
+    chainId: input.chainId,
+    account: input.account,
+    to: input.target,
+    value: input.value,
   });
-}
-
-function serializePreviewArg(value: unknown): unknown {
-  if (typeof value === 'bigint') return value.toString();
-  if (Array.isArray(value)) return value.map(serializePreviewArg);
-  if (value === undefined) return null;
-  return value;
+  return JSON.stringify({
+    signature: env.signature,
+    args: env.args,
+    chainId: env.chainId,
+    account: env.account,
+    target: env.to,
+    value: env.value,
+  });
 }

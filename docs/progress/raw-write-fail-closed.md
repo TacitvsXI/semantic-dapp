@@ -1,6 +1,6 @@
 # Raw writes fail-closed
 
-> **Status:** Phase 1–2 done · Phase 3 planned
+> **Status:** Phase 1–3 done
 
 > **Origin:** r/ethdev feedback ([thread](https://www.reddit.com/r/ethdev/comments/1v6zlzr/i_got_tired_of_rebuilding_contract_admin_uis_so_i/)) — u/Specific-Sector7422  
 > **North star fit:** self-custody + custody trust — the fallback path must be _more_ conservative than the classified path, not less.
@@ -60,14 +60,11 @@ Unclassified / Raw writes are the _highest_ semantic uncertainty — and current
 
 ## Phase 3 — Execution envelope (P1, separate PR + short ADR)
 
-After successful preview, bind an envelope and only allow submit if it still matches:
-
-- `chainId`, `account`, `to`, `value`, `calldata` (+ hash)
-- `abiHash` / `manifestHash` when available
-- proxy `implementation` / diamond facet-set or `codeHash`
-- `simulationBlock` when RPC provides it
-
-Any drift ⇒ invalidate preview / block send.
+- [x] After successful preview, bind an envelope and only allow submit if it still matches:
+      `chainId`, `account`, `to`, `value`, `calldata` (+ hash), optional integrity
+      (`abiHash` / `implementation` / `codeHash` / `facetSet`), `simulationBlock` (audit only).
+- [x] Any integrity / network / account / target / calldata drift ⇒ invalidate / block send.
+- [x] Short ADR: [`ADR-011-execution-envelope.md`](../adr/ADR-011-execution-envelope.md).
 
 **Done when:** network or implementation change invalidates a prior preview envelope.
 
@@ -89,6 +86,8 @@ Any drift ⇒ invalidate preview / block send.
 
 ## Log
 
+- 2026-07-26: **Phase 3 shipped** — `ExecutionEnvelope` binds calldata(+hash) + integrity;
+  submit rebuilds and matches; ADR-011; studio/generated-app populate `executionContext`.
 - 2026-07-26: **Phase 2 shipped** — Raw writes require successful Preview; fingerprint binds
   args/chain/account/target; form + wallet/target drift clears preview; Submit blocked until
   match. `buildPreviewFingerprint` + `requirePreview` on `FunctionRunner`.

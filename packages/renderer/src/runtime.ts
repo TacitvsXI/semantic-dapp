@@ -1,5 +1,6 @@
 import type { ContractFunction } from '@semantic-dapp/spec';
 import type { FormattedOutput, TxState, WritePreview } from '@semantic-dapp/execution';
+import type { ExecutionIntegrity } from './executionEnvelope.js';
 
 export interface WalletState {
   isConnected: boolean;
@@ -20,6 +21,11 @@ export interface ContractRuntime {
   wallet: WalletState;
   /** Call target address (proxy / diamond shell). Used to invalidate stale previews. */
   target?: string;
+  /**
+   * Optional integrity signals bound into the Raw-write execution envelope
+   * (ABI hash, proxy implementation, diamond facets, …).
+   */
+  executionContext?: ExecutionIntegrity;
   /** Execute a read (view/pure) call. */
   callRead: (func: ContractFunction, args: unknown[]) => Promise<FormattedOutput[]>;
   /** Simulate + submit a write; the runtime tracks the tx lifecycle. */

@@ -4,6 +4,7 @@ export * from './useConfirm.js';
 export * from './FunctionRunner.js';
 export * from './WritePreviewView.js';
 export * from './OperationCard.js';
+export * from './executionEnvelope.js';
 export * from './TokenActions.js';
 export * from './VaultActions.js';
 export * from './Erc1155Actions.js';

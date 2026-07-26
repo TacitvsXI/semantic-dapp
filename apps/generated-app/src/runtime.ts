@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useAccount, useConnect, useDisconnect, useSwitchChain, useWalletClient } from 'wagmi';
-import type { Abi, Address, EIP1193Provider } from 'viem';
+import { keccak256, toBytes, type Abi, type Address, type EIP1193Provider } from 'viem';
 import type { ContractFunction } from '@semantic-dapp/spec';
 import {
   createReadClientFor,
@@ -25,6 +25,12 @@ export interface RuntimeConfig {
   rpcUrl: string;
   address?: string;
   name?: string;
+  /** Proxy implementation address, when known. */
+  implementation?: string;
+  /** keccak256 of implementation/target bytecode at analyze time. */
+  codeHash?: string;
+  /** EIP-2535 facet addresses, when known. */
+  facets?: string[];
 }
 
 /**
@@ -199,6 +205,17 @@ export function useContractRuntime(config: RuntimeConfig): ContractRuntime {
     if (injectedConnector) connect({ connector: injectedConnector });
   }, [connect, connectors]);
 
+  const abiHash = useMemo(() => keccak256(toBytes(JSON.stringify(abi))), [abi]);
+  const executionContext = useMemo(
+    () => ({
+      abiHash,
+      ...(config.implementation ? { implementation: config.implementation } : {}),
+      ...(config.codeHash ? { codeHash: config.codeHash } : {}),
+      ...(config.facets && config.facets.length > 0 ? { facetSet: config.facets } : {}),
+    }),
+    [abiHash, config.implementation, config.codeHash, config.facets],
+  );
+
   return {
     wallet: {
       isConnected,
@@ -209,6 +226,7 @@ export function useContractRuntime(config: RuntimeConfig): ContractRuntime {
       switchChain: () => switchChain({ chainId: config.chainId }),
     },
     ...(target ? { target } : {}),
+    executionContext,
     callRead,
     submitWrite,
     previewWrite,

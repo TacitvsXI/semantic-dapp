@@ -17,7 +17,13 @@ import { decodeExecutionError } from '@semantic-dapp/execution';
 import type { ContractRuntime } from './runtime.js';
 import { useConfirm, summarizeArgs } from './useConfirm.js';
 import { WritePreviewView } from './WritePreviewView.js';
-import { buildPreviewFingerprint } from './previewFingerprint.js';
+import {
+  buildExecutionEnvelope,
+  encodeWriteCalldata,
+  envelopesMatch,
+  executionContextKey,
+  type ExecutionEnvelope,
+} from './executionEnvelope.js';
 
 export interface RunnerConfirm {
   risk?: RiskLevel;
@@ -35,8 +41,8 @@ export interface FunctionRunnerProps {
   /** When set, gate the write behind a confirmation modal with these details. */
   confirm?: RunnerConfirm;
   /**
-   * When true, writes require a successful Preview matching the current
-   * args/network/account/target before Submit is enabled (Raw fail-closed).
+   * When true, writes require a successful Preview bound to an execution
+   * envelope before Submit is enabled (Raw fail-closed).
    */
   requirePreview?: boolean;
   submitLabel?: string;
@@ -66,39 +72,50 @@ export function FunctionRunner({
   const [preview, setPreview] = useState<WritePreview | null>(null);
   const [previewArgs, setPreviewArgs] = useState<string[]>([]);
   const [previewBusy, setPreviewBusy] = useState(false);
-  const [boundFingerprint, setBoundFingerprint] = useState<string | null>(null);
+  const [boundEnvelope, setBoundEnvelope] = useState<ExecutionEnvelope | null>(null);
   const { confirm: askConfirm, dialog } = useConfirm();
 
   const txState = runtime.getTxState(func.signature);
   const needsWallet = !func.isRead && !runtime.wallet.isConnected;
   const canPreview = !func.isRead && typeof runtime.previewWrite === 'function';
   const previewGateActive = requirePreview && !func.isRead;
-  const previewReady =
-    !previewGateActive || (boundFingerprint !== null && preview?.success === true);
+  const previewReady = !previewGateActive || (boundEnvelope !== null && preview?.success === true);
 
-  const contextKey = `${runtime.wallet.chainId ?? ''}:${runtime.wallet.address ?? ''}:${runtime.target ?? ''}`;
+  const contextKey = executionContextKey({
+    chainId: runtime.wallet.chainId,
+    account: runtime.wallet.address,
+    target: runtime.target,
+    integrity: runtime.executionContext,
+  });
 
   useEffect(() => {
     setPreview(null);
-    setBoundFingerprint(null);
+    setBoundEnvelope(null);
     setPreviewArgs([]);
   }, [contextKey]);
 
   const clearPreview = () => {
     setPreview(null);
-    setBoundFingerprint(null);
+    setBoundEnvelope(null);
     setPreviewArgs([]);
   };
 
-  const fingerprintFor = (args: unknown[], value?: bigint) =>
-    buildPreviewFingerprint({
+  const envelopeFor = (args: unknown[], previewResult?: WritePreview | null) => {
+    const calldata = previewResult?.calldata ?? encodeWriteCalldata(func, args);
+    return buildExecutionEnvelope({
       signature: func.signature,
       args,
+      calldata,
       chainId: runtime.wallet.chainId,
       account: runtime.wallet.address,
-      target: runtime.target,
-      value,
+      to: runtime.target ?? previewResult?.to,
+      value: previewResult?.value,
+      integrity: runtime.executionContext,
+      ...(previewResult?.simulationBlock !== undefined
+        ? { simulationBlock: previewResult.simulationBlock }
+        : {}),
     });
+  };
 
   const runWrite = async (args: unknown[]) => {
     setBusy(true);
@@ -122,18 +139,9 @@ export function FunctionRunner({
       setPreview(result);
       setPreviewArgs(summarizeArgs(func.inputs, args).map((row) => `${row.label}: ${row.value}`));
       if (result.success) {
-        setBoundFingerprint(
-          buildPreviewFingerprint({
-            signature: func.signature,
-            args,
-            chainId: runtime.wallet.chainId,
-            account: runtime.wallet.address,
-            target: runtime.target ?? result.to,
-            value: result.value,
-          }),
-        );
+        setBoundEnvelope(envelopeFor(args, result));
       } else {
-        setBoundFingerprint(null);
+        setBoundEnvelope(null);
       }
     } catch (error) {
       const decoded = decodeExecutionError(error);
@@ -164,21 +172,22 @@ export function FunctionRunner({
         setReadError('Preview required before send, but preview is unavailable.');
         return;
       }
-      const fp = fingerprintFor(args, preview?.value);
-      // Prefer binding against the preview target when the host omitted runtime.target.
-      const fpWithPreviewTarget = buildPreviewFingerprint({
+      // Rebuild from current args + integrity; calldata from re-encode must match
+      // the bound preview calldata (ABI / arg / target drift fails closed).
+      const current = buildExecutionEnvelope({
         signature: func.signature,
         args,
+        calldata: encodeWriteCalldata(func, args),
         chainId: runtime.wallet.chainId,
         account: runtime.wallet.address,
-        target: runtime.target ?? preview?.to,
+        to: runtime.target ?? preview?.to,
         value: preview?.value,
+        integrity: runtime.executionContext,
       });
-      if (
-        !preview?.success ||
-        (boundFingerprint !== fp && boundFingerprint !== fpWithPreviewTarget)
-      ) {
-        setReadError('Preview required before send. Run Preview again after changing inputs.');
+      if (!preview?.success || !boundEnvelope || !envelopesMatch(boundEnvelope, current)) {
+        setReadError(
+          'Execution envelope changed. Run Preview again before send (args, network, account, target, or ABI/implementation may have drifted).',
+        );
         clearPreview();
         return;
       }
@@ -210,7 +219,7 @@ export function FunctionRunner({
         busy={busy}
         disabled={needsWallet}
         submitDisabled={previewGateActive && !previewReady}
-        onFieldsChange={preview || boundFingerprint ? clearPreview : undefined}
+        onFieldsChange={preview || boundEnvelope ? clearPreview : undefined}
         {...(hints !== undefined ? { hints } : {})}
         {...(amount !== undefined ? { amount } : {})}
         {...(canPreview

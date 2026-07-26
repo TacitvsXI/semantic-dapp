@@ -133,11 +133,11 @@ owner()/admin/...)`, `_checkOwner()`, `_checkRole(ROLE)`, `hasRole(ROLE, msg.sen
       address, or paste the implementation ABI directly. The proxy address stays the call target
       (delegatecalls run there) — only the ABI changes; the manifest is rebuilt fresh. `ProxyOverride`
       in the studio, wired into `ProjectView`. Matters for Safe / upgradeable treasuries.
-- [x] **Raw writes fail-closed (Phase 1–2).** Community review (r/ethdev): Raw was the _least_
+- [x] **Raw writes fail-closed (Phase 1–3).** Community review (r/ethdev): Raw was the _least_
       gated write path while unclassified ops are the _highest_ uncertainty. Confirm + typed
-      `CONFIRM`, mandatory successful Preview with fingerprint invalidation on edit/network/
-      account/target drift. Phase 3 envelope:
-      [`raw-write-fail-closed.md`](./raw-write-fail-closed.md).
+      `CONFIRM`, mandatory Preview, execution envelope (calldata hash + ABI/implementation
+      integrity). See [`raw-write-fail-closed.md`](./raw-write-fail-closed.md) /
+      [`ADR-011`](../adr/ADR-011-execution-envelope.md).
 
 ### P1 — coverage (understand more, safely — general signals only)
 
@@ -216,8 +216,10 @@ owner()/admin/...)`, `_checkOwner()`, `_checkRole(ROLE)`, `hasRole(ROLE, msg.sen
 
 ## Log
 
+- 2026-07-26: **Raw fail-closed Phase 3** — execution envelope (calldata hash + integrity);
+  ADR-011; track closed.
 - 2026-07-26: **Raw fail-closed Phase 2** — mandatory successful Preview + fingerprint
-  invalidation on Raw writes; Submit blocked until match. Phase 3 envelope still open.
+  invalidation on Raw writes; Submit blocked until match.
 - 2026-07-26: **Raw fail-closed Phase 1** — Raw writes require confirm + typed CONFIRM;
   `rawWriteWarnings` + banner; README aligned. See
   `docs/progress/raw-write-fail-closed.md`.

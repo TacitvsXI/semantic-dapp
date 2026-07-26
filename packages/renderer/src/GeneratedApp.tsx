@@ -145,8 +145,9 @@ export function GeneratedApp({
             <h2 className="sd-raw__group-title">Write</h2>
             {rawWrites.length > 0 ? (
               <aside className="sd-raw__write-banner" role="note" data-testid="raw-write-banner">
-                Unclassified writes are fail-closed: Preview required, then confirm and type{' '}
-                <code>CONFIRM</code> before send. Changing inputs clears Preview.
+                Unclassified writes are fail-closed: Preview binds an execution envelope, then
+                confirm and type <code>CONFIRM</code>. Changing inputs, network, or implementation
+                clears Preview.
               </aside>
             ) : (
               <p className="sd-empty">No write functions</p>

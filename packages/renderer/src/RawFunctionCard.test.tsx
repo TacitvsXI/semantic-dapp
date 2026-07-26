@@ -3,6 +3,7 @@ import { render, screen, fireEvent, cleanup, waitFor } from '@testing-library/re
 import { normalizeAbi } from '@semantic-dapp/spec';
 import type { WritePreview } from '@semantic-dapp/execution';
 import { RawFunctionCard } from './OperationCard.js';
+import { encodeWriteCalldata } from './executionEnvelope.js';
 import type { ContractRuntime } from './runtime.js';
 
 afterEach(cleanup);
@@ -38,14 +39,19 @@ const READ_ABI = [
 ];
 
 const TARGET = '0x1111111111111111111111111111111111111111';
+const ABI_HASH = '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
 
-function okPreview(functionName: string): WritePreview {
+function okPreview(
+  func: ReturnType<typeof normalizeAbi>['functions'][0],
+  args: unknown[] = [],
+): WritePreview {
   return {
     to: TARGET as `0x${string}`,
-    functionName,
-    calldata: '0xdeadbeef' as `0x${string}`,
+    functionName: func.name,
+    calldata: encodeWriteCalldata(func, args),
     success: true,
     gasEstimate: 21000n,
+    simulationBlock: 42n,
   };
 }
 
@@ -59,9 +65,10 @@ function runtime(overrides?: Partial<ContractRuntime>): ContractRuntime {
       disconnect: () => {},
     },
     target: TARGET,
+    executionContext: { abiHash: ABI_HASH, implementation: TARGET },
     callRead: async () => [],
     submitWrite: vi.fn(async () => {}),
-    previewWrite: vi.fn(async () => okPreview('setThing')),
+    previewWrite: vi.fn(async () => okPreview(normalizeAbi(WRITE_ABI).functions[0]!)),
     getTxState: () => ({ phase: 'idle' }),
     ...overrides,
   };
@@ -77,9 +84,9 @@ async function confirmTyped() {
 
 describe('RawFunctionCard', () => {
   it('blocks Raw write submit until a successful Preview, then confirm + typed CONFIRM', async () => {
-    const submitWrite = vi.fn(async () => {});
-    const previewWrite = vi.fn(async () => okPreview('setThing'));
     const func = normalizeAbi(WRITE_ABI).functions[0]!;
+    const submitWrite = vi.fn(async () => {});
+    const previewWrite = vi.fn(async () => okPreview(func));
     render(<RawFunctionCard func={func} runtime={runtime({ submitWrite, previewWrite })} />);
 
     const send = screen.getByRole('button', { name: /send transaction/i }) as HTMLButtonElement;
@@ -97,9 +104,9 @@ describe('RawFunctionCard', () => {
   });
 
   it('clears Preview and re-blocks Submit when inputs change', async () => {
-    const submitWrite = vi.fn(async () => {});
-    const previewWrite = vi.fn(async () => okPreview('setAmount'));
     const func = normalizeAbi(AMOUNT_WRITE_ABI).functions[0]!;
+    const submitWrite = vi.fn(async () => {});
+    const previewWrite = vi.fn(async (_f, args: unknown[]) => okPreview(func, args));
     render(<RawFunctionCard func={func} runtime={runtime({ submitWrite, previewWrite })} />);
 
     const amount = screen.getByRole('textbox');
@@ -114,6 +121,40 @@ describe('RawFunctionCard', () => {
     fireEvent.change(amount, { target: { value: '2' } });
     await waitFor(() => expect(send.disabled).toBe(true));
     expect(screen.queryByText(/would succeed/i)).toBeNull();
+    expect(screen.getByTestId('preview-required-hint')).toBeTruthy();
+    expect(submitWrite).not.toHaveBeenCalled();
+  });
+
+  it('invalidates the bound envelope when implementation integrity drifts', async () => {
+    const func = normalizeAbi(WRITE_ABI).functions[0]!;
+    const submitWrite = vi.fn(async () => {});
+    const previewWrite = vi.fn(async () => okPreview(func));
+    const base = runtime({ submitWrite, previewWrite });
+    const { rerender } = render(<RawFunctionCard func={func} runtime={base} />);
+
+    fireEvent.click(screen.getByRole('button', { name: /preview/i }));
+    const send = screen.getByRole('button', { name: /send transaction/i }) as HTMLButtonElement;
+    await waitFor(() => expect(send.disabled).toBe(false));
+
+    rerender(
+      <RawFunctionCard
+        func={func}
+        runtime={{
+          ...base,
+          executionContext: {
+            ...base.executionContext,
+            implementation: '0x3333333333333333333333333333333333333333',
+          },
+        }}
+      />,
+    );
+
+    await waitFor(() => {
+      const blocked = screen.getByRole('button', {
+        name: /send transaction/i,
+      }) as HTMLButtonElement;
+      expect(blocked.disabled).toBe(true);
+    });
     expect(screen.getByTestId('preview-required-hint')).toBeTruthy();
     expect(submitWrite).not.toHaveBeenCalled();
   });

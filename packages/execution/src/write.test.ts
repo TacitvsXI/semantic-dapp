@@ -22,6 +22,7 @@ const ACCOUNT = '0x3333333333333333333333333333333333333333';
 describe('previewWrite', () => {
   it('encodes calldata and reports success + gas on a passing dry-run', async () => {
     const client = {
+      getBlockNumber: vi.fn().mockResolvedValue(123n),
       simulateContract: vi.fn().mockResolvedValue({ request: {} }),
       estimateContractGas: vi.fn().mockResolvedValue(21000n),
     } as unknown as PublicClient;
@@ -40,11 +41,13 @@ describe('previewWrite', () => {
     expect(preview.gasEstimate).toBe(21000n);
     // Function selector for transfer(address,uint256).
     expect(preview.calldata.startsWith('0xa9059cbb')).toBe(true);
+    expect(preview.simulationBlock).toBe(123n);
     expect(preview.error).toBeUndefined();
   });
 
   it('still returns calldata + success when gas estimation fails', async () => {
     const client = {
+      getBlockNumber: vi.fn().mockResolvedValue(1n),
       simulateContract: vi.fn().mockResolvedValue({ request: {} }),
       estimateContractGas: vi.fn().mockRejectedValue(new Error('no gas')),
     } as unknown as PublicClient;
@@ -71,6 +74,7 @@ describe('previewWrite', () => {
       }),
     });
     const client = {
+      getBlockNumber: vi.fn().mockResolvedValue(1n),
       simulateContract: vi.fn().mockRejectedValue(reverted),
       estimateContractGas: vi.fn(),
     } as unknown as PublicClient;

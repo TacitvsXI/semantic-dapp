@@ -51,6 +51,8 @@ export interface WritePreview {
   success: boolean;
   /** Decoded revert/error when the dry-run fails. */
   error?: DecodedExecutionError;
+  /** Block number observed around the dry-run (audit); not a submit gate. */
+  simulationBlock?: bigint;
 }
 
 /**
@@ -76,6 +78,13 @@ export async function previewWrite(
     success: false,
   };
 
+  let simulationBlock: bigint | undefined;
+  try {
+    simulationBlock = await client.getBlockNumber();
+  } catch {
+    simulationBlock = undefined;
+  }
+
   try {
     await simulateWrite(client, request);
     let gasEstimate: bigint | undefined;
@@ -84,9 +93,19 @@ export async function previewWrite(
     } catch {
       gasEstimate = undefined;
     }
-    return { ...base, success: true, ...(gasEstimate !== undefined ? { gasEstimate } : {}) };
+    return {
+      ...base,
+      success: true,
+      ...(gasEstimate !== undefined ? { gasEstimate } : {}),
+      ...(simulationBlock !== undefined ? { simulationBlock } : {}),
+    };
   } catch (error) {
-    return { ...base, success: false, error: decodeExecutionError(error) };
+    return {
+      ...base,
+      success: false,
+      error: decodeExecutionError(error),
+      ...(simulationBlock !== undefined ? { simulationBlock } : {}),
+    };
   }
 }
 
