@@ -1,13 +1,13 @@
 ---
 title: 'Generate a full dApp + admin console from any EVM contract - straight from the ABI'
-published: false
+published: true
 description: 'Stop hand-writing throwaway contract UIs. An open-source, deterministic-first tool that turns any deployed EVM contract into a user dApp, an admin console and a raw developer UI - generated from the ABI.'
 tags: ethereum, webdev, typescript, opensource
 cover_image: https://raw.githubusercontent.com/TacitvsXI/semantic-dapp/main/docs/assets/social-preview.png
 # canonical_url: set this to wherever you publish FIRST, then reuse it on every cross-post
 ---
 
-> **TL;DR** — [Semantic Dapp](https://github.com/TacitvsXI/semantic-dapp) analyzes any
+> **TL;DR** - [Semantic Dapp](https://github.com/TacitvsXI/semantic-dapp) analyzes any
 > deployed EVM contract and generates a **User** dApp, an **Admin** console and a **Raw**
 > developer UI from its ABI. Detection is deterministic and rule-based, with a confidence
 > score and evidence for every decision. It's TypeScript + viem/wagmi, published on npm,
