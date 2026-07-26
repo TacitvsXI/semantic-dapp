@@ -142,8 +142,13 @@ owner()/admin/...)`, `_checkOwner()`, `_checkRole(ROLE)`, `hasRole(ROLE, msg.sen
       fee-on-transfer, rebasing — all via interface/shape detection, applicable to any contract.
 - [ ] **Non-OZ governance:** Governor Bravo/Alpha _shapes_ (by function shape, not by named
       protocol).
-- [ ] **Event-based inference.** Use emitted events (e.g. `Transfer`, `RoleGranted`) as
-      corroborating evidence for ambiguous writers.
+- [x] **Event-based inference.** `corroborateWithEvents` (classifier) lines up a writer with the
+      event it conventionally emits — verb↔event (`deposit`↔`Deposit`, `pause`↔`Paused`,
+      `approve`↔`Approval`) and `setX`↔`XUpdated/Changed/Set` — and adds an `event` evidence note
+      plus a small, capped confidence nudge. Strictly additive: never changes type/audience/risk and
+      never lowers confidence (absence of an event proves nothing). 100% general (Solidity naming
+      convention). Verified on the corpus: WETH 91→92%, UniswapV3 36→37% avg confidence; no routing
+      moved. Unit-tested in `events.test.ts`.
 - [ ] **Aragon/`*Delegator` proxy shapes** (finishes proxy coverage generically).
 
 ### P1 — make improvements measurable
@@ -169,6 +174,10 @@ owner()/admin/...)`, `_checkOwner()`, `_checkRole(ROLE)`, `hasRole(ROLE, msg.sen
 
 ## Log
 
+- 2026-07-26: **event-based inference** — writers are now corroborated by the events they
+  conventionally emit (verb↔event, `setX`↔`XUpdated`). Adds an `event` evidence note + a capped,
+  upgrade-only confidence nudge; never changes routing. General Solidity convention, so it applies
+  to any contract. Corpus: WETH 91→92%, UniswapV3 36→37% avg confidence, no routing changes.
 - 2026-07-26: **source-backed corpus** — vendored trimmed source for DAI + BAYC so the regression
   harness measures NatSpec/modifier/body-access enrichment, not just ABI shape. Baseline now has an
   `enriched` block per source row. Confirmed, regression-guarded gains: DAI +4 descriptions & `rely`

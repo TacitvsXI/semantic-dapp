@@ -7,6 +7,7 @@ import {
 } from '@semantic-dapp/analyzer';
 import { classifyFunction } from './rules.js';
 import { enrichOperations } from './enrich.js';
+import { corroborateWithEvents } from './events.js';
 
 export interface ClassificationResult {
   operations: OperationDefinition[];
@@ -36,6 +37,9 @@ export function classifyContract(
   let operations = model.functions.map((func) =>
     classifyFunction({ func, model, standards, access }, contractId),
   );
+  // Corroborate writers with the events they conventionally emit (additive
+  // evidence + a small confidence nudge; never changes routing).
+  operations = corroborateWithEvents(operations, model.events);
   if (options.docs) operations = enrichOperations(operations, options.docs);
 
   return { operations, standards: standards.detected, detections: standards.detections };

@@ -7,7 +7,7 @@
       "classifiedWrites": 5,
       "unknownWrites": 0
     },
-    "avgConfidencePct": 91,
+    "avgConfidencePct": 92,
     "ops": [
       "allowance(address,address) => read/user",
       "approve(address,uint256) => token-approve/user/medium",
@@ -238,7 +238,7 @@
       "classifiedWrites": 5,
       "unknownWrites": 4
     },
-    "avgConfidencePct": 36,
+    "avgConfidencePct": 37,
     "ops": [
       "burn(int24,int24,uint128) => token-burn/user/medium",
       "collect(address,int24,int24,uint128,uint128) => claim/user/low",
