@@ -23,16 +23,16 @@
     ]
   },
   "DAI": {
-    "standards": ["erc-20"],
+    "standards": ["erc-20", "dai-permit"],
     "counts": {
       "ops": 22,
       "writes": 11,
-      "classifiedWrites": 6,
-      "unknownWrites": 5
+      "classifiedWrites": 7,
+      "unknownWrites": 4
     },
-    "avgConfidencePct": 67,
+    "avgConfidencePct": 76,
     "ops": [
-      "DOMAIN_SEPARATOR() => read/user",
+      "DOMAIN_SEPARATOR() => read/developer",
       "PERMIT_TYPEHASH() => read/user",
       "allowance(address,address) => read/user",
       "approve(address,uint256) => token-approve/user/medium",
@@ -44,7 +44,7 @@
       "move(address,address,uint256) => unknown/developer",
       "name() => read/user",
       "nonces(address) => read/user",
-      "permit(address,address,uint256,uint256,bool,uint8,bytes32,bytes32) => unknown/developer",
+      "permit(address,address,uint256,uint256,bool,uint8,bytes32,bytes32) => token-approve/user/high",
       "pull(address,uint256) => unknown/developer",
       "push(address,uint256) => unknown/developer",
       "rely(address) => unknown/admin/medium",
@@ -56,7 +56,7 @@
       "wards(address) => read/user"
     ],
     "enriched": {
-      "descriptions": 4,
+      "descriptions": 6,
       "inputLabels": 0,
       "privilegedWrites": 3
     }

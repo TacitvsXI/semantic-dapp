@@ -138,8 +138,17 @@ owner()/admin/...)`, `_checkOwner()`, `_checkRole(ROLE)`, `hasRole(ROLE, msg.sen
 
 ### P1 — coverage (understand more, safely — general signals only)
 
-- [ ] **More token/standard shapes:** DAI-style `permit`, ERC-777, ERC-1155 nuances,
-      fee-on-transfer, rebasing — all via interface/shape detection, applicable to any contract.
+- [x] **DAI-style `permit` + ERC-777 shapes.** Two new detectors in `standards.ts`, registered in
+      `registry.ts`. `dai-permit` matches the pre-2612 shape
+      `permit(address,address,uint256,uint256,bool,uint8,bytes32,bytes32)` (a `bool allowed` toggle +
+      `expiry`, distinct from ERC-2612's `deadline`+`value`), gated on the ERC-20 core, so DAI's
+      gasless approve is now `token-approve/user/high` instead of `unknown`. `erc-777` matches the
+      operator surface (`send`/`operatorSend`/`authorizeOperator`/`granularity`, events optional):
+      `send`→transfer, `authorizeOperator`→`token-approve/high` ("grants full control"), `burn`/
+      `operatorBurn`→burn. Both are pure shape detection (no named protocol). Unit-tested in
+      `standards.test.ts`; corpus DAI improved 62→76% avg confidence, 6→7/11 classified writes.
+- [ ] **Remaining token/standard shapes:** ERC-1155 nuances, fee-on-transfer, rebasing — all via
+      interface/shape detection, applicable to any contract.
 - [ ] **Non-OZ governance:** Governor Bravo/Alpha _shapes_ (by function shape, not by named
       protocol).
 - [x] **Event-based inference.** `corroborateWithEvents` (classifier) lines up a writer with the
@@ -179,6 +188,11 @@ owner()/admin/...)`, `_checkOwner()`, `_checkRole(ROLE)`, `hasRole(ROLE, msg.sen
 
 ## Log
 
+- 2026-07-26: **DAI-style `permit` + ERC-777 shapes** — two shape detectors added. `dai-permit`
+  recognises the pre-2612 permit (`bool allowed`+`expiry`) so DAI's gasless approve is labelled
+  `token-approve/user/high` (was `unknown`); `erc-777` recognises the operator/send surface and flags
+  `authorizeOperator` as full-control high risk. Both are first-principles shape detection. Corpus DAI
+  62→76% avg confidence, permit + `DOMAIN_SEPARATOR` now labelled; baseline refreshed. Unit-tested.
 - 2026-07-26: **Aragon/`*Delegator` proxy shapes** — `detectProxy` now resolves ERC-897 DelegateProxy
   (Aragon apps, via `proxyType()`+`implementation()`) and the `*Delegator` family (Compound Unitroller
   & forks via `comptrollerImplementation()`, plus `getImplementation()`/`childImplementation()`). New

@@ -6,6 +6,8 @@ import {
   detectErc1155,
   detectErc4626,
   detectErc2612,
+  detectDaiPermit,
+  detectErc777,
   detectGovernor,
 } from './standards.js';
 
@@ -164,6 +166,91 @@ describe('detectErc2612', () => {
       fn('DOMAIN_SEPARATOR', [], ['bytes32'], 'view'),
     ] as unknown as Abi);
     expect(detectErc2612(noErc20).detected).toBe(false);
+  });
+});
+
+const erc20CoreAbi = [
+  fn('totalSupply', [], ['uint256'], 'view'),
+  fn('balanceOf', ['address'], ['uint256'], 'view'),
+  fn('transfer', ['address', 'uint256'], ['bool']),
+  fn('allowance', ['address', 'address'], ['uint256'], 'view'),
+  fn('approve', ['address', 'uint256'], ['bool']),
+  fn('transferFrom', ['address', 'address', 'uint256'], ['bool']),
+] as const;
+
+const daiPermitAbi = [
+  ...erc20CoreAbi,
+  // DAI-style permit: bool allowed + expiry, not deadline+value.
+  fn(
+    'permit',
+    ['address', 'address', 'uint256', 'uint256', 'bool', 'uint8', 'bytes32', 'bytes32'],
+    [],
+  ),
+  fn('nonces', ['address'], ['uint256'], 'view'),
+  fn('DOMAIN_SEPARATOR', [], ['bytes32'], 'view'),
+] as const satisfies Abi;
+
+describe('detectDaiPermit', () => {
+  it('detects a DAI-style permit token', () => {
+    const result = detectDaiPermit(normalizeAbi(daiPermitAbi as unknown as Abi));
+    expect(result.detected).toBe(true);
+    expect(result.confidence).toBeGreaterThanOrEqual(0.6);
+  });
+
+  it('is distinct from ERC-2612 (canonical permit is not DAI-style and vice versa)', () => {
+    const dai = normalizeAbi(daiPermitAbi as unknown as Abi);
+    expect(detectDaiPermit(dai).detected).toBe(true);
+    // The canonical ERC-2612 permit signature is absent, so 2612 must not fire.
+    expect(detectErc2612(dai).detected).toBe(false);
+  });
+
+  it('requires the ERC-20 core', () => {
+    const noErc20 = normalizeAbi([
+      fn(
+        'permit',
+        ['address', 'address', 'uint256', 'uint256', 'bool', 'uint8', 'bytes32', 'bytes32'],
+        [],
+      ),
+      fn('nonces', ['address'], ['uint256'], 'view'),
+    ] as unknown as Abi);
+    expect(detectDaiPermit(noErc20).detected).toBe(false);
+  });
+});
+
+const erc777Abi = [
+  fn('granularity', [], ['uint256'], 'view'),
+  fn('send', ['address', 'uint256', 'bytes'], []),
+  fn('burn', ['uint256', 'bytes'], []),
+  fn('isOperatorFor', ['address', 'address'], ['bool'], 'view'),
+  fn('authorizeOperator', ['address'], []),
+  fn('revokeOperator', ['address'], []),
+  fn('defaultOperators', [], ['address[]'], 'view'),
+  fn('operatorSend', ['address', 'address', 'uint256', 'bytes', 'bytes'], []),
+  fn('operatorBurn', ['address', 'uint256', 'bytes', 'bytes'], []),
+  fn('name', [], ['string'], 'view'),
+  fn('symbol', [], ['string'], 'view'),
+  fn('totalSupply', [], ['uint256'], 'view'),
+  fn('balanceOf', ['address'], ['uint256'], 'view'),
+] as const satisfies Abi;
+
+describe('detectErc777', () => {
+  it('detects an ERC-777 token by its operator/send surface', () => {
+    const result = detectErc777(normalizeAbi(erc777Abi as unknown as Abi));
+    expect(result.detected).toBe(true);
+    expect(result.confidence).toBeGreaterThanOrEqual(0.6);
+  });
+
+  it('does not detect a plain ERC-20', () => {
+    expect(detectErc777(normalizeAbi(erc20CoreAbi as unknown as Abi)).detected).toBe(false);
+  });
+
+  it('requires the operator core (send + authorizeOperator + operatorSend + granularity)', () => {
+    const partial = normalizeAbi([
+      fn('send', ['address', 'uint256', 'bytes'], []),
+      fn('granularity', [], ['uint256'], 'view'),
+      // missing authorizeOperator / operatorSend
+    ] as unknown as Abi);
+    expect(detectErc777(partial).detected).toBe(false);
   });
 });
 

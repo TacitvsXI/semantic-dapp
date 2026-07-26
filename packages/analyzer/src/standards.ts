@@ -334,6 +334,172 @@ export const erc2612Detector: StandardDetector = {
   semantics: ERC2612_SEMANTICS,
 };
 
+/* ----------------------------- DAI-style permit ------------------------- */
+
+// DAI predates ERC-2612 and uses a different permit shape: a `bool allowed`
+// toggle (full/zero allowance) and an `expiry` instead of a `deadline`+`value`.
+const DAI_PERMIT_SIG = 'permit(address,address,uint256,uint256,bool,uint8,bytes32,bytes32)';
+
+const DAI_PERMIT_MEMBERS: StandardMember[] = [
+  fn(DAI_PERMIT_SIG),
+  fn('nonces(address)'),
+  fn('DOMAIN_SEPARATOR()', false),
+  fn('PERMIT_TYPEHASH()', false),
+];
+
+const DAI_PERMIT_SEMANTICS: Record<string, FunctionSemantic> = {
+  [DAI_PERMIT_SIG]: {
+    operationType: 'token-approve',
+    audience: 'user',
+    title: 'Permit (gasless approve, DAI-style)',
+    description:
+      'Approve a spender with an off-chain EIP-712 signature. DAI-style: the `allowed` flag ' +
+      'toggles between full and zero allowance, gated by an `expiry`.',
+    isRead: false,
+    risk: 'high',
+  },
+  'nonces(address)': {
+    operationType: 'read',
+    audience: 'user',
+    title: 'Permit nonce',
+    description: 'Current signature nonce for an owner.',
+    isRead: true,
+  },
+  'DOMAIN_SEPARATOR()': {
+    operationType: 'read',
+    audience: 'developer',
+    title: 'EIP-712 domain separator',
+    isRead: true,
+  },
+};
+
+export function detectDaiPermit(model: ContractModel): StandardDetection {
+  return detectByMembers(model, {
+    standard: 'dai-permit',
+    members: DAI_PERMIT_MEMBERS,
+    coreRequired: [DAI_PERMIT_SIG, 'nonces(address)'],
+    threshold: 0.6,
+    requiresErc20: true,
+  });
+}
+
+export const daiPermitDetector: StandardDetector = {
+  id: 'dai-permit',
+  detect: detectDaiPermit,
+  semantics: DAI_PERMIT_SEMANTICS,
+};
+
+/* -------------------------------- ERC-777 ------------------------------- */
+
+const ERC777_MEMBERS: StandardMember[] = [
+  fn('granularity()'),
+  fn('send(address,uint256,bytes)'),
+  fn('burn(uint256,bytes)'),
+  fn('isOperatorFor(address,address)'),
+  fn('authorizeOperator(address)'),
+  fn('revokeOperator(address)'),
+  fn('defaultOperators()'),
+  fn('operatorSend(address,address,uint256,bytes,bytes)'),
+  fn('operatorBurn(address,uint256,bytes,bytes)'),
+  fn('name()', false),
+  fn('symbol()', false),
+  fn('totalSupply()', false),
+  fn('balanceOf(address)', false),
+  ev('Sent(address,address,address,uint256,bytes,bytes)'),
+  ev('Minted(address,address,uint256,bytes,bytes)'),
+  ev('Burned(address,address,uint256,bytes,bytes)'),
+  ev('AuthorizedOperator(address,address)'),
+  ev('RevokedOperator(address,address)'),
+];
+
+const ERC777_SEMANTICS: Record<string, FunctionSemantic> = {
+  'send(address,uint256,bytes)': {
+    operationType: 'token-transfer',
+    audience: 'user',
+    title: 'Send tokens',
+    description: 'Send tokens to an address, invoking its ERC-777 receiver hook.',
+    isRead: false,
+    risk: 'medium',
+  },
+  'operatorSend(address,address,uint256,bytes,bytes)': {
+    operationType: 'token-transfer',
+    audience: 'user',
+    title: 'Operator send',
+    description: 'Move tokens on behalf of a holder that authorized you as an operator.',
+    isRead: false,
+    risk: 'medium',
+  },
+  'burn(uint256,bytes)': {
+    operationType: 'token-burn',
+    audience: 'user',
+    title: 'Burn tokens',
+    isRead: false,
+    risk: 'medium',
+  },
+  'operatorBurn(address,uint256,bytes,bytes)': {
+    operationType: 'token-burn',
+    audience: 'user',
+    title: 'Operator burn',
+    description: 'Burn tokens of a holder that authorized you as an operator.',
+    isRead: false,
+    risk: 'high',
+  },
+  'authorizeOperator(address)': {
+    operationType: 'token-approve',
+    audience: 'user',
+    title: 'Authorize operator',
+    description: 'Grant an operator full control to move and burn all of your tokens.',
+    isRead: false,
+    risk: 'high',
+  },
+  'revokeOperator(address)': {
+    operationType: 'token-approve',
+    audience: 'user',
+    title: 'Revoke operator',
+    description: 'Remove an operator you previously authorized.',
+    isRead: false,
+    risk: 'low',
+  },
+  'isOperatorFor(address,address)': {
+    operationType: 'read',
+    audience: 'user',
+    title: 'Is operator for',
+    isRead: true,
+  },
+  'granularity()': {
+    operationType: 'read',
+    audience: 'user',
+    title: 'Granularity',
+    isRead: true,
+  },
+  'defaultOperators()': {
+    operationType: 'read',
+    audience: 'user',
+    title: 'Default operators',
+    isRead: true,
+  },
+};
+
+export function detectErc777(model: ContractModel): StandardDetection {
+  return detectByMembers(model, {
+    standard: 'erc-777',
+    members: ERC777_MEMBERS,
+    coreRequired: [
+      'send(address,uint256,bytes)',
+      'authorizeOperator(address)',
+      'operatorSend(address,address,uint256,bytes,bytes)',
+      'granularity()',
+    ],
+    threshold: 0.6,
+  });
+}
+
+export const erc777Detector: StandardDetector = {
+  id: 'erc-777',
+  detect: detectErc777,
+  semantics: ERC777_SEMANTICS,
+};
+
 /* ------------------------------- Governor ------------------------------- */
 
 const GOVERNOR_MEMBERS: StandardMember[] = [
