@@ -126,8 +126,11 @@ owner()/admin/...)`, `_checkOwner()`, `_checkRole(ROLE)`, `hasRole(ROLE, msg.sen
       whether it would succeed or revert (with the decoded reason) _before_ the user signs. Fully
       general (`previewWrite` in execution → `WritePreviewView`); the flagship "don't trust the
       frontend" feature. Unit-tested in `write.test.ts` + `WritePreviewView.test.tsx`.
-- [ ] **Proxy implementation override.** Manual address/ABI field in the proxy banner to
-      re-resolve an implementation in one click (matters for Safe / upgradeable treasuries).
+- [x] **Proxy implementation override.** When auto-resolution fails, the proxy shell banner now
+      offers "Fix implementation": resolve a verified ABI from a manually-entered implementation
+      address, or paste the implementation ABI directly. The proxy address stays the call target
+      (delegatecalls run there) — only the ABI changes; the manifest is rebuilt fresh. `ProxyOverride`
+      in the studio, wired into `ProjectView`. Matters for Safe / upgradeable treasuries.
 
 ### P1 — coverage (understand more, safely — general signals only)
 
@@ -158,6 +161,10 @@ owner()/admin/...)`, `_checkOwner()`, `_checkRole(ROLE)`, `hasRole(ROLE, msg.sen
 
 ## Log
 
+- 2026-07-26: **proxy implementation override** shipped — the "proxy shell" banner now has a "Fix
+  implementation" action to resolve a verified ABI from a manually-entered implementation address or
+  paste the impl ABI directly. Call target stays the proxy; only the ABI/manifest are rebuilt.
+  Closes the last P0 transaction-trust item alongside preview/dry-run.
 - 2026-07-26: **transaction preview + dry-run** shipped — every write now has a "Preview" action
   that encodes the exact calldata and `eth_call`-simulates it, showing target/args/value/gas and a
   pass/revert verdict (decoded reason) before the user signs. `previewWrite` (execution) +

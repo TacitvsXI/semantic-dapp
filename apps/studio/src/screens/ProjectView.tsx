@@ -20,6 +20,7 @@ import { downloadJson } from '../lib/download.js';
 import type { Project } from '../state/project.js';
 import { SettingsPanel } from './SettingsPanel.js';
 import { ManifestEditor } from './ManifestEditor.js';
+import { ProxyOverride, type ProxyOverridePatch } from './ProxyOverride.js';
 
 export interface ProjectViewProps {
   project: Project;
@@ -38,6 +39,7 @@ export function ProjectView({ project: initialProject, onBack, onUpdated }: Proj
   const [showEditor, setShowEditor] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
+  const [showOverride, setShowOverride] = useState(false);
   const [stale, setStale] = useState(false);
   const [history, setHistory] = useState<AuditEntry[]>(() => loadHistory(initialProject.id));
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -95,6 +97,30 @@ export function ProjectView({ project: initialProject, onBack, onUpdated }: Proj
       }
     }
     persist(nextProject, computeManifest(nextProject, model));
+  };
+
+  // Manually point a proxy at its real implementation (address or pasted ABI).
+  // The proxy address stays the call target - only the ABI/implementation change,
+  // so we rebuild the manifest fresh (the new interface is a different contract).
+  const applyProxyOverride = (patch: ProxyOverridePatch) => {
+    const nextProject: Project = {
+      ...project,
+      abi: patch.abi,
+      proxy: {
+        isProxy: true,
+        kind: project.proxy?.kind ?? 'unknown',
+        ...((patch.implementation ?? project.proxy?.implementation)
+          ? { implementation: patch.implementation ?? project.proxy?.implementation }
+          : {}),
+        unresolvedImplementation: false,
+      },
+      ...(patch.provenance ? { provenance: patch.provenance } : {}),
+      ...(patch.codeHash ? { codeHash: patch.codeHash } : {}),
+      ...(patch.sourceDocs ? { sourceDocs: patch.sourceDocs } : {}),
+    };
+    const nextModel = normalizeAbi(patch.abi);
+    persist(nextProject, computeManifest({ ...nextProject, manifest: undefined }, nextModel));
+    setShowOverride(false);
   };
 
   const saveSettings = (patch: {
@@ -283,10 +309,16 @@ export function ProjectView({ project: initialProject, onBack, onUpdated }: Proj
               </>
             ) : null}
             . You are seeing the <strong>proxy shell</strong> - the real functions live in the
-            implementation. Import the implementation address directly, or paste its ABI, to get the
-            true interface.
+            implementation. Point it at the implementation below to get the true interface.
           </span>
+          <button className="sd-btn sd-btn--write" onClick={() => setShowOverride((s) => !s)}>
+            {showOverride ? 'Hide' : 'Fix implementation'}
+          </button>
         </div>
+      ) : null}
+
+      {project.proxy?.unresolvedImplementation && showOverride ? (
+        <ProxyOverride project={project} onApply={applyProxyOverride} />
       ) : null}
 
       {stale ? (
