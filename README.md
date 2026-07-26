@@ -10,6 +10,12 @@ Semantic Dapp turns any deployed EVM contract into a clean **user dApp**, an **a
 
 <br/>
 
+<img src="docs/demo/demo.gif" alt="A generated dApp for USDC: User, Admin, Read and Raw tabs with semantic labels, roles and risk" width="100%" />
+
+<sub>A generated dApp for mainnet USDC - the same four tabs (User · Admin · Read · Raw) you get for any contract. <a href="https://tacitvsxi.github.io/semantic-dapp/">Try it live →</a></sub>
+
+<br/>
+
 [![CI](https://github.com/TacitvsXI/semantic-dapp/actions/workflows/ci.yml/badge.svg)](https://github.com/TacitvsXI/semantic-dapp/actions/workflows/ci.yml)
 [![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)
 [![Release](https://img.shields.io/badge/release-v0.1.1-14b8a6.svg)](CHANGELOG.md)
