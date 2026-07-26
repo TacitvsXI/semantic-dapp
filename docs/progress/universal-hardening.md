@@ -133,6 +133,10 @@ owner()/admin/...)`, `_checkOwner()`, `_checkRole(ROLE)`, `hasRole(ROLE, msg.sen
       address, or paste the implementation ABI directly. The proxy address stays the call target
       (delegatecalls run there) — only the ABI changes; the manifest is rebuilt fresh. `ProxyOverride`
       in the studio, wired into `ProjectView`. Matters for Safe / upgradeable treasuries.
+- [ ] **Raw writes fail-closed.** Community review (r/ethdev): Raw is currently the _least_ gated
+      write path, but unclassified ops are the _highest_ uncertainty — inverted for mainnet admin
+      trust. Plan: [`raw-write-fail-closed.md`](./raw-write-fail-closed.md) (Phase 1 confirm → Phase 2
+      mandatory preview/invalidate → Phase 3 execution envelope).
 
 ### P1 — coverage (understand more, safely — general signals only)
 
