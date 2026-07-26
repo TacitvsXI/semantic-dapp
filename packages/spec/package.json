@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "abitype": "^1.0.8",
-    "viem": "^2.21.55",
+    "viem": "^2.55.8",
     "zod": "^3.24.1",
     "zod-to-json-schema": "^3.24.1"
   }
