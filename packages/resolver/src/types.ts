@@ -11,6 +11,8 @@ export type ProxyKind =
   | 'eip1167-minimal'
   | 'legacy-implementation'
   | 'gnosis-safe'
+  | 'erc897-delegate'
+  | 'delegator'
   | 'unknown';
 
 export interface ContractSourceFile {

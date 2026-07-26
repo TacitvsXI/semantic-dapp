@@ -13,6 +13,17 @@ export const EIP1967_BEACON_SLOT: Hex =
 const IMPLEMENTATION_SELECTOR: Hex = '0x5c60da1b';
 /** `masterCopy()` selector used by Gnosis Safe (v1.0) proxies. */
 const MASTERCOPY_SELECTOR: Hex = '0xa619486e';
+/** `proxyType()` selector (ERC-897 DelegateProxy, e.g. AragonOS app proxies). */
+const PROXY_TYPE_SELECTOR: Hex = '0x4555d5c9';
+/**
+ * Implementation getters exposed by `*Delegator` / *upgradeable-by-getter*
+ * proxies that don't use EIP-1967 slots. All are zero-arg, address-returning
+ * public state getters, so they generalise across a family of forks:
+ *   - `comptrollerImplementation()` — Compound Unitroller & its many forks.
+ *   - `getImplementation()`         — assorted delegators / diamond-lite proxies.
+ *   - `childImplementation()`       — 0x/other delegator variants.
+ */
+const DELEGATOR_SELECTORS: Hex[] = ['0xbb82aa5e', '0xaaf10f42', '0xda525716'];
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
@@ -99,10 +110,30 @@ export async function detectProxy(reader: ChainReader, address: Address): Promis
     return { isProxy: true, kind: 'eip1167-minimal', implementation: clone };
   }
 
+  // ERC-897 DelegateProxy (AragonOS apps, and others): a `proxyType()` returning
+  // 1 (forwarding) or 2 (upgradeable) plus an `implementation()` getter. Checked
+  // before the plain legacy getter so these are labelled specifically.
+  const proxyType = await callUintGetter(reader, address, PROXY_TYPE_SELECTOR);
+  if (proxyType === 1n || proxyType === 2n) {
+    const impl = await callAddressGetter(reader, address, IMPLEMENTATION_SELECTOR);
+    if (impl && (await hasCode(reader, impl))) {
+      return { isProxy: true, kind: 'erc897-delegate', implementation: impl };
+    }
+  }
+
   // Legacy proxies: a plain `implementation()` getter (EIP-1822/OZ pre-1967).
   const legacyImpl = await callAddressGetter(reader, address, IMPLEMENTATION_SELECTOR);
   if (legacyImpl && (await hasCode(reader, legacyImpl))) {
     return { isProxy: true, kind: 'legacy-implementation', implementation: legacyImpl };
+  }
+
+  // `*Delegator` family (Compound Unitroller & forks, etc.): a non-standard,
+  // zero-arg address getter that points at the logic contract.
+  for (const selector of DELEGATOR_SELECTORS) {
+    const impl = await callAddressGetter(reader, address, selector);
+    if (impl && (await hasCode(reader, impl))) {
+      return { isProxy: true, kind: 'delegator', implementation: impl };
+    }
   }
 
   // Gnosis Safe proxies expose `masterCopy()`.
@@ -136,6 +167,21 @@ async function callAddressGetter(
   try {
     const data = await reader.call({ to: address, data: selector });
     return addressFromStorageWord(data);
+  } catch {
+    return undefined;
+  }
+}
+
+/** Call a zero-arg selector that returns a uint; undefined if it reverts/empty. */
+async function callUintGetter(
+  reader: ChainReader,
+  address: Address,
+  selector: Hex,
+): Promise<bigint | undefined> {
+  try {
+    const data = await reader.call({ to: address, data: selector });
+    if (!data || data === '0x') return undefined;
+    return BigInt(data.length > 66 ? data.slice(0, 66) : data);
   } catch {
     return undefined;
   }

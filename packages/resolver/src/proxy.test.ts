@@ -16,6 +16,10 @@ function word(address: string): Hex {
   return `0x${'0'.repeat(24)}${address.toLowerCase().replace(/^0x/, '')}` as Hex;
 }
 
+function uintWord(n: number): Hex {
+  return `0x${n.toString(16).padStart(64, '0')}` as Hex;
+}
+
 const IMPL: Address = getAddress('0x1111111111111111111111111111111111111111');
 const ADMIN: Address = getAddress('0x2222222222222222222222222222222222222222');
 const BEACON: Address = getAddress('0x3333333333333333333333333333333333333333');
@@ -129,6 +133,42 @@ describe('detectProxy', () => {
     });
     const proxy = await detectProxy(reader, ADMIN);
     expect(proxy.isProxy).toBe(false);
+  });
+
+  it('detects an ERC-897 DelegateProxy (Aragon) via proxyType() + implementation()', async () => {
+    const reader = makeReader({
+      calls: { '0x4555d5c9': uintWord(2), '0x5c60da1b': word(IMPL) },
+    });
+    const proxy = await detectProxy(reader, ADMIN);
+    expect(proxy).toMatchObject({
+      isProxy: true,
+      kind: 'erc897-delegate',
+      implementation: IMPL,
+    });
+  });
+
+  it('accepts a forwarding ERC-897 proxy (proxyType === 1)', async () => {
+    const reader = makeReader({
+      calls: { '0x4555d5c9': uintWord(1), '0x5c60da1b': word(IMPL) },
+    });
+    const proxy = await detectProxy(reader, ADMIN);
+    expect(proxy.kind).toBe('erc897-delegate');
+  });
+
+  it('ignores a bogus proxyType() value (not 1 or 2), falling through', async () => {
+    const reader = makeReader({ calls: { '0x4555d5c9': uintWord(7) } });
+    const proxy = await detectProxy(reader, ADMIN);
+    expect(proxy.isProxy).toBe(false);
+  });
+
+  it('detects a *Delegator proxy via comptrollerImplementation()', async () => {
+    const reader = makeReader({ calls: { '0xbb82aa5e': word(IMPL) } });
+    const proxy = await detectProxy(reader, ADMIN);
+    expect(proxy).toMatchObject({
+      isProxy: true,
+      kind: 'delegator',
+      implementation: IMPL,
+    });
   });
 
   it('detects a Gnosis Safe masterCopy() proxy', async () => {

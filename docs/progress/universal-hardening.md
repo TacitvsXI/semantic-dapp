@@ -149,7 +149,12 @@ owner()/admin/...)`, `_checkOwner()`, `_checkRole(ROLE)`, `hasRole(ROLE, msg.sen
       never lowers confidence (absence of an event proves nothing). 100% general (Solidity naming
       convention). Verified on the corpus: WETH 91→92%, UniswapV3 36→37% avg confidence; no routing
       moved. Unit-tested in `events.test.ts`.
-- [ ] **Aragon/`*Delegator` proxy shapes** (finishes proxy coverage generically).
+- [x] **Aragon/`*Delegator` proxy shapes.** `detectProxy` now recognises ERC-897 DelegateProxy
+      (AragonOS app proxies: `proxyType()` returning 1/2 + `implementation()`) and the `*Delegator`
+      family that exposes a non-1967 address getter (`comptrollerImplementation()` for Compound
+      Unitroller & its forks, plus `getImplementation()`/`childImplementation()`). New kinds
+      `erc897-delegate` / `delegator`; each still requires the resolved target to have code, so false
+      positives stay near zero. Unit-tested in `proxy.test.ts`. Finishes generic proxy coverage.
 
 ### P1 — make improvements measurable
 
@@ -174,6 +179,11 @@ owner()/admin/...)`, `_checkOwner()`, `_checkRole(ROLE)`, `hasRole(ROLE, msg.sen
 
 ## Log
 
+- 2026-07-26: **Aragon/`*Delegator` proxy shapes** — `detectProxy` now resolves ERC-897 DelegateProxy
+  (Aragon apps, via `proxyType()`+`implementation()`) and the `*Delegator` family (Compound Unitroller
+  & forks via `comptrollerImplementation()`, plus `getImplementation()`/`childImplementation()`). New
+  kinds `erc897-delegate`/`delegator`; each requires the target to have code. Closes generic proxy
+  coverage; unit-tested.
 - 2026-07-26: **event-based inference** — writers are now corroborated by the events they
   conventionally emit (verb↔event, `setX`↔`XUpdated`). Adds an `event` evidence note + a capped,
   upgrade-only confidence nudge; never changes routing. General Solidity convention, so it applies
