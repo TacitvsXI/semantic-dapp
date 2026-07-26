@@ -157,8 +157,13 @@ owner()/admin/...)`, `_checkOwner()`, `_checkRole(ROLE)`, `hasRole(ROLE, msg.sen
       tested in `standards.test.ts` (3 shapes + 2 negatives).
 - [ ] **Remaining token/standard shapes:** ERC-1155 nuances, fee-on-transfer (needs a transfer
       simulation, not ABI-detectable) — via shape/simulation, applicable to any contract.
-- [ ] **Non-OZ governance:** Governor Bravo/Alpha _shapes_ (by function shape, not by named
-      protocol).
+- [x] **Non-OZ governance (Governor Bravo/Alpha shapes).** New `governor-bravo` detector for the
+      Compound-style surface used by Uniswap/ENS/many forks: 5-arg
+      `propose(address[],uint256[],string[],bytes[],string)` (signatures[]), id-based
+      `queue(uint256)`/`execute(uint256)`/`cancel(uint256)`, plus `castVote(uint256,uint8)` (Bravo) or
+      `castVote(uint256,bool)` (Alpha). Signatures are disjoint from OpenZeppelin IGovernor (4-arg propose,
+      hash-based queue/execute), so the two detectors never collide. Labels propose/vote/queue/execute and
+      the common getters. Pure shape detection. Unit-tested (Bravo, Alpha, cross-negative vs OZ).
 - [x] **Event-based inference.** `corroborateWithEvents` (classifier) lines up a writer with the
       event it conventionally emits — verb↔event (`deposit`↔`Deposit`, `pause`↔`Paused`,
       `approve`↔`Approval`) and `setX`↔`XUpdated/Changed/Set` — and adds an `event` evidence note
@@ -196,6 +201,10 @@ owner()/admin/...)`, `_checkOwner()`, `_checkRole(ROLE)`, `hasRole(ROLE, msg.sen
 
 ## Log
 
+- 2026-07-26: **Governor Bravo/Alpha shapes** — new `governor-bravo` detector for Compound-style
+  governance (5-arg propose with `signatures[]`, id-based queue/execute/cancel, Alpha's bool `castVote`
+  or Bravo's uint8). Disjoint from OZ IGovernor, so no collision. Labels propose/vote/lifecycle + getters.
+  Overview chip: "Governor Bravo/Alpha". Unit-tested.
 - 2026-07-26: **rebasing / share-based token detection** — new `rebasing` shape detector for stETH-,
   aToken- and AMPL-style tokens (share/scaled balance or elastic supply), gated on the ERC-20 core.
   Labels the share getters and adds a plain-language Overview advisory that `balanceOf` can change with

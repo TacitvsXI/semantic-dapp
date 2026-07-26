@@ -10,6 +10,7 @@ import {
   detectErc777,
   detectRebasing,
   detectGovernor,
+  detectGovernorBravo,
 } from './standards.js';
 
 function fn(name: string, inputs: string[], outputs: string[], mut = 'nonpayable') {
@@ -324,5 +325,64 @@ describe('detectGovernor', () => {
       // missing state / proposalSnapshot / proposalDeadline
     ] as unknown as Abi);
     expect(detectGovernor(partial).detected).toBe(false);
+  });
+});
+
+const governorBravoAbi = [
+  // Bravo propose: includes signatures[] — disjoint from OZ's 4-arg propose.
+  fn('propose', ['address[]', 'uint256[]', 'string[]', 'bytes[]', 'string'], ['uint256']),
+  fn('castVote', ['uint256', 'uint8'], []),
+  fn('castVoteWithReason', ['uint256', 'uint8', 'string'], []),
+  fn('queue', ['uint256'], []),
+  fn('execute', ['uint256'], []),
+  fn('cancel', ['uint256'], []),
+  fn('state', ['uint256'], ['uint8'], 'view'),
+  fn('getActions', ['uint256'], ['address[]', 'uint256[]', 'string[]', 'bytes[]'], 'view'),
+  fn('getReceipt', ['uint256', 'address'], ['bool', 'uint8', 'uint96'], 'view'),
+  fn('proposalCount', [], ['uint256'], 'view'),
+  fn('quorumVotes', [], ['uint256'], 'view'),
+  fn('proposalThreshold', [], ['uint256'], 'view'),
+  fn('votingDelay', [], ['uint256'], 'view'),
+  fn('votingPeriod', [], ['uint256'], 'view'),
+] as const satisfies Abi;
+
+const governorAlphaAbi = [
+  fn('propose', ['address[]', 'uint256[]', 'string[]', 'bytes[]', 'string'], ['uint256']),
+  fn('castVote', ['uint256', 'bool'], []), // Alpha: bool support, not uint8
+  fn('queue', ['uint256'], []),
+  fn('execute', ['uint256'], []),
+  fn('cancel', ['uint256'], []),
+  fn('state', ['uint256'], ['uint8'], 'view'),
+  fn('proposalCount', [], ['uint256'], 'view'),
+] as const satisfies Abi;
+
+describe('detectGovernorBravo', () => {
+  it('detects a Governor Bravo–shaped contract', () => {
+    const result = detectGovernorBravo(normalizeAbi(governorBravoAbi as unknown as Abi));
+    expect(result.detected).toBe(true);
+    expect(result.confidence).toBeGreaterThanOrEqual(0.6);
+  });
+
+  it('detects a Governor Alpha–shaped contract (bool castVote)', () => {
+    const result = detectGovernorBravo(normalizeAbi(governorAlphaAbi as unknown as Abi));
+    expect(result.detected).toBe(true);
+  });
+
+  it('is disjoint from OpenZeppelin Governor (neither misfires on the other)', () => {
+    const oz = normalizeAbi(governorAbi as unknown as Abi);
+    const bravo = normalizeAbi(governorBravoAbi as unknown as Abi);
+    expect(detectGovernor(oz).detected).toBe(true);
+    expect(detectGovernorBravo(oz).detected).toBe(false);
+    expect(detectGovernorBravo(bravo).detected).toBe(true);
+    expect(detectGovernor(bravo).detected).toBe(false);
+  });
+
+  it('requires propose + castVote + id-based queue/execute + state', () => {
+    const partial = normalizeAbi([
+      fn('propose', ['address[]', 'uint256[]', 'string[]', 'bytes[]', 'string'], ['uint256']),
+      fn('castVote', ['uint256', 'uint8'], []),
+      // missing queue/execute/state
+    ] as unknown as Abi);
+    expect(detectGovernorBravo(partial).detected).toBe(false);
   });
 });

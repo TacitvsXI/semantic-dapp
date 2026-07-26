@@ -10,6 +10,7 @@ import {
   erc777Detector,
   rebasingDetector,
   governorDetector,
+  governorBravoDetector,
 } from './standards.js';
 import {
   ownableDetector,
@@ -32,6 +33,7 @@ export const ALL_DETECTORS: StandardDetector[] = [
   erc1155Detector,
   erc4626Detector,
   governorDetector,
+  governorBravoDetector,
   ownableDetector,
   accessControlDetector,
   pausableDetector,

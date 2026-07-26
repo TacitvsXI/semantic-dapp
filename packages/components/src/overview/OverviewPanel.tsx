@@ -25,6 +25,7 @@ const STANDARD_LABELS: Record<string, string> = {
   'dai-permit': 'DAI Permit',
   rebasing: 'Rebasing',
   governor: 'Governor',
+  'governor-bravo': 'Governor Bravo/Alpha',
   ownable: 'Ownable',
   'access-control': 'AccessControl',
   pausable: 'Pausable',

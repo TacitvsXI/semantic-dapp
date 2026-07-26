@@ -767,3 +767,185 @@ export const governorDetector: StandardDetector = {
   detect: detectGovernor,
   semantics: GOVERNOR_SEMANTICS,
 };
+
+/* -------------------------- Governor Bravo/Alpha ------------------------ */
+
+// Compound's GovernorAlpha/Bravo shape (also Uniswap, ENS, many forks). Unlike
+// OpenZeppelin's IGovernor it uses a 5-arg `propose` with a `signatures[]` array
+// and *id-based* `queue`/`execute`/`cancel` (not the hash-based OZ variants) —
+// disjoint signatures, so this never collides with the `governor` detector. Pure
+// shape detection: matches any fork, keyed on structure not on a named protocol.
+const BRAVO_PROPOSE = 'propose(address[],uint256[],string[],bytes[],string)';
+const BRAVO_CAST_UINT8 = 'castVote(uint256,uint8)';
+const BRAVO_CAST_BOOL = 'castVote(uint256,bool)'; // GovernorAlpha
+
+const GOVERNOR_BRAVO_KNOWN = [
+  BRAVO_PROPOSE,
+  BRAVO_CAST_UINT8,
+  BRAVO_CAST_BOOL,
+  'castVoteWithReason(uint256,uint8,string)',
+  'castVoteBySig(uint256,uint8,uint8,bytes32,bytes32)',
+  'queue(uint256)',
+  'execute(uint256)',
+  'cancel(uint256)',
+  'state(uint256)',
+  'getActions(uint256)',
+  'getReceipt(uint256,address)',
+  'proposalCount()',
+  'quorumVotes()',
+  'proposalThreshold()',
+  'votingDelay()',
+  'votingPeriod()',
+];
+
+const GOVERNOR_BRAVO_SEMANTICS: Record<string, FunctionSemantic> = {
+  [BRAVO_PROPOSE]: {
+    operationType: 'governance-propose',
+    audience: 'user',
+    title: 'Create proposal',
+    description: 'Submit a proposal: targets, values, signatures, calldatas and a description.',
+    isRead: false,
+    risk: 'medium',
+  },
+  [BRAVO_CAST_UINT8]: {
+    operationType: 'governance-vote',
+    audience: 'user',
+    title: 'Cast vote',
+    description: 'Vote on a proposal (0 = Against, 1 = For, 2 = Abstain).',
+    isRead: false,
+    risk: 'low',
+  },
+  [BRAVO_CAST_BOOL]: {
+    operationType: 'governance-vote',
+    audience: 'user',
+    title: 'Cast vote',
+    description: 'Vote on a proposal (true = For, false = Against).',
+    isRead: false,
+    risk: 'low',
+  },
+  'castVoteWithReason(uint256,uint8,string)': {
+    operationType: 'governance-vote',
+    audience: 'user',
+    title: 'Cast vote with reason',
+    isRead: false,
+    risk: 'low',
+  },
+  'castVoteBySig(uint256,uint8,uint8,bytes32,bytes32)': {
+    operationType: 'governance-vote',
+    audience: 'user',
+    title: 'Cast vote by signature',
+    isRead: false,
+    risk: 'low',
+  },
+  'queue(uint256)': {
+    operationType: 'governance-execute',
+    audience: 'user',
+    title: 'Queue proposal',
+    description: 'Queue a succeeded proposal in the Timelock before execution.',
+    isRead: false,
+    risk: 'medium',
+  },
+  'execute(uint256)': {
+    operationType: 'governance-execute',
+    audience: 'user',
+    title: 'Execute proposal',
+    description: 'Execute a succeeded (and queued) proposal — runs the encoded calls on-chain.',
+    isRead: false,
+    risk: 'high',
+  },
+  'cancel(uint256)': {
+    operationType: 'admin-config',
+    audience: 'admin',
+    title: 'Cancel proposal',
+    isRead: false,
+    risk: 'high',
+  },
+  'state(uint256)': {
+    operationType: 'read',
+    audience: 'user',
+    title: 'Proposal state',
+    isRead: true,
+  },
+  'getActions(uint256)': {
+    operationType: 'read',
+    audience: 'user',
+    title: 'Proposal actions',
+    isRead: true,
+  },
+  'getReceipt(uint256,address)': {
+    operationType: 'read',
+    audience: 'user',
+    title: 'Vote receipt',
+    isRead: true,
+  },
+  'proposalCount()': {
+    operationType: 'read',
+    audience: 'user',
+    title: 'Proposal count',
+    isRead: true,
+  },
+  'quorumVotes()': {
+    operationType: 'read',
+    audience: 'user',
+    title: 'Quorum votes',
+    isRead: true,
+  },
+  'proposalThreshold()': {
+    operationType: 'read',
+    audience: 'user',
+    title: 'Proposal threshold',
+    isRead: true,
+  },
+  'votingDelay()': {
+    operationType: 'read',
+    audience: 'user',
+    title: 'Voting delay',
+    isRead: true,
+  },
+  'votingPeriod()': {
+    operationType: 'read',
+    audience: 'user',
+    title: 'Voting period',
+    isRead: true,
+  },
+};
+
+export function detectGovernorBravo(model: ContractModel): StandardDetection {
+  const fns = new Set(model.functions.map((f) => f.signature));
+  const hasPropose = fns.has(BRAVO_PROPOSE);
+  const hasCastVote = fns.has(BRAVO_CAST_UINT8) || fns.has(BRAVO_CAST_BOOL);
+  const hasLifecycle = fns.has('queue(uint256)') && fns.has('execute(uint256)');
+  const hasState = fns.has('state(uint256)');
+  const detected = hasPropose && hasCastVote && hasLifecycle && hasState;
+
+  const matched = GOVERNOR_BRAVO_KNOWN.filter((s) => fns.has(s));
+  const confidence = detected
+    ? Number(Math.min(1, 0.7 + 0.3 * (matched.length / GOVERNOR_BRAVO_KNOWN.length)).toFixed(4))
+    : matched.length
+      ? 0.3
+      : 0;
+
+  const missing: string[] = [];
+  if (!hasPropose) missing.push(BRAVO_PROPOSE);
+  if (!hasCastVote) missing.push(`${BRAVO_CAST_UINT8}|${BRAVO_CAST_BOOL}`);
+  if (!hasLifecycle) missing.push('queue(uint256)|execute(uint256)');
+  if (!hasState) missing.push('state(uint256)');
+
+  return {
+    standard: 'governor-bravo',
+    detected,
+    confidence,
+    evidence: matched.map((sig) => ({
+      source: 'signature',
+      detail: `governor-bravo: ${sig} present`,
+    })),
+    matched,
+    missing,
+  };
+}
+
+export const governorBravoDetector: StandardDetector = {
+  id: 'governor-bravo',
+  detect: detectGovernorBravo,
+  semantics: GOVERNOR_BRAVO_SEMANTICS,
+};
