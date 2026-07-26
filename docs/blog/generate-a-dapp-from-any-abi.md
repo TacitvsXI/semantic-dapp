@@ -4,7 +4,9 @@ published: true
 description: 'Stop hand-writing throwaway contract UIs. An open-source, deterministic-first tool that turns any deployed EVM contract into a user dApp, an admin console and a raw developer UI - generated from the ABI.'
 tags: ethereum, webdev, typescript, opensource
 cover_image: https://raw.githubusercontent.com/TacitvsXI/semantic-dapp/main/docs/assets/social-preview.png
-# canonical_url: set this to wherever you publish FIRST, then reuse it on every cross-post
+# Canonical (published first on dev.to). Do NOT uncomment for dev.to itself; on every
+# cross-post (Hashnode/Medium/your blog) set the canonical to this URL:
+# canonical_url: https://dev.to/ileskov/generate-a-full-dapp-admin-console-from-any-evm-contract-straight-from-the-abi-28kg
 ---
 
 > **TL;DR** - [Semantic Dapp](https://github.com/TacitvsXI/semantic-dapp) analyzes any

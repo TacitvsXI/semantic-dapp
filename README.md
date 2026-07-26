@@ -28,7 +28,7 @@ Semantic Dapp turns any deployed EVM contract into a clean **user dApp**, an **a
 
 <br/>
 
-[**🚀 Live demo**](https://tacitvsxi.github.io/semantic-dapp/) - a generated dApp for a real mainnet token, running entirely in your browser · [**📓 Changelog**](CHANGELOG.md) · [**🗺️ Roadmap**](docs/roadmap.md)
+[**🚀 Live demo**](https://tacitvsxi.github.io/semantic-dapp/) - a generated dApp for a real mainnet token, running entirely in your browser · [**📖 How it works (writeup)**](https://dev.to/ileskov/generate-a-full-dapp-admin-console-from-any-evm-contract-straight-from-the-abi-28kg) · [**📓 Changelog**](CHANGELOG.md) · [**🗺️ Roadmap**](docs/roadmap.md)
 
 <br/>
 
