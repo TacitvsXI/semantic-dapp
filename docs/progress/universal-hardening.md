@@ -9,6 +9,31 @@
 > 2. **Graceful, transparent degradation.** When unsure, drop to Raw and say why. Never
 >    silently analyze the wrong thing (e.g. a proxy shell).
 
+## Who this is for (and what we deliberately do NOT build)
+
+The value is **safely operating arbitrary / new / custom / UI-less contracts** — especially
+their privileged surface. Three audiences, one common need:
+
+- **Builders & devs** — instant admin console + test UI for a freshly-deployed contract, no
+  throwaway React.
+- **Custody / multisig / DAO ops** — call privileged functions on _any_ contract with correct
+  role checks, risk badges, and a confirm flow. No good tool exists here today.
+- **Self-custody / trust-minimised users** — interact with contracts that have no frontend, or
+  where you don't trust the frontend (verify calldata, use Raw).
+
+**Non-goals (explicit):**
+
+- ❌ **No protocol-specific packs** (Uniswap/Aave/Curve/Seaport "detectors"). They already have
+  great frontends, our audience won't come to us to swap, and memorising N protocols is a
+  treadmill that makes the engine _wider_, not _smarter_. If DeFi semantics are added, they must
+  come from **general, first-principles signals** (ERC standards like 4626/permit, shape- and
+  event-based inference) that generalise to every fork and every unknown contract — never from
+  "this address/interface is Unispwap".
+- ❌ No custodial backend, no hosted keys — everything stays client-side / self-hostable.
+
+Litmus test for any new feature: _does it make us better at an **arbitrary** contract our three
+audiences would actually paste?_ If it only helps one named protocol, it's out of scope.
+
 ## Empirical baseline (12 real mainnet contracts, 2026-07-26)
 
 Ran `buildManifest` on live ABIs (Blockscout). Snapshot of where we stand today:
@@ -66,20 +91,43 @@ else degrades to Raw. The two make-or-break gaps are **proxy resolution** and
   implementation in one click. Aragon `AppProxyUpgradeable` / Compound `*Delegator`
   shapes also still pending.
 
-### P1 — coverage (understand more, safely)
+### P0 — admin/permission correctness (the core for custody & devs)
 
-- [x] **NatSpec/source enrichment.** `parseNatSpec` (analyzer) mines `@notice`/`@dev`/`@param`
-      and applied modifiers from verified sources; `enrichOperations` (classifier) turns them
-      into operation descriptions + input labels and, crucially, promotes a `user` verdict to
-      `admin` when a real access modifier (`onlyOwner`/`onlyRole(...)`) gates the write. Privilege
-      is only ever upgraded, never downgraded (absence of a modifier proves nothing), so this is
-      the definitive signal that disambiguates cases the ABI alone cannot (e.g. `withdraw`). Wired
-      through the studio import flow (docs parsed once, persisted on the project). Unit-tested in
-      `natspec.test.ts` + `enrich.test.ts`.
-- [ ] **DeFi detector packs:** Uniswap V2/V3 (swap/add/removeLiquidity), Compound/Aave
-      (supply/borrow/repay/redeem), so the biggest real contracts get real semantics.
-- [ ] **Non-OZ governance:** Governor Bravo/Alpha shapes.
-- [ ] **More token shapes:** DAI-style `permit`, ERC-777, fee-on-transfer, rebasing.
+> The 6-contract NatSpec measurement (2026-07-26) showed privilege upgrades fire correctly but
+> **rarely**, because big contracts gate access with signals we don't yet read. Closing this is
+> the highest-leverage, fully-general work for our audience.
+
+- [x] **NatSpec/modifier enrichment.** `@notice`/`@param` → descriptions + input labels;
+      `onlyOwner`/`onlyRole(...)`/`auth`-style modifiers promote `user → admin` with a concrete
+      permission (upgrade-only; absence proves nothing). Measured on real contracts: ~40% of
+      functions gained human descriptions; all 3 privilege upgrades (DAI `rely`, BAYC
+      `flipSaleState`/`reserveApes`) were correct. See `natspec.test.ts` + `enrich.test.ts`.
+- [ ] **Body-level access detection.** Mine `require(msg.sender == owner/admin/...)`,
+      `_checkRole(...)`, `_checkOwner()`, custom `onlyX` modifiers whose _definition_ contains
+      such a check, and `hasRole(...)` guards. This is what Compound/USDC/older contracts use
+      instead of standard modifiers — general, high-impact, not overfit.
+- [ ] **Surface the evidence in the UI.** Show _why_ a function is admin ("gated by `onlyOwner`"
+      / "requires `MINTER_ROLE`") so custody operators can trust the label.
+- [ ] **Risk heuristic precision.** `payable` alone shouldn't imply medium risk for obvious user
+      deposits; `upgrade`/`setAdmin`/`migrate` stay high.
+
+### P0 — transaction trust (the core for self-custody)
+
+- [ ] **Calldata preview + dry-run before send.** Decode the exact calldata and run an
+      `eth_call` simulation, showing the decoded call and revert/return _before_ the user signs.
+      The flagship "don't trust the frontend" feature; 100% general.
+- [ ] **Proxy implementation override.** Manual address/ABI field in the proxy banner to
+      re-resolve an implementation in one click (matters for Safe / upgradeable treasuries).
+
+### P1 — coverage (understand more, safely — general signals only)
+
+- [ ] **More token/standard shapes:** DAI-style `permit`, ERC-777, ERC-1155 nuances,
+      fee-on-transfer, rebasing — all via interface/shape detection, applicable to any contract.
+- [ ] **Non-OZ governance:** Governor Bravo/Alpha _shapes_ (by function shape, not by named
+      protocol).
+- [ ] **Event-based inference.** Use emitted events (e.g. `Transfer`, `RoleGranted`) as
+      corroborating evidence for ambiguous writers.
+- [ ] **Aragon/`*Delegator` proxy shapes** (finishes proxy coverage generically).
 
 ### P1 — make improvements measurable
 
@@ -88,6 +136,9 @@ else degrades to Raw. The two make-or-break gaps are **proxy resolution** and
       (`scripts/corpus/`). `pnpm corpus` diffs current output vs `baseline.json`;
       `pnpm corpus:update` refreshes it. Every rule change now shows what improved/regressed
       on real contracts. See `scripts/corpus/README.md`.
+- [ ] **Source-backed corpus row(s).** The corpus is ABI-only, so it can't measure NatSpec/
+      body-access improvements. Vendor trimmed source for a couple of contracts so those gains
+      become part of the regression baseline too.
 
 ### P2 — polish
 
@@ -108,3 +159,10 @@ else degrades to Raw. The two make-or-break gaps are **proxy resolution** and
   input labels; access modifiers promote user→admin with a concrete permission (upgrade-only).
   Resolves ABI-only ambiguity (withdraw/roles) with the author's own signal.
 - 2026-07-26: real-contract regression harness added (10 contracts, offline baseline).
+- 2026-07-26: measured NatSpec on 6 real contracts (ABI+source): +62 descriptions & +57 input
+  labels across 157 ops (~40% coverage where docs exist, honest 0 where they don't); 3 privilege
+  upgrades, all correct. Measurement also caught + fixed a prototype-key crash in `parseNatSpec`.
+- 2026-07-26: **strategy pivot** — dropped protocol-specific DeFi packs (Uniswap/Aave/etc.) as a
+  non-goal (treadmill + wrong audience). Refocused the roadmap on universal admin/permission
+  correctness (body-level access detection) and transaction trust (calldata preview + dry-run),
+  which serve builders / custody / self-custody on _any_ contract. See "Who this is for".
