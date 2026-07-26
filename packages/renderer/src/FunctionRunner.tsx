@@ -217,8 +217,9 @@ export function FunctionRunner({
         onSubmit={handleSubmit}
         submitLabel={submitLabel}
         busy={busy}
-        disabled={needsWallet}
-        submitDisabled={previewGateActive && !previewReady}
+        // Preview/dry-run works without a wallet (host simulates from zero address).
+        // Only the submit button stays gated on connection + envelope.
+        submitDisabled={needsWallet || (previewGateActive && !previewReady)}
         onFieldsChange={preview || boundEnvelope ? clearPreview : undefined}
         {...(hints !== undefined ? { hints } : {})}
         {...(amount !== undefined ? { amount } : {})}
@@ -231,7 +232,7 @@ export function FunctionRunner({
         <p className="sd-runner__hint">Connect a wallet to send this transaction.</p>
       ) : null}
 
-      {previewGateActive && !needsWallet && !previewReady ? (
+      {previewGateActive && !previewReady ? (
         <p className="sd-runner__hint" data-testid="preview-required-hint">
           {canPreview
             ? 'Preview required before send.'

@@ -103,6 +103,31 @@ describe('RawFunctionCard', () => {
     await waitFor(() => expect(submitWrite).toHaveBeenCalledTimes(1));
   });
 
+  it('allows Preview without a wallet but keeps Submit blocked', async () => {
+    const func = normalizeAbi(WRITE_ABI).functions[0]!;
+    const previewWrite = vi.fn(async () => okPreview(func));
+    render(
+      <RawFunctionCard
+        func={func}
+        runtime={runtime({
+          previewWrite,
+          wallet: { isConnected: false, connect: () => {}, disconnect: () => {} },
+        })}
+      />,
+    );
+
+    const previewBtn = screen.getByRole('button', { name: /preview/i }) as HTMLButtonElement;
+    const send = screen.getByRole('button', { name: /send transaction/i }) as HTMLButtonElement;
+    expect(previewBtn.disabled).toBe(false);
+    expect(send.disabled).toBe(true);
+
+    fireEvent.click(previewBtn);
+    await waitFor(() => expect(previewWrite).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(screen.getByText(/would succeed/i)).toBeTruthy());
+    expect(send.disabled).toBe(true);
+    expect(screen.getByText(/Connect a wallet/i)).toBeTruthy();
+  });
+
   it('clears Preview and re-blocks Submit when inputs change', async () => {
     const func = normalizeAbi(AMOUNT_WRITE_ABI).functions[0]!;
     const submitWrite = vi.fn(async () => {});
