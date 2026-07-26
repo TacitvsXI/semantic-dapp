@@ -1,5 +1,5 @@
 import type { ContractFunction } from '@semantic-dapp/spec';
-import type { FormattedOutput, TxState } from '@semantic-dapp/execution';
+import type { FormattedOutput, TxState, WritePreview } from '@semantic-dapp/execution';
 
 export interface WalletState {
   isConnected: boolean;
@@ -22,6 +22,12 @@ export interface ContractRuntime {
   callRead: (func: ContractFunction, args: unknown[]) => Promise<FormattedOutput[]>;
   /** Simulate + submit a write; the runtime tracks the tx lifecycle. */
   submitWrite: (func: ContractFunction, args: unknown[], value?: bigint) => Promise<void>;
+  /**
+   * Dry-run a write without sending it: returns the encoded calldata and whether
+   * the call would revert, so the UI can preview it before the user signs.
+   * Optional so hosts can omit it; the UI hides the Preview action when absent.
+   */
+  previewWrite?: (func: ContractFunction, args: unknown[], value?: bigint) => Promise<WritePreview>;
   /** Current transaction state for a function signature. */
   getTxState: (signature: string) => TxState;
   /** Optional block explorer base URL. */

@@ -8,11 +8,13 @@ import {
   estimateWriteGas,
   explorerUrlForChain,
   idleTxState,
+  previewWrite as previewWriteCall,
   readAndFormat,
   simulateWrite,
   waitForTx,
   type FormattedOutput,
   type TxState,
+  type WritePreview,
 } from '@semantic-dapp/execution';
 import type { ContractRuntime } from '@semantic-dapp/renderer';
 import { pushToast } from '@semantic-dapp/components';
@@ -73,6 +75,22 @@ export function useContractRuntime(config: RuntimeConfig): ContractRuntime {
       );
     },
     [publicClient, abi, target],
+  );
+
+  const previewWrite = useCallback(
+    async (func: ContractFunction, args: unknown[], value?: bigint): Promise<WritePreview> => {
+      if (!target) throw new Error('Set a contract address to preview a transaction.');
+      const account = (address ?? '0x0000000000000000000000000000000000000000') as Address;
+      return previewWriteCall(publicClient, {
+        address: target,
+        abi,
+        functionName: func.name,
+        args,
+        account,
+        ...(value !== undefined ? { value } : {}),
+      });
+    },
+    [publicClient, abi, target, address],
   );
 
   const submitWrite = useCallback(
@@ -192,6 +210,7 @@ export function useContractRuntime(config: RuntimeConfig): ContractRuntime {
     },
     callRead,
     submitWrite,
+    previewWrite,
     getTxState,
     ...(explorerUrl ? { explorerUrl } : {}),
   };

@@ -417,6 +417,75 @@
   font-size: 13px;
 }
 
+/* Form actions row (submit + optional preview) */
+.sd-form__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Transaction preview / dry-run panel */
+.sd-preview {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid var(--sd-border, rgba(128, 128, 128, 0.3));
+  border-left: 3px solid var(--sd-muted, #888);
+  border-radius: 8px;
+  background: var(--sd-surface, transparent);
+  font-size: 13px;
+}
+.sd-preview--ok {
+  border-left-color: var(--sd-ok);
+}
+.sd-preview--fail {
+  border-left-color: var(--sd-danger);
+}
+.sd-preview__head {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.sd-preview--ok .sd-preview__head {
+  color: var(--sd-ok);
+}
+.sd-preview--fail .sd-preview__head {
+  color: var(--sd-danger-text);
+}
+.sd-preview__error {
+  margin: 0 0 8px;
+  color: var(--sd-danger-text);
+}
+.sd-preview__grid {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4px 12px;
+  margin: 0;
+  align-items: baseline;
+}
+.sd-preview__grid dt {
+  color: var(--sd-muted);
+  font-size: 12px;
+}
+.sd-preview__grid dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.sd-preview__grid code {
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+}
+.sd-preview__args {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.sd-preview__calldata {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 /* ERC-20 semantic components */
 .sd-token-dashboard__grid {
   display: grid;

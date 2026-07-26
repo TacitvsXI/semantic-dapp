@@ -103,7 +103,7 @@ else degrades to Raw. The two make-or-break gaps are **proxy resolution** and
       functions gained human descriptions; all 3 privilege upgrades (DAI `rely`, BAYC
       `flipSaleState`/`reserveApes`) were correct. See `natspec.test.ts` + `enrich.test.ts`.
 - [x] **Body-level access detection.** `parseNatSpec` now also mines `require/if (msg.sender ==
-  owner()/admin/...)`, `_checkOwner()`, `_checkRole(ROLE)`, `hasRole(ROLE, msg.sender)`, and
+owner()/admin/...)`, `_checkOwner()`, `_checkRole(ROLE)`, `hasRole(ROLE, msg.sender)`, and
       custom `onlyX` modifiers whose _definition_ contains such a check. Each function gets a
       resolved, serialisable `AccessHint {kind, role?, detail}` that `enrichOperations` uses to
       promote user→admin with a concrete permission + human evidence (upgrade-only). Unit-tested
@@ -121,9 +121,11 @@ else degrades to Raw. The two make-or-break gaps are **proxy resolution** and
 
 ### P0 — transaction trust (the core for self-custody)
 
-- [ ] **Calldata preview + dry-run before send.** Decode the exact calldata and run an
-      `eth_call` simulation, showing the decoded call and revert/return _before_ the user signs.
-      The flagship "don't trust the frontend" feature; 100% general.
+- [x] **Calldata preview + dry-run before send.** A "Preview" action on every write encodes the
+      exact calldata and runs an `eth_call` simulation, showing target/decoded args/value/gas and
+      whether it would succeed or revert (with the decoded reason) _before_ the user signs. Fully
+      general (`previewWrite` in execution → `WritePreviewView`); the flagship "don't trust the
+      frontend" feature. Unit-tested in `write.test.ts` + `WritePreviewView.test.tsx`.
 - [ ] **Proxy implementation override.** Manual address/ABI field in the proxy banner to
       re-resolve an implementation in one click (matters for Safe / upgradeable treasuries).
 
@@ -156,6 +158,11 @@ else degrades to Raw. The two make-or-break gaps are **proxy resolution** and
 
 ## Log
 
+- 2026-07-26: **transaction preview + dry-run** shipped — every write now has a "Preview" action
+  that encodes the exact calldata and `eth_call`-simulates it, showing target/args/value/gas and a
+  pass/revert verdict (decoded reason) before the user signs. `previewWrite` (execution) +
+  `WritePreviewView` (renderer), wired into both the studio and generated-app runtimes. The core
+  "don't trust the frontend" trust feature for self-custody; 100% general. Unit-tested.
 - 2026-07-26: baseline captured; backlog created.
 - 2026-07-26: signature-aware `mint` shipped (fixes cToken/NFT-paid-mint mislabels).
 - 2026-07-26: name-rule audit round 1 — shape-aware `withdraw`; dropped generic `add`/`remove`

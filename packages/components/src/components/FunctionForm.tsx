@@ -18,6 +18,14 @@ export interface FunctionFormProps {
   hints?: (InputWidget | undefined)[];
   /** Token metadata for `token-amount` widgets. */
   amount?: AmountContext;
+  /**
+   * Optional secondary action (e.g. "Preview / dry-run") that receives the same
+   * validated + encoded args as {@link onSubmit} without submitting.
+   */
+  onSecondary?: (args: unknown[]) => void;
+  secondaryLabel?: string;
+  /** The secondary action is in flight. */
+  secondaryBusy?: boolean;
 }
 
 /**
@@ -33,6 +41,9 @@ export function FunctionForm({
   disabled,
   hints,
   amount,
+  onSecondary,
+  secondaryLabel,
+  secondaryBusy,
 }: FunctionFormProps) {
   const [values, setValues] = useState<FieldValue[]>(() =>
     func.inputs.map((input) => defaultFieldValue(input)),
@@ -50,6 +61,15 @@ export function FunctionForm({
     setErrors(result.errors);
     if (result.ok && result.values) {
       onSubmit(result.values);
+    }
+  };
+
+  const handleSecondary = () => {
+    if (!onSecondary) return;
+    const result = encodeInputs(func.inputs, values);
+    setErrors(result.errors);
+    if (result.ok && result.values) {
+      onSecondary(result.values);
     }
   };
 
@@ -76,13 +96,25 @@ export function FunctionForm({
           />
         ))
       )}
-      <button
-        type="submit"
-        className={`sd-btn ${func.isRead ? 'sd-btn--read' : 'sd-btn--write'}`}
-        disabled={busy || disabled}
-      >
-        {busy ? 'Working…' : label}
-      </button>
+      <div className="sd-form__actions">
+        {onSecondary ? (
+          <button
+            type="button"
+            className="sd-btn sd-btn--ghost"
+            onClick={handleSecondary}
+            disabled={secondaryBusy || busy || disabled}
+          >
+            {secondaryBusy ? 'Simulating…' : (secondaryLabel ?? 'Preview')}
+          </button>
+        ) : null}
+        <button
+          type="submit"
+          className={`sd-btn ${func.isRead ? 'sd-btn--read' : 'sd-btn--write'}`}
+          disabled={busy || disabled}
+        >
+          {busy ? 'Working…' : label}
+        </button>
+      </div>
     </form>
   );
 }
