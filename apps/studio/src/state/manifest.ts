@@ -34,6 +34,7 @@ export function computeManifest(project: Project, model: ContractModel): Semanti
       ? { implementationAddress: project.proxy.implementation }
       : {}),
     ...(project.codeHash ? { implementationCodeHash: project.codeHash } : {}),
+    ...(project.sourceDocs ? { docs: project.sourceDocs } : {}),
   });
 
   return project.manifest ? mergeReviewed(project.manifest, fresh) : fresh;

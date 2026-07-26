@@ -1,6 +1,7 @@
 import { useState, type ChangeEvent } from 'react';
 import { getAddress, isAddress } from 'viem';
 import { parseAbiJson } from '@semantic-dapp/spec';
+import { parseNatSpec } from '@semantic-dapp/analyzer';
 import type { ResolvedContract } from '@semantic-dapp/resolver';
 import { DEFAULT_CHAIN_ID, DEFAULT_RPC_URL, type Project } from '../state/project.js';
 import { newProjectId, saveProject } from '../state/storage.js';
@@ -124,6 +125,8 @@ export function ImportWizard({ onCancel, onCreated }: ImportWizardProps) {
   const handleCreateFromResolved = () => {
     if (!resolved) return;
     const now = Date.now();
+    const sourceDocs = resolved.sources ? parseNatSpec(resolved.sources) : undefined;
+    const hasDocs = sourceDocs && Object.keys(sourceDocs).length > 0;
     const project: Project = {
       id: newProjectId(),
       name: name.trim() || resolved.contractName || 'Contract',
@@ -139,6 +142,7 @@ export function ImportWizard({ onCancel, onCreated }: ImportWizardProps) {
       provenance: resolved.provenance,
       ...(resolved.proxy ? { proxy: resolved.proxy } : {}),
       ...(resolved.codeHash ? { codeHash: resolved.codeHash } : {}),
+      ...(hasDocs ? { sourceDocs } : {}),
     };
     saveProject(project);
     onCreated(project);

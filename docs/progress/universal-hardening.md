@@ -68,9 +68,14 @@ else degrades to Raw. The two make-or-break gaps are **proxy resolution** and
 
 ### P1 — coverage (understand more, safely)
 
-- [ ] **NatSpec/source enrichment.** Resolver already fetches source; mine `@notice`/
-      `@dev`/`@param` for titles/descriptions and modifiers for permission hints. Closes
-      the README's "(and source/NatSpec when available)" promise.
+- [x] **NatSpec/source enrichment.** `parseNatSpec` (analyzer) mines `@notice`/`@dev`/`@param`
+      and applied modifiers from verified sources; `enrichOperations` (classifier) turns them
+      into operation descriptions + input labels and, crucially, promotes a `user` verdict to
+      `admin` when a real access modifier (`onlyOwner`/`onlyRole(...)`) gates the write. Privilege
+      is only ever upgraded, never downgraded (absence of a modifier proves nothing), so this is
+      the definitive signal that disambiguates cases the ABI alone cannot (e.g. `withdraw`). Wired
+      through the studio import flow (docs parsed once, persisted on the project). Unit-tested in
+      `natspec.test.ts` + `enrich.test.ts`.
 - [ ] **DeFi detector packs:** Uniswap V2/V3 (swap/add/removeLiquidity), Compound/Aave
       (supply/borrow/repay/redeem), so the biggest real contracts get real semantics.
 - [ ] **Non-OZ governance:** Governor Bravo/Alpha shapes.
@@ -99,4 +104,7 @@ else degrades to Raw. The two make-or-break gaps are **proxy resolution** and
 - 2026-07-26: proxy transparency — broadened detection (EIP-1167 clones, legacy
   `implementation()`, Gnosis `masterCopy()`) + `unresolvedImplementation` flag + studio
   shell-warning banner so a proxy shell is never silently shown as the real contract.
+- 2026-07-26: NatSpec/modifier enrichment — author `@notice`/`@param` become descriptions +
+  input labels; access modifiers promote user→admin with a concrete permission (upgrade-only).
+  Resolves ABI-only ambiguity (withdraw/roles) with the author's own signal.
 - 2026-07-26: real-contract regression harness added (10 contracts, offline baseline).

@@ -2,9 +2,11 @@ import type { ContractModel, OperationDefinition, SemanticManifest } from '@sema
 import {
   resolveSemantics,
   detectAccessModel,
+  type SourceDocs,
   type StandardDetection,
 } from '@semantic-dapp/analyzer';
 import { classifyFunction } from './rules.js';
+import { enrichOperations } from './enrich.js';
 
 export interface ClassificationResult {
   operations: OperationDefinition[];
@@ -12,18 +14,29 @@ export interface ClassificationResult {
   detections: StandardDetection[];
 }
 
+export interface ClassifyOptions {
+  /** Parsed NatSpec/modifier docs from verified source, for enrichment. */
+  docs?: SourceDocs;
+}
+
 /**
  * Run all detectors and classify every function in a contract model into
  * semantic operations via the priority rule engine (ADR-006). Deterministic and
- * network-free.
+ * network-free. When source docs are supplied, operations are enriched with
+ * author NatSpec + modifier-based privilege hints (additive; never demotes).
  */
-export function classifyContract(model: ContractModel, contractId: string): ClassificationResult {
+export function classifyContract(
+  model: ContractModel,
+  contractId: string,
+  options: ClassifyOptions = {},
+): ClassificationResult {
   const standards = resolveSemantics(model);
   const access = detectAccessModel(model);
 
-  const operations = model.functions.map((func) =>
+  let operations = model.functions.map((func) =>
     classifyFunction({ func, model, standards, access }, contractId),
   );
+  if (options.docs) operations = enrichOperations(operations, options.docs);
 
   return { operations, standards: standards.detected, detections: standards.detections };
 }
@@ -37,6 +50,8 @@ export interface BuildManifestOptions {
   abiSource?: SemanticManifest['contracts'][number]['abiSource'];
   implementationAddress?: string;
   implementationCodeHash?: string;
+  /** Parsed NatSpec/modifier docs from verified source, for enrichment. */
+  docs?: SourceDocs;
 }
 
 /**
@@ -47,7 +62,9 @@ export function buildManifest(
   model: ContractModel,
   options: BuildManifestOptions,
 ): SemanticManifest {
-  const { operations, standards } = classifyContract(model, options.contractId);
+  const { operations, standards } = classifyContract(model, options.contractId, {
+    ...(options.docs ? { docs: options.docs } : {}),
+  });
   return {
     version: 1,
     project: { name: options.projectName },

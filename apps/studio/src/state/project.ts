@@ -1,5 +1,6 @@
 import type { Abi } from 'viem';
 import type { SemanticManifest } from '@semantic-dapp/spec';
+import type { SourceDocs } from '@semantic-dapp/analyzer';
 import type { Provenance, ProxyInfo } from '@semantic-dapp/resolver';
 
 /** A locally-persisted studio project (no backend; self-hostable). */
@@ -22,6 +23,8 @@ export interface Project {
   proxy?: ProxyInfo;
   /** keccak256 of the (implementation) bytecode at resolve time (staleness). */
   codeHash?: string;
+  /** Parsed NatSpec/modifier docs from verified source, for manifest enrichment. */
+  sourceDocs?: SourceDocs;
   /** Computed semantic manifest (operations filled in by analyzer/classifier). */
   manifest?: SemanticManifest;
 }

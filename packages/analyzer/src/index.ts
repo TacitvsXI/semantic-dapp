@@ -6,3 +6,4 @@ export * from './capabilities.js';
 export * from './access.js';
 export * from './registry.js';
 export * from './metadata.js';
+export * from './natspec.js';
