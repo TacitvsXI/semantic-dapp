@@ -64,7 +64,7 @@ function toBundle(args: {
     ...(args.address ? { address: args.address } : {}),
     ...(args.contractName ? { contractName: args.contractName } : {}),
     ...(explorer ? { explorerUrl: explorer } : {}),
-    generator: { name: 'semantic-dapp-demo', version: '0.1.1' },
+    generator: { name: 'semantic-dapp-demo', version: '0.1.2' },
   });
 }
 

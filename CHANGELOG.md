@@ -5,6 +5,32 @@ All notable changes to this project are documented here. The format is based on
 follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) once it reaches
 `1.0.0`. While in `0.x`, minor versions may include breaking changes.
 
+## [0.1.2] - 2026-07-26
+
+Universal hardening pass: proxy/diamond resolution, more token & governance shapes,
+admin evidence in the UI, and a live-demo “load your contract” flow.
+
+### Added
+
+- **EIP-2535 diamond support**: loupe `facetAddresses()` detection, per-facet ABI
+  fetch + selector-deduped merge; diamond address stays the call target;
+  `diamondCut` labelled upgrade/critical.
+- **Governor Bravo/Alpha** shape detector (Compound-style propose/queue/execute),
+  disjoint from OpenZeppelin Governor.
+- **DAI-style permit**, **ERC-777**, **rebasing / share-based** tokens, and a
+  **fee-on-transfer** advisory (fee-exclusion admin surface + Overview warning).
+- **ERC-1155 nuances**: Supply / Burnable / mintBatch semantics.
+- **NatSpec + body-level access detection**, **PermissionBadge**, **tx Preview /
+  dry-run**, **proxy implementation override**, Aragon ERC-897 + `*Delegator`
+  proxy shapes, event-based corroboration.
+- **Live demo**: “Load your contract” (address or paste ABI) on GitHub Pages.
+- **Real-contract corpus** harness (incl. source-backed DAI/BAYC rows).
+
+### Changed
+
+- Risk heuristic: `payable` is a medium floor, not an override of user routing.
+- Signature-aware `mint` / `withdraw` heuristics to cut false admin labels.
+
 ## [0.1.1] - 2026-07-25
 
 First npm release: all nine `@semantic-dapp/*` packages published under the scope,

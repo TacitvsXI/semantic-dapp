@@ -1,6 +1,6 @@
 {
   "name": "@semantic-dapp/components",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Trusted UI components and input widgets for Semantic Dapp generated apps.",
   "license": "AGPL-3.0-only",
   "homepage": "https://github.com/TacitvsXI/semantic-dapp#readme",

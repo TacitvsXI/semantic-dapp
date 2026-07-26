@@ -1,6 +1,6 @@
 {
   "name": "@semantic-dapp/execution",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "viem/wagmi reads, simulation, writes, receipts and error decoding for Semantic Dapp.",
   "license": "AGPL-3.0-only",
   "homepage": "https://github.com/TacitvsXI/semantic-dapp#readme",
