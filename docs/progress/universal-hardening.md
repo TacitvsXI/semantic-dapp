@@ -211,6 +211,8 @@ owner()/admin/...)`, `_checkOwner()`, `_checkRole(ROLE)`, `hasRole(ROLE, msg.sen
 
 ## Log
 
+- 2026-07-26: **Raw fail-closed plan** — captured from r/ethdev review; see
+  `docs/progress/raw-write-fail-closed.md`. Added as open P0 under transaction trust.
 - 2026-07-26: **P1 tails closed** — ERC-1155 supply/burnable/mint semantics; fee-on-transfer via
   fee-exclusion admin shape + transfer advisory/Overview warn (honest: ABI can't prove the fee,
   only the management surface). P1 coverage checklist complete aside from eternal runtime FoT sim.
