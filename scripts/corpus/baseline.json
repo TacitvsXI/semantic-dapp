@@ -30,7 +30,7 @@
       "classifiedWrites": 6,
       "unknownWrites": 5
     },
-    "avgConfidencePct": 62,
+    "avgConfidencePct": 67,
     "ops": [
       "DOMAIN_SEPARATOR() => read/user",
       "PERMIT_TYPEHASH() => read/user",
@@ -47,14 +47,19 @@
       "permit(address,address,uint256,uint256,bool,uint8,bytes32,bytes32) => unknown/developer",
       "pull(address,uint256) => unknown/developer",
       "push(address,uint256) => unknown/developer",
-      "rely(address) => unknown/developer",
+      "rely(address) => unknown/admin/medium",
       "symbol() => read/user",
       "totalSupply() => read/user",
       "transfer(address,uint256) => token-transfer/user/low",
       "transferFrom(address,address,uint256) => token-transfer/user/medium",
       "version() => read/user",
       "wards(address) => read/user"
-    ]
+    ],
+    "enriched": {
+      "descriptions": 4,
+      "inputLabels": 0,
+      "privilegedWrites": 3
+    }
   },
   "USDC": {
     "standards": ["upgradeable"],
@@ -81,7 +86,7 @@
       "classifiedWrites": 14,
       "unknownWrites": 2
     },
-    "avgConfidencePct": 60,
+    "avgConfidencePct": 66,
     "ops": [
       "BAYC_PROVENANCE() => read/user",
       "MAX_APES() => read/user",
@@ -91,7 +96,7 @@
       "balanceOf(address) => read/user",
       "baseURI() => read/user",
       "emergencySetStartingIndexBlock() => fund-withdraw/emergency/critical",
-      "flipSaleState() => unknown/developer",
+      "flipSaleState() => unknown/admin/medium",
       "getApproved(uint256) => read/user",
       "isApprovedForAll(address,address) => read/user",
       "maxApePurchase() => read/user",
@@ -100,7 +105,7 @@
       "owner() => read/user",
       "ownerOf(uint256) => read/user",
       "renounceOwnership() => ownership-transfer/admin/critical",
-      "reserveApes() => unknown/developer",
+      "reserveApes() => unknown/admin/medium",
       "safeTransferFrom(address,address,uint256) => token-transfer/user/medium",
       "safeTransferFrom(address,address,uint256,bytes) => token-transfer/user/medium",
       "saleIsActive() => read/user",
@@ -120,7 +125,12 @@
       "transferFrom(address,address,uint256) => token-transfer/user/medium",
       "transferOwnership(address) => ownership-transfer/admin/high",
       "withdraw() => fund-withdraw/admin/high"
-    ]
+    ],
+    "enriched": {
+      "descriptions": 25,
+      "inputLabels": 0,
+      "privilegedWrites": 10
+    }
   },
   "Compound-cDAI": {
     "standards": ["erc-20"],

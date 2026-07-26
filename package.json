@@ -57,6 +57,7 @@
     "corpus": "pnpm -w build && node scripts/corpus-check.mjs",
     "corpus:update": "pnpm -w build && node scripts/corpus-check.mjs --update",
     "corpus:fetch": "node scripts/corpus-check.mjs --fetch",
+    "corpus:fetch-sources": "node scripts/corpus-check.mjs --fetch-sources",
     "clean": "turbo run clean && rm -rf node_modules",
     "release:dry": "pnpm -w build && pnpm -r publish --dry-run --no-git-checks",
     "release": "pnpm -w build && pnpm -r publish --no-git-checks",
@@ -66,6 +67,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
+    "@semantic-dapp/analyzer": "workspace:*",
     "@semantic-dapp/classifier": "workspace:*",
     "@semantic-dapp/export": "workspace:*",
     "@semantic-dapp/spec": "workspace:*",

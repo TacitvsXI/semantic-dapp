@@ -6,18 +6,24 @@ measurement tool behind [`docs/progress/universal-hardening.md`](../../docs/prog
 
 ## How it works
 
-- `contracts.json` — the curated corpus (address + chain + category).
+- `contracts.json` — the curated corpus (address + chain + category). A `"source": true`
+  flag marks rows that also carry vendored source (below).
 - `abis/<chainId>-<address>.json` — **vendored ABIs** (trimmed to functions + events) so
   the check is offline and deterministic.
+- `sources/<chainId>-<address>.json` — **vendored trimmed source** (only files that declare
+  functions/modifiers) for `"source": true` rows, so NatSpec/modifier/body-access enrichment
+  is measured too, not just ABI-shape classification.
 - `baseline.json` — the committed classification snapshot (standards, op counts, avg
-  confidence, and every `function => operationType/audience/risk`).
+  confidence, every `function => operationType/audience/risk`, and — for source-backed rows —
+  an `enriched` block: `descriptions`, `inputLabels`, `privilegedWrites`).
 
 ## Commands
 
 ```bash
-pnpm corpus          # offline: compare current classification to the baseline (CI-safe)
-pnpm corpus:update   # offline: regenerate baseline.json after an intended change
-pnpm corpus:fetch    # network: refresh vendored ABIs (needs internet, keyless Blockscout)
+pnpm corpus                # offline: compare current classification to the baseline (CI-safe)
+pnpm corpus:update         # offline: regenerate baseline.json after an intended change
+pnpm corpus:fetch          # network: refresh vendored ABIs (keyless Blockscout)
+pnpm corpus:fetch-sources  # network: vendor trimmed source for "source": true rows
 ```
 
 ## Typical workflow
@@ -33,4 +39,5 @@ pnpm corpus:fetch    # network: refresh vendored ABIs (needs internet, keyless B
   doesn't report an implementation. That's intentional: it documents the proxy blind spot
   until proxy resolution is hardened.
 - To add a contract: add it to `contracts.json`, run `pnpm corpus:fetch`, then
-  `pnpm corpus:update`.
+  `pnpm corpus:update`. To also measure source enrichment, add `"source": true` and run
+  `pnpm corpus:fetch-sources` before `pnpm corpus:update`.

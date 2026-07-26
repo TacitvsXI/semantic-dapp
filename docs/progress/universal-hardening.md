@@ -153,9 +153,13 @@ owner()/admin/...)`, `_checkOwner()`, `_checkRole(ROLE)`, `hasRole(ROLE, msg.sen
       (`scripts/corpus/`). `pnpm corpus` diffs current output vs `baseline.json`;
       `pnpm corpus:update` refreshes it. Every rule change now shows what improved/regressed
       on real contracts. See `scripts/corpus/README.md`.
-- [ ] **Source-backed corpus row(s).** The corpus is ABI-only, so it can't measure NatSpec/
-      body-access improvements. Vendor trimmed source for a couple of contracts so those gains
-      become part of the regression baseline too.
+- [x] **Source-backed corpus row(s).** Two rows (DAI, BAYC) now carry vendored trimmed source
+      (`scripts/corpus/sources/`, only files with functions/modifiers). The harness runs
+      `parseNatSpec` on them and feeds `docs` into `buildManifest`, so the baseline records an
+      `enriched` block (`descriptions`, `inputLabels`, `privilegedWrites`) and the audience upgrades.
+      Measured gains, now regression-guarded: DAI +4 descriptions & `rely` → admin (ward-gated);
+      BAYC +25 descriptions & 10 privileged writes (`flipSaleState`/`reserveApes`/… → admin via
+      `onlyOwner`). `pnpm corpus:fetch-sources` refreshes them.
 
 ### P2 — polish
 
@@ -165,6 +169,11 @@ owner()/admin/...)`, `_checkOwner()`, `_checkRole(ROLE)`, `hasRole(ROLE, msg.sen
 
 ## Log
 
+- 2026-07-26: **source-backed corpus** — vendored trimmed source for DAI + BAYC so the regression
+  harness measures NatSpec/modifier/body-access enrichment, not just ABI shape. Baseline now has an
+  `enriched` block per source row. Confirmed, regression-guarded gains: DAI +4 descriptions & `rely`
+  promoted to admin; BAYC +25 descriptions & 10 privileged writes surfaced (was Raw). This makes the
+  admin-correctness work provable instead of anecdotal.
 - 2026-07-26: **risk precision** — `payable` is no longer treated as inherently risky. It's now a
   medium _floor_ (priority 45, below routing) so obvious user actions keep their assigned risk while
   unknown payable writers still default to medium; destructive/upgrade/admin names stay high at 70.
