@@ -185,6 +185,13 @@ Live demo 👇 https://tacitvsxi.github.io/semantic-dapp/
 
 ## 5. dev.to / Hashnode article (evergreen)
 
+> ✅ A complete, ready-to-publish draft already lives at
+> [`docs/blog/generate-a-dapp-from-any-abi.md`](blog/generate-a-dapp-from-any-abi.md).
+> It has dev.to front matter, working code samples and images via raw GitHub URLs.
+> Paste it into dev.to (it stays `published: false` until you flip it), then cross-post
+> to Hashnode / your blog with the **same `canonical_url`** (set it to wherever you
+> publish first) so you don't get an SEO duplicate-content penalty.
+
 **Title ideas:**
 
 - "Stop hand-writing contract admin panels: generate them from the ABI"

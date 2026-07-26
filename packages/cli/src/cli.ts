@@ -6,7 +6,7 @@ import { bundleFilename } from '@semantic-dapp/export';
 import { exportApp, readBundleFile } from './scaffold.js';
 import { serve } from './serve.js';
 
-const VERSION = '0.1.0-beta';
+const VERSION = '0.1.1';
 
 const HELP = `semantic-dapp ${VERSION}
 
