@@ -12,13 +12,13 @@ Semantic Dapp turns any deployed EVM contract into a clean **user dApp**, an **a
 
 <img src="docs/demo/demo.gif" alt="A generated dApp for USDC: User, Admin, Read and Raw tabs with semantic labels, roles and risk" width="100%" />
 
-<sub>A generated dApp for mainnet USDC - the same four tabs (User · Admin · Read · Raw) you get for any contract. <a href="https://tacitvsxi.github.io/semantic-dapp/">Try it live →</a></sub>
+<sub>Mainnet USDC demo — same User · Admin · Read · Raw tabs for any contract. On the live page, use <b>Load your contract</b> for your own address/ABI. <a href="https://tacitvsxi.github.io/semantic-dapp/">Try it live →</a></sub>
 
 <br/>
 
 [![CI](https://github.com/TacitvsXI/semantic-dapp/actions/workflows/ci.yml/badge.svg)](https://github.com/TacitvsXI/semantic-dapp/actions/workflows/ci.yml)
 [![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)
-[![Release](https://img.shields.io/badge/release-v0.1.1-14b8a6.svg)](CHANGELOG.md)
+[![Release](https://img.shields.io/badge/release-v0.1.2-14b8a6.svg)](CHANGELOG.md)
 [![npm](https://img.shields.io/npm/v/@semantic-dapp/cli/latest.svg?logo=npm&color=cb3837)](https://www.npmjs.com/package/@semantic-dapp/cli)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -28,7 +28,7 @@ Semantic Dapp turns any deployed EVM contract into a clean **user dApp**, an **a
 
 <br/>
 
-[**🚀 Live demo**](https://tacitvsxi.github.io/semantic-dapp/) - a generated dApp for a real mainnet token, running entirely in your browser · [**📖 How it works (writeup)**](https://dev.to/ileskov/generate-a-full-dapp-admin-console-from-any-evm-contract-straight-from-the-abi-28kg) · [**📓 Changelog**](CHANGELOG.md) · [**🗺️ Roadmap**](docs/roadmap.md)
+[**🚀 Live demo**](https://tacitvsxi.github.io/semantic-dapp/) - USDC demo + **Load your contract** (address or ABI) in the browser · [**📖 How it works (writeup)**](https://dev.to/ileskov/generate-a-full-dapp-admin-console-from-any-evm-contract-straight-from-the-abi-28kg) · [**📓 Changelog**](CHANGELOG.md) · [**🗺️ Roadmap**](docs/roadmap.md)
 
 <br/>
 
@@ -81,13 +81,15 @@ Auto-generated **User**, **Admin** and **Raw** tabs. Connect a wallet, simulate,
 ## Features
 
 - 🧠 **Semantic manifest** - a reviewable, machine-readable understanding of the contract that sits between analysis and UI. Edit it, export it, version it.
-- 🏷️ **Standards & access detection** - ERC-20 / 721 / 1155 / 4626, plus Ownable / AccessControl / Pausable / UUPS-upgradeable, via a member-based rule engine.
+- 🏷️ **Standards & access detection** - ERC-20 / 2612 / DAI-permit / 777 / 721 / 1155 / 4626, rebasing & fee-on-transfer advisories, OZ Governor + Bravo/Alpha, Ownable / AccessControl / Pausable / upgradeable (incl. `diamondCut`), via a member-based rule engine.
+- 📜 **NatSpec & source access hints** - descriptions, param labels, and privilege upgrades from modifiers / body-level checks when verified source is available; **PermissionBadge** shows why a function is admin.
+- 🪞 **Proxy & diamond aware** - EIP-1967 / 1167 / Safe / ERC-897 / Delegator / EIP-2535 facets; unresolved-shell warnings + manual implementation override.
 - 🛡️ **Safety first** - role-by-name pickers with live `hasRole` badges, "type CONFIRM" gates on critical actions, homoglyph/bidi text sanitization, staleness detection when a proxy is upgraded.
-- ✍️ **Real execution** - viem + wagmi reads, `eth_call` **simulation before signing**, gas estimation, decoded revert reasons, and a local audit trail.
+- ✍️ **Real execution** - viem + wagmi reads, calldata **Preview** + `eth_call` dry-run before signing, gas estimation, decoded revert reasons, and a local audit trail.
 - 📦 **Export a standalone dApp** - package identity + ABI + reviewed manifest into a portable **bundle** and host it anywhere. No Semantic Dapp cloud, ever.
 - 🧰 **CLI** - build, export, and serve apps headlessly (`semantic-dapp bundle | export | serve`).
 - 🔌 **Wallet-fallback reads** - if a public RPC is missing or rate-limited, reads fall back to the connected wallet's provider.
-- ♿ **Accessible & tested** - axe-core a11y gate, unit + e2e tests, and analyzer tests driven by real compiled Foundry ABIs.
+- ♿ **Accessible & tested** - axe-core a11y gate, unit + e2e tests, real-contract corpus harness, and analyzer tests driven by compiled Foundry ABIs.
 
 ## How it works
 
@@ -98,7 +100,7 @@ flowchart LR
     C --> D[Classifier<br/>operation type · audience]
     D --> E[Semantic Manifest<br/>reviewable · versioned]
     E --> F[Renderer<br/>User · Admin · Raw]
-    F --> G[Execution<br/>simulate · sign · trace]
+    F --> G[Execution<br/>preview · simulate · sign]
     E -.export.-> H[Standalone dApp<br/>+ CLI]
 ```
 
@@ -127,7 +129,7 @@ pnpm --filter @semantic-dapp/generated-app dev  # render a bundled dApp
 
 ## Use as a library (npm)
 
-All the building blocks are published to npm under the [`@semantic-dapp`](https://www.npmjs.com/org/semantic-dapp) scope, so you can embed the analyzer, classifier and generated UI in your own app:
+All the building blocks are published to npm under the `@semantic-dapp` scope, so you can embed the analyzer, classifier and generated UI in your own app:
 
 ```bash
 # analyze + classify a contract and render the generated UI
@@ -147,13 +149,13 @@ semantic-dapp --help
 | [`@semantic-dapp/renderer`](https://www.npmjs.com/package/@semantic-dapp/renderer)                                                                                                                                                                                                       | Renders a full app from a manifest + runtime             |
 | [`@semantic-dapp/execution`](https://www.npmjs.com/package/@semantic-dapp/execution) · [`resolver`](https://www.npmjs.com/package/@semantic-dapp/resolver) · [`export`](https://www.npmjs.com/package/@semantic-dapp/export) · [`cli`](https://www.npmjs.com/package/@semantic-dapp/cli) | Tx execution, contract resolution, portable bundles, CLI |
 
-> Beta: published as `0.1.1`. APIs may shift before `1.0`.
+> Latest: **`0.1.2`** on npm. Still `0.x` beta — APIs may shift before `1.0`.
 
 ## Try the demos
 
-The [**live demo**](https://tacitvsxi.github.io/semantic-dapp/) renders a generated dApp for a real mainnet ERC-20 (USDC) - reads run against a public RPC, and connecting a wallet enables writes. Use **Load your contract** on that page to paste an address or ABI and try your own contract in the browser. Or run demos locally:
+The [**live demo**](https://tacitvsxi.github.io/semantic-dapp/) ships a mainnet USDC bundle (public RPC for reads; connect a wallet for writes). Click **Load your contract** to resolve an address or paste an ABI/artifact and run the generated UI on _your_ contract — no Studio install required.
 
-Three self-contained demos built from real compiled contracts:
+Local fixture demos (compiled Foundry contracts):
 
 | Demo      | Contract               | Shows off                                  |
 | --------- | ---------------------- | ------------------------------------------ |
@@ -165,13 +167,15 @@ See [`docs/demos.md`](docs/demos.md) for rendering them (optionally against a lo
 
 ## What it understands today
 
-| Category        | Supported                                                         |
-| --------------- | ----------------------------------------------------------------- |
-| Token standards | ERC-20, ERC-2612 (permit), ERC-721, ERC-1155, ERC-4626            |
-| Governance      | OpenZeppelin Governor (propose / vote / queue / execute)          |
-| Access models   | Ownable, AccessControl (roles), Pausable, UUPS-upgradeable        |
-| Proxies         | EIP-1967 detection → analyze the implementation                   |
-| Sources         | Sourcify, block explorers (Etherscan v2 API), manual ABI/artifact |
+| Category         | Supported                                                                 |
+| ---------------- | ------------------------------------------------------------------------- |
+| Token standards  | ERC-20, ERC-2612, DAI-style permit, ERC-777, ERC-721, ERC-1155, ERC-4626  |
+| Token advisories | Rebasing / share-based, fee-on-transfer (admin-surface + Overview warn)   |
+| Governance       | OpenZeppelin Governor; Compound-style Governor Bravo / Alpha              |
+| Access models    | Ownable, AccessControl (roles), Pausable, upgradeable (+ `diamondCut`)    |
+| Proxies          | EIP-1967, EIP-1167, Gnosis Safe, ERC-897, `*Delegator`, EIP-2535 diamonds |
+| Enrichment       | NatSpec + modifier / body-level access hints when source is available     |
+| Sources          | Sourcify, block explorers (Etherscan v2 API), manual ABI/artifact         |
 
 Don't see your pattern? The Raw tab always exposes **every** ABI function, and the rule engine is designed to be extended - [contributions welcome](CONTRIBUTING.md).
 
@@ -219,10 +223,10 @@ semantic-dapp/
 
 ## Status & roadmap
 
-`v0.1.0-beta` - the full pipeline works end to end. Beta means the surface is usable but still moving: while in `0.x`, minor versions may include breaking changes.
+**`v0.1.2`** - full pipeline + universal hardening (proxies/diamonds, more standards, tx preview, live load-your-contract). Still beta: while in `0.x`, minor versions may include breaking changes.
 
 - 🗺️ [Roadmap](docs/roadmap.md) · 📓 [Changelog](CHANGELOG.md) · 📊 [Progress dashboard](PROGRESS.md)
-- 🎨 [UX roadmap](docs/ux-improvements.md) · 🧱 [Architecture decisions (ADRs)](docs/adr)
+- 🧱 [Universal hardening backlog](docs/progress/universal-hardening.md) · 🎨 [UX roadmap](docs/ux-improvements.md) · 🧱 [ADRs](docs/adr)
 
 ## Contributing
 
