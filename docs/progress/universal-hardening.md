@@ -147,8 +147,16 @@ owner()/admin/...)`, `_checkOwner()`, `_checkRole(ROLE)`, `hasRole(ROLE, msg.sen
       `send`→transfer, `authorizeOperator`→`token-approve/high` ("grants full control"), `burn`/
       `operatorBurn`→burn. Both are pure shape detection (no named protocol). Unit-tested in
       `standards.test.ts`; corpus DAI improved 62→76% avg confidence, 6→7/11 classified writes.
-- [ ] **Remaining token/standard shapes:** ERC-1155 nuances, fee-on-transfer, rebasing — all via
-      interface/shape detection, applicable to any contract.
+- [x] **Rebasing / share-based tokens.** New `rebasing` shape detector (`standards.ts`) flags ERC-20s
+      whose balance is derived from an internal share/scaled unit, so `balanceOf` can change with no
+      transfer: Lido stETH shape (`sharesOf`+`getPooledEthByShares`/`getSharesByPooledEth`), Aave aToken
+      shape (`scaledBalanceOf`+`scaledTotalSupply`), AMPL-style elastic supply (`rebase(uint256,int256)`).
+      Requires the ERC-20 core to keep false positives near zero. Labels the share getters and, in the
+      generated Overview, shows a plain-language advisory ("your balance can change with no transfer, and
+      a transfer may deliver a different amount than you type"). Pure shape detection (any fork). Unit-
+      tested in `standards.test.ts` (3 shapes + 2 negatives).
+- [ ] **Remaining token/standard shapes:** ERC-1155 nuances, fee-on-transfer (needs a transfer
+      simulation, not ABI-detectable) — via shape/simulation, applicable to any contract.
 - [ ] **Non-OZ governance:** Governor Bravo/Alpha _shapes_ (by function shape, not by named
       protocol).
 - [x] **Event-based inference.** `corroborateWithEvents` (classifier) lines up a writer with the
@@ -188,6 +196,12 @@ owner()/admin/...)`, `_checkOwner()`, `_checkRole(ROLE)`, `hasRole(ROLE, msg.sen
 
 ## Log
 
+- 2026-07-26: **rebasing / share-based token detection** — new `rebasing` shape detector for stETH-,
+  aToken- and AMPL-style tokens (share/scaled balance or elastic supply), gated on the ERC-20 core.
+  Labels the share getters and adds a plain-language Overview advisory that `balanceOf` can change with
+  no transfer. Fee-on-transfer deliberately left out — it can't be told from the ABI, only from a
+  transfer simulation (future runtime feature). Unit-tested; corpus unchanged. Overview standard labels
+  extended (ERC-777, permits, Governor, Rebasing).
 - 2026-07-26: **DAI-style `permit` + ERC-777 shapes** — two shape detectors added. `dai-permit`
   recognises the pre-2612 permit (`bool allowed`+`expiry`) so DAI's gasless approve is labelled
   `token-approve/user/high` (was `unknown`); `erc-777` recognises the operator/send surface and flags

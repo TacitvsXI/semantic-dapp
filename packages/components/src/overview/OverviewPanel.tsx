@@ -20,6 +20,11 @@ const STANDARD_LABELS: Record<string, string> = {
   'erc-721': 'ERC-721',
   'erc-1155': 'ERC-1155',
   'erc-4626': 'ERC-4626 Vault',
+  'erc-777': 'ERC-777',
+  'erc-2612': 'ERC-2612 Permit',
+  'dai-permit': 'DAI Permit',
+  rebasing: 'Rebasing',
+  governor: 'Governor',
   ownable: 'Ownable',
   'access-control': 'AccessControl',
   pausable: 'Pausable',
@@ -88,6 +93,14 @@ export function OverviewPanel({
           </div>
         ) : null}
       </div>
+
+      {standards.includes('rebasing') ? (
+        <p className="sd-overview__warn">
+          Rebasing / share-based token: your balance can change with no transfer, and a transfer may
+          deliver a slightly different amount than you type. Check the share getters before relying
+          on exact amounts.
+        </p>
+      ) : null}
 
       {wrongNetwork ? (
         <p className="sd-overview__warn">

@@ -8,6 +8,7 @@ import {
   detectErc2612,
   detectDaiPermit,
   detectErc777,
+  detectRebasing,
   detectGovernor,
 } from './standards.js';
 
@@ -251,6 +252,50 @@ describe('detectErc777', () => {
       // missing authorizeOperator / operatorSend
     ] as unknown as Abi);
     expect(detectErc777(partial).detected).toBe(false);
+  });
+});
+
+describe('detectRebasing', () => {
+  it('detects a Lido-style share-based token', () => {
+    const steth = normalizeAbi([
+      ...erc20CoreAbi,
+      fn('sharesOf', ['address'], ['uint256'], 'view'),
+      fn('getTotalShares', [], ['uint256'], 'view'),
+      fn('getSharesByPooledEth', ['uint256'], ['uint256'], 'view'),
+      fn('getPooledEthByShares', ['uint256'], ['uint256'], 'view'),
+    ] as unknown as Abi);
+    const result = detectRebasing(steth);
+    expect(result.detected).toBe(true);
+    expect(result.confidence).toBeGreaterThanOrEqual(0.6);
+  });
+
+  it('detects an Aave aToken-style scaled-balance token', () => {
+    const aToken = normalizeAbi([
+      ...erc20CoreAbi,
+      fn('scaledBalanceOf', ['address'], ['uint256'], 'view'),
+      fn('scaledTotalSupply', [], ['uint256'], 'view'),
+    ] as unknown as Abi);
+    expect(detectRebasing(aToken).detected).toBe(true);
+  });
+
+  it('detects an AMPL-style elastic supply token', () => {
+    const ampl = normalizeAbi([
+      ...erc20CoreAbi,
+      fn('rebase', ['uint256', 'int256'], ['uint256']),
+    ] as unknown as Abi);
+    expect(detectRebasing(ampl).detected).toBe(true);
+  });
+
+  it('does not flag a plain ERC-20', () => {
+    expect(detectRebasing(normalizeAbi(erc20CoreAbi as unknown as Abi)).detected).toBe(false);
+  });
+
+  it('requires the ERC-20 core (share getters alone are not enough)', () => {
+    const noErc20 = normalizeAbi([
+      fn('sharesOf', ['address'], ['uint256'], 'view'),
+      fn('getPooledEthByShares', ['uint256'], ['uint256'], 'view'),
+    ] as unknown as Abi);
+    expect(detectRebasing(noErc20).detected).toBe(false);
   });
 });
 

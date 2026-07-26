@@ -1,5 +1,5 @@
-import type { ContractModel } from '@semantic-dapp/spec';
-import { detectByMembers, type StandardMember } from './detect.js';
+import type { ContractModel, Evidence } from '@semantic-dapp/spec';
+import { detectByMembers, ERC20_CORE, type StandardMember } from './detect.js';
 import type { FunctionSemantic, StandardDetection, StandardDetector } from './types.js';
 
 const fn = (signature: string, required = true): StandardMember => ({
@@ -498,6 +498,108 @@ export const erc777Detector: StandardDetector = {
   id: 'erc-777',
   detect: detectErc777,
   semantics: ERC777_SEMANTICS,
+};
+
+/* ------------------------- Rebasing / share-based ----------------------- */
+
+// ERC-20 tokens whose *balance* is derived from an internal share / scaled unit,
+// so `balanceOf` can change with no transfer, and a transfer can deliver a
+// slightly different amount than requested. Covers Lido stETH (share-based),
+// Aave aTokens (scaled balance) and AMPL-style elastic supply. Pure shape
+// detection over well-known getters — matches any fork, never a named protocol.
+const REBASING_SEMANTICS: Record<string, FunctionSemantic> = {
+  'sharesOf(address)': {
+    operationType: 'read',
+    audience: 'user',
+    title: 'Share balance',
+    description:
+      'Underlying share balance. The token balance is derived from this and can change ' +
+      'without a transfer (rebasing).',
+    isRead: true,
+  },
+  'getTotalShares()': {
+    operationType: 'read',
+    audience: 'user',
+    title: 'Total shares',
+    isRead: true,
+  },
+  'getSharesByPooledEth(uint256)': {
+    operationType: 'read',
+    audience: 'user',
+    title: 'Shares for amount',
+    isRead: true,
+  },
+  'getPooledEthByShares(uint256)': {
+    operationType: 'read',
+    audience: 'user',
+    title: 'Amount for shares',
+    isRead: true,
+  },
+  'scaledBalanceOf(address)': {
+    operationType: 'read',
+    audience: 'user',
+    title: 'Scaled balance',
+    description:
+      'Balance in internal scaled units; the displayed balance grows over time (rebasing).',
+    isRead: true,
+  },
+  'scaledTotalSupply()': {
+    operationType: 'read',
+    audience: 'user',
+    title: 'Scaled total supply',
+    isRead: true,
+  },
+  'rebase(uint256,int256)': {
+    operationType: 'admin-config',
+    audience: 'admin',
+    title: 'Rebase supply',
+    description: "Adjust total supply — every holder's balance changes proportionally.",
+    isRead: false,
+    risk: 'high',
+  },
+};
+
+export function detectRebasing(model: ContractModel): StandardDetection {
+  const fns = new Set(model.functions.map((f) => f.signature));
+  const erc20 = ERC20_CORE.every((s) => fns.has(s));
+  const lido =
+    fns.has('sharesOf(address)') &&
+    (fns.has('getPooledEthByShares(uint256)') || fns.has('getSharesByPooledEth(uint256)'));
+  const aave = fns.has('scaledBalanceOf(address)') && fns.has('scaledTotalSupply()');
+  const elastic = fns.has('rebase(uint256,int256)');
+  const detected = erc20 && (lido || aave || elastic);
+
+  const matched = Object.keys(REBASING_SEMANTICS).filter((s) => fns.has(s));
+  const evidence: Evidence[] = [];
+  if (detected) {
+    const shape = lido
+      ? 'share-based (stETH-style)'
+      : aave
+        ? 'scaled-balance (aToken-style)'
+        : 'elastic supply (rebase)';
+    evidence.push({
+      source: 'signature',
+      detail: `rebasing: ${shape}; balanceOf can change without a transfer`,
+    });
+    for (const sig of matched) {
+      evidence.push({ source: 'signature', detail: `rebasing: ${sig} present` });
+    }
+  }
+
+  return {
+    standard: 'rebasing',
+    detected,
+    confidence: detected ? 0.85 : 0,
+    evidence,
+    matched,
+    missing: [],
+  };
+}
+
+export const rebasingDetector: StandardDetector = {
+  id: 'rebasing',
+  detect: detectRebasing,
+  semantics: REBASING_SEMANTICS,
 };
 
 /* ------------------------------- Governor ------------------------------- */

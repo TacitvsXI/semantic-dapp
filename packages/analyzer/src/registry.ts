@@ -8,6 +8,7 @@ import {
   erc2612Detector,
   daiPermitDetector,
   erc777Detector,
+  rebasingDetector,
   governorDetector,
 } from './standards.js';
 import {
@@ -26,6 +27,7 @@ export const ALL_DETECTORS: StandardDetector[] = [
   erc2612Detector,
   daiPermitDetector,
   erc777Detector,
+  rebasingDetector,
   erc721Detector,
   erc1155Detector,
   erc4626Detector,
