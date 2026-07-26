@@ -9,6 +9,7 @@ import {
   detectDaiPermit,
   detectErc777,
   detectRebasing,
+  detectFeeOnTransfer,
   detectGovernor,
   detectGovernorBravo,
 } from './standards.js';
@@ -119,6 +120,27 @@ describe('detectErc1155', () => {
   it('detects a canonical ERC-1155', () => {
     const result = detectErc1155(normalizeAbi(erc1155Abi as unknown as Abi));
     expect(result.detected).toBe(true);
+  });
+
+  it('still detects when OZ supply/burnable/mint extensions are present', () => {
+    const extended = normalizeAbi([
+      ...erc1155Abi,
+      fn('totalSupply', ['uint256'], ['uint256'], 'view'),
+      fn('exists', ['uint256'], ['bool'], 'view'),
+      fn('burn', ['address', 'uint256', 'uint256'], []),
+      fn('burnBatch', ['address', 'uint256[]', 'uint256[]'], []),
+      fn('mint', ['address', 'uint256', 'uint256', 'bytes'], []),
+      fn('mintBatch', ['address', 'uint256[]', 'uint256[]', 'bytes'], []),
+    ] as unknown as Abi);
+    const result = detectErc1155(extended);
+    expect(result.detected).toBe(true);
+    expect(result.matched).toEqual(
+      expect.arrayContaining([
+        'totalSupply(uint256)',
+        'burn(address,uint256,uint256)',
+        'mint(address,uint256,uint256,bytes)',
+      ]),
+    );
   });
 });
 
@@ -297,6 +319,32 @@ describe('detectRebasing', () => {
       fn('getPooledEthByShares', ['uint256'], ['uint256'], 'view'),
     ] as unknown as Abi);
     expect(detectRebasing(noErc20).detected).toBe(false);
+  });
+});
+
+describe('detectFeeOnTransfer', () => {
+  it('detects an ERC-20 with the fee-exclusion admin surface', () => {
+    const fot = normalizeAbi([
+      ...erc20CoreAbi,
+      fn('excludeFromFee', ['address'], []),
+      fn('includeInFee', ['address'], []),
+      fn('isExcludedFromFee', ['address'], ['bool'], 'view'),
+    ] as unknown as Abi);
+    const result = detectFeeOnTransfer(fot);
+    expect(result.detected).toBe(true);
+    expect(result.confidence).toBeGreaterThanOrEqual(0.6);
+  });
+
+  it('does not flag a plain ERC-20', () => {
+    expect(detectFeeOnTransfer(normalizeAbi(erc20CoreAbi as unknown as Abi)).detected).toBe(false);
+  });
+
+  it('requires excludeFromFee plus include or isExcluded getter', () => {
+    const onlyExclude = normalizeAbi([
+      ...erc20CoreAbi,
+      fn('excludeFromFee', ['address'], []),
+    ] as unknown as Abi);
+    expect(detectFeeOnTransfer(onlyExclude).detected).toBe(false);
   });
 });
 

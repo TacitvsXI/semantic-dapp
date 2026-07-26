@@ -125,10 +125,18 @@ const ERC1155_MEMBERS: StandardMember[] = [
   fn('isApprovedForAll(address,address)'),
   fn('safeTransferFrom(address,address,uint256,uint256,bytes)'),
   fn('safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)'),
+  // Common OZ / ecosystem extensions (optional — do not affect core detection).
   fn('uri(uint256)', false),
+  fn('totalSupply(uint256)', false), // ERC-1155Supply
+  fn('exists(uint256)', false),
+  fn('burn(address,uint256,uint256)', false), // ERC-1155Burnable
+  fn('burnBatch(address,uint256[],uint256[])', false),
+  fn('mint(address,uint256,uint256,bytes)', false),
+  fn('mintBatch(address,uint256[],uint256[],bytes)', false),
   ev('TransferSingle(address,address,address,uint256,uint256)'),
   ev('TransferBatch(address,address,address,uint256[],uint256[])'),
   ev('ApprovalForAll(address,address,bool)'),
+  ev('URI(string,uint256)'),
 ];
 
 const ERC1155_SEMANTICS: Record<string, FunctionSemantic> = {
@@ -144,6 +152,7 @@ const ERC1155_SEMANTICS: Record<string, FunctionSemantic> = {
     operationType: 'token-transfer',
     audience: 'user',
     title: 'Batch transfer',
+    description: 'Transfer amounts of several token ids in one call.',
     isRead: false,
     risk: 'medium',
   },
@@ -152,6 +161,37 @@ const ERC1155_SEMANTICS: Record<string, FunctionSemantic> = {
     audience: 'user',
     title: 'Approve all',
     description: 'Allow an operator to manage all of your tokens.',
+    isRead: false,
+    risk: 'high',
+  },
+  'burn(address,uint256,uint256)': {
+    operationType: 'token-burn',
+    audience: 'user',
+    title: 'Burn tokens',
+    description: 'Destroy an amount of a token id from an account (needs allowance or self).',
+    isRead: false,
+    risk: 'medium',
+  },
+  'burnBatch(address,uint256[],uint256[])': {
+    operationType: 'token-burn',
+    audience: 'user',
+    title: 'Burn batch',
+    isRead: false,
+    risk: 'medium',
+  },
+  'mint(address,uint256,uint256,bytes)': {
+    operationType: 'token-mint',
+    audience: 'admin',
+    title: 'Mint tokens',
+    description: 'Create supply of a token id for an account. Usually privileged.',
+    isRead: false,
+    risk: 'high',
+  },
+  'mintBatch(address,uint256[],uint256[],bytes)': {
+    operationType: 'token-mint',
+    audience: 'admin',
+    title: 'Mint batch',
+    description: 'Create supply of several token ids. Usually privileged.',
     isRead: false,
     risk: 'high',
   },
@@ -168,6 +208,20 @@ const ERC1155_SEMANTICS: Record<string, FunctionSemantic> = {
     isRead: true,
   },
   'uri(uint256)': { operationType: 'read', audience: 'user', title: 'URI', isRead: true },
+  'totalSupply(uint256)': {
+    operationType: 'read',
+    audience: 'user',
+    title: 'Total supply (id)',
+    description: 'Circulating supply of a single token id (ERC-1155Supply).',
+    isRead: true,
+  },
+  'exists(uint256)': {
+    operationType: 'read',
+    audience: 'user',
+    title: 'Exists',
+    description: 'Whether a token id has been minted (supply > 0).',
+    isRead: true,
+  },
 };
 
 export function detectErc1155(model: ContractModel): StandardDetection {
@@ -600,6 +654,78 @@ export const rebasingDetector: StandardDetector = {
   id: 'rebasing',
   detect: detectRebasing,
   semantics: REBASING_SEMANTICS,
+};
+
+/* --------------------------- Fee-on-transfer ---------------------------- */
+
+// Tokens that skim a fee on transfer can't be proven from the ABI alone (needs a
+// live transfer simulation). What *can* be detected safely is the common admin
+// surface used to manage those fees across many forks: exclude/include + a
+// boolean getter. False positives on USDC/DAI/WETH are near zero; false negatives
+// remain for FoT tokens that hide the fee with no admin toggles.
+const FOT_EXCLUDE = 'excludeFromFee(address)';
+const FOT_INCLUDE = 'includeInFee(address)';
+const FOT_IS_EXCLUDED = 'isExcludedFromFee(address)';
+
+const FEE_ON_TRANSFER_SEMANTICS: Record<string, FunctionSemantic> = {
+  [FOT_EXCLUDE]: {
+    operationType: 'admin-config',
+    audience: 'admin',
+    title: 'Exclude from fee',
+    description: 'Stop charging transfer fees for an address.',
+    isRead: false,
+    risk: 'medium',
+  },
+  [FOT_INCLUDE]: {
+    operationType: 'admin-config',
+    audience: 'admin',
+    title: 'Include in fee',
+    description: 'Resume charging transfer fees for an address.',
+    isRead: false,
+    risk: 'medium',
+  },
+  [FOT_IS_EXCLUDED]: {
+    operationType: 'read',
+    audience: 'user',
+    title: 'Is excluded from fee',
+    isRead: true,
+  },
+};
+
+export function detectFeeOnTransfer(model: ContractModel): StandardDetection {
+  const fns = new Set(model.functions.map((f) => f.signature));
+  const erc20 = ERC20_CORE.every((s) => fns.has(s));
+  const hasExclude = fns.has(FOT_EXCLUDE);
+  const hasToggle = fns.has(FOT_INCLUDE) || fns.has(FOT_IS_EXCLUDED);
+  const detected = erc20 && hasExclude && hasToggle;
+
+  const matched = Object.keys(FEE_ON_TRANSFER_SEMANTICS).filter((s) => fns.has(s));
+  const evidence: Evidence[] = [];
+  if (detected) {
+    evidence.push({
+      source: 'signature',
+      detail:
+        'fee-on-transfer: fee-exclusion admin surface present; recipient may receive less than sent',
+    });
+    for (const sig of matched) {
+      evidence.push({ source: 'signature', detail: `fee-on-transfer: ${sig} present` });
+    }
+  }
+
+  return {
+    standard: 'fee-on-transfer',
+    detected,
+    confidence: detected ? 0.8 : 0,
+    evidence,
+    matched,
+    missing: [],
+  };
+}
+
+export const feeOnTransferDetector: StandardDetector = {
+  id: 'fee-on-transfer',
+  detect: detectFeeOnTransfer,
+  semantics: FEE_ON_TRANSFER_SEMANTICS,
 };
 
 /* ------------------------------- Governor ------------------------------- */

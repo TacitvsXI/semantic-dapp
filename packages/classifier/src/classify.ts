@@ -8,6 +8,7 @@ import {
 import { classifyFunction } from './rules.js';
 import { enrichOperations } from './enrich.js';
 import { corroborateWithEvents } from './events.js';
+import { annotateFeeOnTransfer } from './warnings.js';
 
 export interface ClassificationResult {
   operations: OperationDefinition[];
@@ -41,6 +42,8 @@ export function classifyContract(
   // evidence + a small confidence nudge; never changes routing).
   operations = corroborateWithEvents(operations, model.events);
   if (options.docs) operations = enrichOperations(operations, options.docs);
+  // Soft advisory when the fee-exclusion admin surface was detected (additive).
+  operations = annotateFeeOnTransfer(operations, standards.detected);
 
   return { operations, standards: standards.detected, detections: standards.detections };
 }

@@ -24,6 +24,7 @@ const STANDARD_LABELS: Record<string, string> = {
   'erc-2612': 'ERC-2612 Permit',
   'dai-permit': 'DAI Permit',
   rebasing: 'Rebasing',
+  'fee-on-transfer': 'Fee-on-transfer',
   governor: 'Governor',
   'governor-bravo': 'Governor Bravo/Alpha',
   ownable: 'Ownable',
@@ -101,6 +102,13 @@ export function OverviewPanel({
           Rebasing / share-based token: your balance can change with no transfer, and a transfer may
           deliver a slightly different amount than you type. Check the share getters before relying
           on exact amounts.
+        </p>
+      ) : null}
+
+      {standards.includes('fee-on-transfer') ? (
+        <p className="sd-overview__warn">
+          Fee-on-transfer token: a transfer may deliver less than the amount you enter (the contract
+          skims a fee). Prefer Preview / dry-run and verify the recipient balance.
         </p>
       ) : null}
 

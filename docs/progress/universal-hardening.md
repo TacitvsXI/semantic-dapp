@@ -73,8 +73,8 @@ else degrades to Raw. The two make-or-break gaps are **proxy resolution** and
       instead of a false `admin` label. Verified via the corpus (WETH/BAYC/Uniswap diffs are
       intended) and unit-tested. Remaining verbs (`burn`, `deposit`, `claim`, `set*`) reviewed
       and left as-is.
-- [ ] **Risk heuristic precision.** `payable` alone shouldn't imply medium risk for
-      obvious user deposits; `upgrade`/`setAdmin`/`migrate` stay high.
+- [x] **Risk heuristic precision.** Done under admin/permission section below (`payable` is a
+      medium floor; destructive names stay high).
 
 ### P0 — proxy transparency & robustness
 
@@ -86,10 +86,8 @@ else degrades to Raw. The two make-or-break gaps are **proxy resolution** and
       (canonical + PUSH0 bytecode), legacy `implementation()` getters (EIP-1822/OZ pre-1967,
       code-verified to avoid false positives), and Gnosis Safe `masterCopy()`. Beacon +
       explorer-reported implementation were already handled. Unit-tested in `proxy.test.ts`.
-- [~] **Proxy UX in the renderer/studio:** banner shipped (shows kind + implementation
-  address when known). Still TODO: a manual-override address/ABI field to re-resolve the
-  implementation in one click. Aragon `AppProxyUpgradeable` / Compound `*Delegator`
-  shapes also still pending.
+- [x] **Proxy UX in the renderer/studio:** banner + manual implementation override shipped;
+      Aragon/`*Delegator` shapes shipped under P1.
 
 ### P0 — admin/permission correctness (the core for custody & devs)
 
@@ -155,8 +153,15 @@ owner()/admin/...)`, `_checkOwner()`, `_checkRole(ROLE)`, `hasRole(ROLE, msg.sen
       generated Overview, shows a plain-language advisory ("your balance can change with no transfer, and
       a transfer may deliver a different amount than you type"). Pure shape detection (any fork). Unit-
       tested in `standards.test.ts` (3 shapes + 2 negatives).
-- [ ] **Remaining token/standard shapes:** ERC-1155 nuances, fee-on-transfer (needs a transfer
-      simulation, not ABI-detectable) — via shape/simulation, applicable to any contract.
+- [x] **ERC-1155 nuances.** Optional OZ/ecosystem surface on the existing `erc-1155` detector:
+      `totalSupply(uint256)`/`exists(uint256)` (Supply), `burn`/`burnBatch` (Burnable),
+      `mint`/`mintBatch` (privileged supply), `URI` event. Core detection unchanged; mint is
+      `token-mint/admin/high`, burns are user/medium. Unit-tested.
+- [x] **Fee-on-transfer (shape + advisory).** Cannot prove a fee from the ABI alone; instead we
+      detect the common fee-exclusion admin surface (`excludeFromFee` + `includeInFee` /
+      `isExcludedFromFee`) on an ERC-20 — near-zero false positives on clean tokens. Labels those
+      admin ops, annotates `token-transfer` writers with a plain-language warning, and shows an
+      Overview advisory. Live balance-delta simulation remains a future runtime nicety.
 - [x] **Non-OZ governance (Governor Bravo/Alpha shapes).** New `governor-bravo` detector for the
       Compound-style surface used by Uniswap/ENS/many forks: 5-arg
       `propose(address[],uint256[],string[],bytes[],string)` (signatures[]), id-based
@@ -206,6 +211,9 @@ owner()/admin/...)`, `_checkOwner()`, `_checkRole(ROLE)`, `hasRole(ROLE, msg.sen
 
 ## Log
 
+- 2026-07-26: **P1 tails closed** — ERC-1155 supply/burnable/mint semantics; fee-on-transfer via
+  fee-exclusion admin shape + transfer advisory/Overview warn (honest: ABI can't prove the fee,
+  only the management surface). P1 coverage checklist complete aside from eternal runtime FoT sim.
 - 2026-07-26: **EIP-2535 diamond facets** — loupe `facetAddresses()` detection, per-facet ABI fetch +
   selector-deduped merge, diamond stays call target. Studio banner for facet count /
   unresolvedFacets; `diamondCut` → upgrade/critical. Closes the multi-contract/diamond P2 item
