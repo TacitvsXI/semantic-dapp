@@ -71,7 +71,7 @@
     "@semantic-dapp/classifier": "workspace:*",
     "@semantic-dapp/export": "workspace:*",
     "@semantic-dapp/spec": "workspace:*",
-    "@types/node": "^22.10.2",
+    "@types/node": "^26.1.1",
     "@typescript-eslint/eslint-plugin": "^8.65.0",
     "@typescript-eslint/parser": "^8.65.0",
     "eslint": "^9.17.0",
